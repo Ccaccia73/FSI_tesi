@@ -1,0 +1,35 @@
+\chapter{Introduction}
+\label{cha:intro}
+
+
+% Interaction between a fluid and a solid happens everywhere
+
+
+% TODO: initial claim, magari da limare
+
+~\ac{FSI} is present in various forms both in nature and in man-made systems. A leaf fluttering in the wind, groundwater flow and the heart pumping blood in artery are typical examples of fluid-structure interaction in nature. Fluid-structure interaction for engineered systems occurs in modeling the behavior of turbomachinery, the flight characteristics of an aircraft, or the interaction of a building with the wind, just to name a few examples.
+
+All the aforementioned problems go under the same  category of FSI, even if the nature of the interaction between the solid and fluid is different. Specifically, the intensity of the exchanged quantities and the effect in the fluid and solid domains vary among different problems.
+
+%While many problems involve solid deformation as an integral part, there are many man-made problems in which the solid may be considered to move as a rigid body. It is also possible to have one-directional coupling between the fluid and solid in certain problems. For the sake of completeness and clarity, we classify the subject below.
+There can be multiple ways to classify FSI problems, based on the flow physics and the on the behavior of the body. Incompressible flow assumption is always made for liquid-solid interaction, while both compressible and incompressible flow assumptions are made when a gas interacts with a solid, depending on the flow properties and the kind of simulation. The main application of air-solid interaction is in the determination of aerodynamic forces on structures such as aircraft wings. Such study is often referred to as aeroelasticity. Dynamic aeroelasticity is the topic that normally investigates the interaction between aerodynamic, elastic, and inertial forces. Aerodynamic flutter is one of the severe consequences of dynamic aerodynamic forces and responsible for destructive effects in structures and it is a significant example of FSI problem.
+
+The subject may also be classified considering the behavior of the structure interacting with the fluid: the solid can be assumed rigid or deforming because of the fluid forces. Examples where rigid body assumption may be used include internal combustion engines, turbines, ships, and offshore platforms. The rigid body–fluid interaction problem is simpler to some extent, nevertheless the dynamics of rigid body motion requires a solution that reflects the fluid forces.
+Examples of deforming body–fluid interaction include aeroelasticity, biomedical applications and poroelasticity. Both the rigid body and deforming body interaction with a fluid is often strongly coupled, influencing both fluid and solid forces. Within the deformable body–fluid interaction, the nature of the deforming body may vary from very simple linear elastic models in small strain to highly complex nonlinear deformations of inelastic materials.
+%The material may also be compressible or nearly incompressible in nature.
+
+
+Physical models aren't the only way in which FSI problems can be classified. The solution procedure employed plays a key role in building models and algorithms to solve this kind of problems. The two main approaches are: the \textit{monolithic approach} in which both fluid and solid are treated as one single system and the \textit{partitioned approach} in which fluid and solid are considered as two separated systems coupled only through an interface. This latter approach is often preferred when building new solution procedures as it allows to use solvers that have been already developed, tested and optimized for a specific domain. The solvers only need to be linked to a third component, which takes care of all the interaction aspects.
+The partitioned approach can be further classified considering the coupling between the fluid and solid: the solution may be carried out using a \textit{weakly coupled approach}, in which the two solvers advance without synchronization, or a \textit{strongly coupled approach}, in which the solution for all the physics must be synchronized at every time step. Although the weakly coupled approach is used in some aerodynamic applications, it is seldom used in other areas due to instability issues. A strongly coupled approach is generally preferred, even though this leads to more complex procedures of coupling procedures at the interface between the fluid and solid.
+
+ This \textit{partitioned approach} has been considered in this thesis in order to couple ~\ac{MBDyn} with the multiphysics coupling library ~\ac{preCICE} and then with any CFD solver. For this purpose, some "glue-code" (i.e. a \textit{preCICE adapter}) has been developed, to share the required data and control elements between MBDyn and the coupling library preCICE.
+
+%Due to the emergence of immersed boundary methods in the last two decades, a further classification based on immersed boundary methods or nonconforming mesh methods may also be used. In an immersed boundary method the structure is assumed to be immersed into the fluid and the forces are transferred between fluid and solid boundaries. Since only interface forces require transferring, the need for conforming meshes is eliminated in such methods. These methods are useful in complex problems of fluid–structure interaction in which complex mesh regeneration may be difficult to carry out.
+
+%Fluid-structure interaction is an interdisciplinary subject of interest to many researchers in the field of fluid dynamics. The finite element method has been at the forefront of research in this important area.
+The thesis is structured as follows. Section \ref{cha:physics} introduces the reader to FSI problems and their complexity, with particular attention to the physical description of the fluid and solid domains and the interface. 
+Section \ref{cha:computation} focuses on numerical methods, describing how to computationally deal with these kind of problems: details regarding the different coupling approaches are given here.
+Section \ref{cha:software} explains the features of preCICE that the adapter needs to support and gives a short introduction to MBDyn, explaining the main functionalities of interest.
+Section \ref{cha:adapter} presents the adapter developed in this work, its most important feautere and .
+Section \ref{cha:tests} .
+Finally, section .
