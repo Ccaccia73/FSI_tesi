@@ -2,36 +2,37 @@
 \label{cha:physics}
 
 
-TODO: Intro
+Dynamic models of solids or fluids aim at describing the evolution of an initial configuration through time. Structural mechanics and fluid dynamics use different perspectives when describing the motion of respectively a solid or a fluid particle. When dealing with FSI problems the two approaches need to be combined in order to obtain a suitable description of the two domains and their interface: this aspect is treated in \ref{sec:desc-motion}.
+
+As outlined in the introduction, the fluid and the solid domain of a FSI problem might be described by means of many different models: some of them are outlined in section \ref{sec:models}.  \textit{Dimensional analysis} and the use of dimensionless numbers is a powerful tool used to classify fluid dynamics problems: some of the principles used there can be applied to FSI problems in order to classify them: this can help define and classify FSI problems, as described in section \ref{sec:classification}.
 
 \section{Description of motion}
 \label{sec:desc-motion}
-A fluid in motion is considered and interaction with a solid occurs via deformations of the latter due to
-viscous and/or inviscid forces exerted on the structure by the fluid. The resulting change in shape of
-the structural material also implicates geometrical changes of the fluid domain. This yields different flow
-behavior in reverse. Thus, it is necessary to represent kinematic and dynamic processes formally. Therefore,
-some thoughts concerning the motion of the before mentioned continuum particles must be made.
-In classical continuum mechanics there are two different perspectives ([26]): The Eulerian description,
-which is discussed in Section 2.2.1, and the Lagrangian point of view, which I explain in Section 2.2.2.
-Those two perspectives can be combined to the arbitrary Lagrangean-Eulerian (ALE) method, described
-in Section 2.2.3.
+
+In a FSI model, the fluid in motion deforms the solid because of the forces exerted to the structure. The change in the shape of the solid modifies the fluid domain, causing a different flow behavior. For this reason it is necessary to describe formally the kinematics and the dynamics of the whole process. Classical continuum mechanics considers the motion of particles by means of two different perspectives  \cite{batra2006elements}: the \textit{eulerian description}, briefly described in section \ref{subsec:euler}, and the \textit{lagrangian description}, outlined in section \ref{subsec:lagrange}. Those two perspectives are typically combined into the \textit{~\ac{ALE}} method, described in section \ref{subsec:ALE}.
 
 \subsection{Eulerian perspective}
 \label{subsec:euler}
 
-In a Eulerian perspective the change of quantities of interest (e.g. density, velocity, pressure) is observed
-at spatially fixed locations. In other words, a Eulerian observer does not vary the point of focus during
-different time steps. This is depicted intuitively in Figure 2.1. Located at a certain point in Euclidean
-space, the observer always focuses on the same location, no matter where particles may move. Thus, in
-Eulerian description, quantities can be expressed as functions of a fixed location as well as time. This
-may be denoted by:
+The \textit{eulerian perspective} observes the change of quantities of interest (e.g. density, velocity, pressure) at spatially fixed locations. In other words: the observer does not vary the point of view during different time steps. Thus, quantities can be expressed as functions of time at fixed locations. 
+This is represented by the following notation:
 
 \begin{equation}
 	\Theta = \tilde{\Theta}(x,y,z,t)
 \end{equation}
 
-where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes it in a Eulerian point of view. $(x, y, z)$ represent a fixed position in Euclidean space and t refers to time. Clearly, different particles can occupy the spatial location, which the observer focuses on, at different instances of time. Therefore, in general no direct information regarding the change of quantities of a single particle is available when motion is described
-in a Eulerian perspective ([26]).
+where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes the same quantity form an eulerian point of view; $(x, y, z)$ represent a fixed location in the euclidean space.
+
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/eulerian}
+	\caption{Eulerian perspective}
+	\label{fig:eulerian}
+\end{figure}
+
+A computatinal mesh can be interpreted as a number of observers distributed across the domain of interest and connected to each other in order to form a a grid with nodes. If the particles of the domain move, a purely euclidean mesh does not move and the position othe nodes remain fixed at any instance of time. 
+%where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes it in a Eulerian point of view. $(x, y, z)$ represent a fixed position in Euclidean space and t refers to time. Clearly, different particles can occupy the spatial location, which the observer focuses on, at different instances of time. Therefore, in general no direct information regarding the change of quantities of a single particle is available when motion is described in a Eulerian perspective 26.
 Eventually, a description of motion is needed not only for single particles and points in space, but rather
 computational domains and meshes being central aspects of FSI problems. A computational mesh can be
 interpreted as a number of observers distributed across the domain of interest and connected so as to form
@@ -53,7 +54,8 @@ reference coordinates (or material coordinates) in Euclidean space, $(X, Y, Z)$,
 observed particle at a reference configuration. Often $t = 0$ is chosen as reference but in general any time
 instance can be used. Once the particle to be observed is specified, the Lagrangian observer only registers changes concerning this one particle as time passes. Thus, quantities of interest can be described as
 \begin{equation}
-\Theta = \hat{\Theta}(X, Y,Z, t)
+%\Theta = \hat{\Theta}(X, Y,Z, t)
+a = b
 \end{equation}
 Again, computational domains and meshes are considered: At a reference instance of time, usually at the
 beginning of a simulation, mesh nodes are attached to the underlying material particles. As time passes
@@ -102,6 +104,7 @@ apparent ([32], [10]).
 
 
 \section{Domains and interface}
+\label{sec:models}
 
 As the name fluid-structure interaction implies, this type of problems is determined by the fluid and solid
 domain, covered in Sections 2.3.1 and 2.3.2, respectively. Furthermore, their interaction is of importance,
@@ -129,15 +132,14 @@ volume and an elaborate derivation can be found in [14]. The equations are taken
 \end{eqnarray}
 
 
-$\rho$ denotes density, t time, \textbf{u} flow velocities in all dimensions and p pressure. $\delta_{ij}$
-is the Kronecker delta, $\tau$ the viscous stress tensor, $e_0$ total energy (per unit mass) and \textbf{q} heat flux (via conduction). For a Newtonian fluid the viscous stress tensor is given by
+%rho denotes density, t time, \textbf{u} flow velocities in all dimensions and p pressure. $\delta_{ij}$ is the Kronecker delta, $\tau$ the viscous stress tensor, $e_0$ total energy (per unit mass) and \textbf{q} heat flux (via conduction). For a Newtonian fluid the viscous stress tensor is given by
 
 \begin{equation}
 	\tau_{ij} = -\frac{2}{3}\mu u_{k/k} \delta_{ij}+2\mu S_{ij} \quad \forall i,j = 1,2,3
 \end{equation}
 
 
-With $\mu$ being the dynamic viscosity and \textbf{S} the rate of deformation tensor (symmetric part of the velocity gradient $\nabla u$):
+% With $\mu$ being the dynamic viscosity and \textbf{S} the rate of deformation tensor (symmetric part of the velocity gradient $\nabla u$):
 
 \begin{equation}
 	S_{i,j} = \frac{1}{2}u_{i/j}+u_{j/i} \quad \forall i,j = 1,2,3
@@ -166,14 +168,14 @@ The following explanation is a short version, since this thesis does not focus o
 aspects of FSI problems. It is inspired by and partly taken from [18] and [26], where derivations are given
 to a more detailed level.
 By analogy with the NSE (see Equations 2.5), the description of the solid arises from considering a control
-volume and applying Newton’s Law to it. A typical equation of motion in the form Mass  Acceleration
+% volume and applying Newton Law to it. A typical equation of motion in the form Mass  Acceleration
 = Forces can be derived (again, the general three-dimensional case is considered):
 
-\begin{equation}
+\begin{equation}
 	\rho u_{tt} = S_{ij/j} + \rho f_i \quad \forall i,j = 1,2,3
 \end{equation}
 
-Here,  corresponds to the structure density, the second derivative of the displacements u with respect
+%Here,  corresponds to the structure density, the second derivative of the displacements u with respect
 to time t to the acceleration of a material particle and S to the second Piola-Kirchhoff stress tensor. X
 denotes the material coordinates as mentioned before. In this case, also the volume force f is considered,
 because gravity can often not be ignored for solid materials. Again, a constitutive law must be taken into
@@ -191,10 +193,7 @@ with
 
 Note that E is the Lagrangian (finite) strain tensor. The latter summand in Equation 2.10 is nonlinear
 and can be neglected for small deformations, leading to the Lagrangian infinitesimal strain tensor.
-However, since we deal with possibly large deformations, this relationship remains non-linear. ij again
-refers to the Kronecker delta.  and  are material parameters named Lamé constants. They relate
-directly to Young’s modulus E and Poisson ratio , which are of more practical use1. Their relationship
-is given as follows:
+%However, since we deal with possibly large deformations, this relationship remains non-linear. ij again refers to the Kronecker delta.  and  are material parameters named Lamé constants. They relate directly to Young’s modulus E and Poisson ratio , which are of more practical use1. Their relationship is given as follows:
 
 \begin{eqnarray}
 	E &=& \frac{\mu(3\lambda+2\mu)}{\lambda + \mu} \\
@@ -202,7 +201,7 @@ is given as follows:
 \end{eqnarray}
 
 
-Either (E; $\nu$) or ($\lambda$; $\mu$ ) are enough to fully characterize this material under specific assumptions:
+%Either (E; $\nu$) or ($\lambda$; $\mu$ ) are enough to fully characterize this material under specific assumptions:
 
 \begin{itemize}
 	\item The solid is linearly elastic and isotropic. 
@@ -210,8 +209,8 @@ Either (E; $\nu$) or ($\lambda$; $\mu$ ) are enough to fully characterize thi
 	\item as well as the stress tensor S. 
 \end{itemize}
 
- 
- Furthermore, a scalar, positive definite strain energy density function (not shown in this shortened
+
+Furthermore, a scalar, positive definite strain energy density function (not shown in this shortened
 explanation) relating stress and strain tensor via a potential formulation exists.
 For more sophisticated explanations the interested reader may refer to [26].
 
@@ -248,11 +247,11 @@ respectively. They have to be equal and opposite leading to the dynamic coupling
 \sigma_F \cdot \hat{n}_F = -\sigma_S \cdot \hat{n}_F
 \end{equation}
 
-$\sigma $ 2 R33 denotes the stress tensor and n 2 R3 the outward normal vector of the fluid and solid domain.
+%$\sigma$ 2 R33 denotes the stress tensor and n 2 R3 the outward normal vector of the fluid and solid domain.
 Note that here viscous as well as inviscid stresses are included.
 
 \section{Classification of FSI problems}
-
+\label{sec:classification}
 you have been interested in the effect of boundary conditions on the flow. For instance, here is the effect of a cylinder that deviates a uniform flow. In fluid mechanics, we consider solids as boundary conditions only,
 and not in terms of what they are made of.
 In solid mechanics, we usually consider fluids just as the cause of a loading at the boundary, a force type boundary condition. These two approaches are very useful, and I extensively used in engineering. For instance, in civil engineering you may find engineers that compute wind loads on a bridge. And then send them to other engineers that will check that this is acceptable in terms of the solid mechanics of the bridge. This is often quite sufficient.

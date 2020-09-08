@@ -140,16 +140,13 @@ taking into account inertial effects not only of the solid itself, but also of t
 artificially rests for the span of a single structure solver time step. In more descriptive words: Moving the
 solid also implies moving fluid particles close to the solid. Therefore, the structure behaves more inert
 due to artificially added mass ([42], [2]). Since inertia is dependent on mass and therefore density, the
-AME is also. More precisely, it is dependent on the ratio (MA) of structural (S) und fluid density (F )
+% AME is also. More precisely, it is dependent on the ratio (MA) of structural (S) und fluid density (F )
 ([42], [5]):
-MA =
-S
-F
-: (3.1)
+%MA = S F : (3.1)
 This ratio is often used to describe how strong the interaction between solid and fluid is. For cases, in
-which the solid density is much higher than the fluid density (MA  1), this effect does not dominantly
+%which the solid density is much higher than the fluid density (MA  1), this effect does not dominantly
 influence the FSI problem (weak interaction). But as fluid and structure densities approach each other
-(MA  1) or the fluid becomes even denser than the solid (MA < 1), its consideration is crucial (strong
+%(MA  1) or the fluid becomes even denser than the solid (MA < 1), its consideration is crucial (strong
 interaction) and imposes stability limits on partitioned solution techniques ([5], [42], [2]). Note that the
 AME is not only governed by the density ratio of Equation 3.1 but also by geometric properties of the
 problem, the stiffness of the solid ([5]) and the speed of sound in the flow domain ([42]). Nonetheless,
