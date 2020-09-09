@@ -19,6 +19,7 @@ This is represented by the following notation:
 
 \begin{equation}
 	\Theta = \tilde{\Theta}(x,y,z,t)
+	\label{eq:eulerian}
 \end{equation}
 
 where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes the same quantity form an eulerian point of view; $(x, y, z)$ represent a fixed location in the euclidean space.
@@ -31,77 +32,84 @@ where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes the same q
 	\label{fig:eulerian}
 \end{figure}
 
-A computatinal mesh can be interpreted as a number of observers distributed across the domain of interest and connected to each other in order to form a a grid with nodes. If the particles of the domain move, a purely euclidean mesh does not move and the position othe nodes remain fixed at any instance of time. 
-%where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes it in a Eulerian point of view. $(x, y, z)$ represent a fixed position in Euclidean space and t refers to time. Clearly, different particles can occupy the spatial location, which the observer focuses on, at different instances of time. Therefore, in general no direct information regarding the change of quantities of a single particle is available when motion is described in a Eulerian perspective 26.
-Eventually, a description of motion is needed not only for single particles and points in space, but rather
-computational domains and meshes being central aspects of FSI problems. A computational mesh can be
-interpreted as a number of observers distributed across the domain of interest and connected so as to form
-a grid with nodes. If particles of the underlying domain move, a purely Eulerian mesh does not change
-the positions of its nodes throughout the whole mesh at different instances of time. This is graphically
-shown in Figure 2.2. Since this behavior of the mesh is independent of large-scale movements of particles,
-it is the typical choice for CFD problems, where in general fluid particles move throughout the whole
-computational domain. However, this approach also has its drawbacks as the level of refinement of the
-mesh is crucial to the accuracy of computations because it defines to what extent small-scale changes can
-be observed. If a mesh is of a much coarser scale than the motion occurring in the underlying domain,
-the motion cannot be resolved ([10], [26]).
+A computational mesh can be interpreted as a number of observers distributed across the domain of interest and connected to each other in order to form a a grid with nodes. If the particles of the domain move, a purely euclidean mesh does not move and the position other nodes remain fixed at any instance of time \cite{Cheng2006SlidingFL}. 
+This behavior is represented in Figure \ref{fig:eulerian} (adapted from \cite{Cheng2006SlidingFL}). The mesh is independent of particles movement, resulting in a convenient choice for ~\ac{CFD} problems, where fluid flows throughout the whole
+computational domain. Within this approach, proper mesh refinement is crucial for computational accuracy as it defines to what extent small scale movement can be modeled and resolved \cite{donea2017arbitrary}.
 
 \subsection{Lagrangian perspective}
 \label{subsec:lagrange}
 
-A Lagrangian description implies that the observer focuses on a specific particle and follows it, regardless of the speed and distance it may travel. Therefore, provided that the particle moves, changes of the quantities of interest are observed at different spatial locations. The Lagrangian observer tracks a particle and moves with it, as illustrated in Figure 2.3.
-The motion of the particle as well as all other quantities of interest, can therefore be described by
-reference coordinates (or material coordinates) in Euclidean space, $(X, Y, Z)$, uniquely identifying the
-observed particle at a reference configuration. Often $t = 0$ is chosen as reference but in general any time
-instance can be used. Once the particle to be observed is specified, the Lagrangian observer only registers changes concerning this one particle as time passes. Thus, quantities of interest can be described as
+A \textit{lagrangian observer} focuses on a single particles and follows it throughout the motion, as depicted in Figure \ref{fig:lagrangian}. Changes in the quantities of interest are observed at different spatial locations. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/lagrangian}
+	\caption{Lagrangian perspective}
+	\label{fig:lagrangian}
+\end{figure}
+
+The motion of the particle and the other quantities of interest can be described by reference coordinates (or \textit{material coordinates}) in Euclidean space $(X, Y, Z)$, uniquely identifying the observed particle at a reference configuration \cite{XING201957}. Usually $t = 0$ is chosen as reference but this is not mandatory. The Lagrangian observer only registers changes concerning one specific particle as time advances. Thus, quantities of interest can be described as:
+
 \begin{equation}
-%\Theta = \hat{\Theta}(X, Y,Z, t)
-a = b
+	\Theta = \hat{\Theta}(X, Y, Z, t)
 \end{equation}
-Again, computational domains and meshes are considered: At a reference instance of time, usually at the
-beginning of a simulation, mesh nodes are attached to the underlying material particles. As time passes
-and particles move, the mesh nodes move with them causing the mesh to deform (except for cases in
-which all particles move smoothly with equal speed and distance). Figure 2.4 depicts such a situation.
-As it can be seen, the mesh nodes always coincide with their respective particles. A drawback of this
-Lagrangian technique is that large-scale and irregular motions lead to distortions of the computational
-mesh, which yields smaller accuracy in simulations as a consequence of the strictly enforced tracking.
-However, from this point of view, small-scale motions, which often occur in solids, can easily be observed
-without the need of using extremely fine meshes, which would be necessary in case a Eulerian perspective
-was used. This results in reduced computational effort. Therefore, in general, the Lagrangian description
-is the method of choice for CSM problems ([10], [26]).
-Eulerian and Lagrangian descriptions are related. A mapping between them can be derived if the motion
-is known:
+
+In contrast to the eulerian perspective (Equation \ref{eq:eulerian}), the obtained information is strictly limited to a single material particle (implied by the usage of the capital reference coordinate variables). 
+Information about a fixed point in space is not directly available and no convective fluxes appear in a Lagrangian description.
+
+This perspective is again translated into computational meshes: at a reference instance of time, mesh nodes are attached to material particles. As these move, the mesh nodes move with them causing the mesh to deform. Figure \ref{fig:lagrangian} describes the situation. The mesh nodes always coincide with their respective particles.
+
+In this situation large-scale and irregular motions and more importantly deformation lead to distortions of the computational mesh, which yields smaller accuracy in simulations requiring to apply techniques to keep the desired accuracy \cite{lipton2010robustness}.
+
+Lagrangian perspective is the usual method of choice for ~\ac{CSM} simulations.
+
+Eulerian and Lagrangian descriptions are related \cite{bertram2012elasticity}. A mapping between them can described by the \textit{motion} function $\phi$ such that:
+
+
 \begin{equation}
-x_i = X_i + u_i(X_i, t) \quad \forall i = 1, 2, 3
+\vec{x}(t) = \phi(\vec{X}, t)
+\label{eq:lag-motion}
 \end{equation}
-Equation 2.4 can be explained as follows: The Eulerian, spatial position x of a particle at time t is the
-position of this particle at its reference configuration X plus the displacements u that it traveled since
-the point of time of the reference state ([26]).
+
+Equation \ref{eq:lag-motion} tells that he eulerian, spatial position $\vec{x}$ of a particle at time t is the
+mapping of the particle at its reference configuration $\vec{X}$: the mapping must be bijective.
 
 \subsection{ALE method}
 \label{subsec:ALE}
 
-Finally, I explain the ALE approach, a combination of the Eulerian and Lagrangian perspective widely
-used for FSI problems. As the name implies, an ALE observer can arbitrarily decide whether to move
-the point of focus or not. Furthermore, the observer is in no way restricted to the movement of particles.
-Figure 2.5 depicts such a situation. The observer moves independently of the particle motion.
-By analogy with the Eulerian and Lagrangian meshes before, an ALE mesh is considered as it can be seen
-from a Eulerian perspective in Figure 2.6. Mesh nodes can move almost arbitrarily regarding the motion
-of the underlying particles. The only restriction is, that node movements should not distort the mesh too
-much as this leads to inaccuracy. It is reasonable to allow the nodes to follow moving particles up to a
-certain extent, which is defined by mesh quality criteria. Since this approach does not allow to directly link mesh motion and material particle motion, a new unknown is introduced to such a problem, namely
-the relative movement between the ALE mesh and the material domain. This approach is especially
-interesting for FSI problems because it is an alternative description to the Eulerian frame for the fluid
-domain. As it is further explained in Section 2.3.3, fluid and solid material have to follow the moving
-interface between them for physical reasons. Since the solid domain is usually described in a Lagrangian
-view, there is no problem with keeping the solid mesh attached to the FSI interface. However, if a purely
-Eulerian approach was used for the fluid domain, movements of the interface would lead to gaps between
-the wet surface and the fluid mesh. Therefore, in ALE methods the fluid mesh nodes at the interface
-always move with it. This can be interpreted as Lagrangian fashion of the approach, as fluid mesh nodes
-follow the fluid particles sticking to the interface, while the rest of the fluid mesh is allowed to move
-in such way that mesh distortions are kept minimal in order to preserve computational accuracy. Since
-preserving mesh regularity refers more to a Eulerian approach, the choice of the name ALE becomes
-apparent ([32], [10]).
+As outlined above, CSM and CFD problems adopt different perspectives. The ~\ac{ALE} approach, a combination of the two points of view, is used for FSI problems. As the name implies, an ALE observer moves arbitrarily with respect to a specific material particle.
+Figure \ref{fig:ale} depicts such a situation.
 
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/ale}
+	\caption{ALE perspective}
+	\label{fig:ale}
+\end{figure}
+
+When dealing with computational meshes, an ALE mesh is considered as it can move almost arbitrarily with respect to the motion of the underlying particles, as shown in Figure \ref{fig:ale-mesh}.
+The only constraint is that node movements should not distort the mesh too much as this leads to computational inaccuracy. Many algorithm exist to implement suitable quality criteria and keep the mesh motion reasonable and to allow the nodes to follow moving particles up to a certain extent \cite{de2007mesh}.
+
+Since the mesh motion and material particle motion are not directly linked, a new unknown is introduced:  the relative movement between the ALE mesh and the material domain. This approach is particularly useful in FSI problems: fluid and solid must follow the moving interface between them for physical reasons.
+Since the solid domain is usually described in a lagrangian perspective, the solid mesh is kept attached to the FSI interface. However, also the fluid domain must deform to avoid formation of gaps between the meshes. Therefore, in ALE methods the fluid mesh nodes at the interface move with it. Fluid mesh nodes follow the fluid particles sticking to the interface (for viscous flows), while the rest of the fluid mesh is allowed to move in such way that mesh distortions are kept minimal, to preserve computational accuracy \cite{ramm1998fluid}.
+
+\begin{figure}[htbp!]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.99\linewidth]{images/undist}
+		\caption{undistorted mesh}
+		\label{fig:undist}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.99\linewidth]{images/dist}
+		\caption{distorted mesh}
+		\label{fig:dist}
+	\end{subfigure}
+	\caption{ALE mesh}
+	\label{fig:ale-mesh}
+\end{figure}
 
 \section{Domains and interface}
 \label{sec:models}
