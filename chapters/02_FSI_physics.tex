@@ -9,12 +9,12 @@ As outlined in the introduction, the fluid and the solid domain of a FSI problem
 \section{Description of motion}
 \label{sec:desc-motion}
 
-In a FSI model, the fluid in motion deforms the solid because of the forces exerted to the structure. The change in the shape of the solid modifies the fluid domain, causing a different flow behavior. For this reason it is necessary to describe formally the kinematics and the dynamics of the whole process. Classical continuum mechanics considers the motion of particles by means of two different perspectives  \cite{batra2006elements}: the \textit{eulerian description}, briefly described in section \ref{subsec:euler}, and the \textit{lagrangian description}, outlined in section \ref{subsec:lagrange}. Those two perspectives are typically combined into the \textit{~\ac{ALE}} method, described in section \ref{subsec:ALE}.
+In a FSI model, the fluid in motion deforms the solid because of the forces exerted to the structure. The change in the shape of the solid modifies the fluid domain, causing a different flow behavior. For this reason it is necessary to describe formally the kinematics and the dynamics of the whole process. Classical continuum mechanics considers the motion of particles by means of two different perspectives  \cite{batra2006elements}: the \textit{Eulerian description}, briefly described in section \ref{subsec:euler}, and the \textit{Lagrangian description}, outlined in section \ref{subsec:lagrange}. Those two perspectives are typically combined into the \textit{~\ac{ALE}} method, described in section \ref{subsec:ALE}.
 
 \subsection{Eulerian perspective}
 \label{subsec:euler}
 
-The \textit{eulerian perspective} observes the change of quantities of interest (e.g. density, velocity, pressure) at spatially fixed locations. In other words: the observer does not vary the point of view during different time steps. Thus, quantities can be expressed as functions of time at fixed locations. 
+The \textit{Eulerian perspective} observes the change of quantities of interest (e.g. density, velocity, pressure) at spatially fixed locations. In other words: the observer does not vary the point of view during different time steps. Thus, quantities can be expressed as functions of time at fixed locations. 
 This is represented by the following notation:
 
 \begin{equation}
@@ -22,7 +22,7 @@ This is represented by the following notation:
 	\label{eq:eulerian}
 \end{equation}
 
-where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes the same quantity form an eulerian point of view; $(x, y, z)$ represent a fixed location in the euclidean space.
+where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes the same quantity form an Eulerian point of view; $(x, y, z)$ represent a fixed location in the euclidean space.
 
 
 \begin{figure}[htbp!]
@@ -54,7 +54,7 @@ The motion of the particle and the other quantities of interest can be described
 	\Theta = \hat{\Theta}(X, Y, Z, t)
 \end{equation}
 
-In contrast to the eulerian perspective (Equation \ref{eq:eulerian}), the obtained information is strictly limited to a single material particle (implied by the usage of the capital reference coordinate variables). 
+In contrast to the Eulerian perspective (Equation \ref{eq:eulerian}), the obtained information is strictly limited to a single material particle (implied by the usage of the capital reference coordinate variables). 
 Information about a fixed point in space is not directly available and no convective fluxes appear in a Lagrangian description.
 
 This perspective is again translated into computational meshes: at a reference instance of time, mesh nodes are attached to material particles. As these move, the mesh nodes move with them causing the mesh to deform. Figure \ref{fig:lagrangian} describes the situation. The mesh nodes always coincide with their respective particles.
@@ -71,7 +71,7 @@ Eulerian and Lagrangian descriptions are related \cite{bertram2012elasticity}. A
 \label{eq:lag-motion}
 \end{equation}
 
-Equation \ref{eq:lag-motion} tells that he eulerian, spatial position $\vec{x}$ of a particle at time t is the
+Equation \ref{eq:lag-motion} tells that he Eulerian, spatial position $\vec{x}$ of a particle at time t is the
 mapping of the particle at its reference configuration $\vec{X}$: the mapping must be bijective.
 
 \subsection{ALE method}
@@ -91,7 +91,7 @@ When dealing with computational meshes, an ALE mesh is considered as it can move
 The only constraint is that node movements should not distort the mesh too much as this leads to computational inaccuracy. Many algorithm exist to implement suitable quality criteria and keep the mesh motion reasonable and to allow the nodes to follow moving particles up to a certain extent \cite{de2007mesh}.
 
 Since the mesh motion and material particle motion are not directly linked, a new unknown is introduced:  the relative movement between the ALE mesh and the material domain. This approach is particularly useful in FSI problems: fluid and solid must follow the moving interface between them for physical reasons.
-Since the solid domain is usually described in a lagrangian perspective, the solid mesh is kept attached to the FSI interface. However, also the fluid domain must deform to avoid formation of gaps between the meshes. Therefore, in ALE methods the fluid mesh nodes at the interface move with it. Fluid mesh nodes follow the fluid particles sticking to the interface (for viscous flows), while the rest of the fluid mesh is allowed to move in such way that mesh distortions are kept minimal, to preserve computational accuracy \cite{ramm1998fluid}.
+Since the solid domain is usually described in a Lagrangian perspective, the solid mesh is kept attached to the FSI interface. However, also the fluid domain must deform to avoid formation of gaps between the meshes. Therefore, in ALE methods the fluid mesh nodes at the interface move with it. Fluid mesh nodes follow the fluid particles sticking to the interface (for viscous flows), while the rest of the fluid mesh is allowed to move in such way that mesh distortions are kept minimal, to preserve computational accuracy \cite{ramm1998fluid}.
 
 \begin{figure}[htbp!]
 	\centering
@@ -114,117 +114,123 @@ Since the solid domain is usually described in a lagrangian perspective, the sol
 \section{Domains and interface}
 \label{sec:models}
 
-As the name fluid-structure interaction implies, this type of problems is determined by the fluid and solid
-domain, covered in Sections 2.3.1 and 2.3.2, respectively. Furthermore, their interaction is of importance,
-which underlines the necessity of suitable coupling conditions at the domain common interface. The
-interface is also referred to as wet surface. Its formal definition is stated in Section 2.3.3
+Fluid-structure interaction implies that the overall model is determined by models defining the fluid behavior and the solid behavior, briefly described in sections \ref{sec:solid} and \ref{sec:fluid}. A short overview of beam models is given in section \ref{sec:beam} as it is relevant for the model developed in this work.
+Finally a formal definition of the interface is given in section \ref{sec:interface}, as it is necessary to define suitable coupling conditions at the common boundary of the solid and the fluid.
+
 
 \subsection{Fluid domain}
+\label{sec:fluid}
 
-In the following, all of my considerations are limited to viscous Newtonian flows in the compressible
-regime as this kind of model is the only relevant one for this thesis. Nevertheless, I want to point out that
-throughout the FSI community also incompressible and inviscid flow regimes are commonly considered,
-depending on the type of physical problem.
-The before mentioned kind of flow is described by the Navier-Stokes equations (NSE), which I consider
-in the general three-dimensional case in a Eulerian description. They consist of the continuity equation
-(conservation of mass, Equation 2.5a), the momentum equation (conservation of momentum, Equation
-2.5b) and the energy equation (conservation of energy, Equation 2.5c). The equations are shown in index
-notation. Repeated indices imply Einstein’s summation convention. For a detailed explanation of this
-convention, I refer to [26]. The NSE are usually derived by applying Newton’s Law to a fluid control
-volume and an elaborate derivation can be found in [14]. The equations are taken from [26] and [14].
+An exhaustive description of all possible fluid models is far beyond the scope of this work. A quite general model is the viscous compressible one described by the ~\ac{NSE}. 
 
+\begin{subequations}
 \begin{eqnarray}
-	\rho_t + \left(\rho u_j\right)_j &=&  0 \\
-	\left(\rho u_i\right)_i + \left(\rho u_i u_j +p\delta_{ij} -\tau_{ij}\right)_j &=& 0 \quad \forall i,j = 1,2,3 \\
-	\left(\rho e_0\right)_t + \left(\rho e_0 u_j +u_jp + q_j -u_i \tau_{ij}\right)_j &=& 0
+	\label{eq:cont}
+	\frac{\partial{\rho}}{\partial{t}} + \nabla \cdot \left(\rho \vec{v}\right) &=&  0 \\	
+	\label{eq:mom-cons} 
+	\frac{\partial }{\partial t}\left( \rho \vec{v} \right) + \nabla \cdot \left( \rho \vec{v} \otimes \vec{v} \right) +\nabla p - \nabla \cdot \mathbf{\tau} - \rho \vec{g} &=& 0 \\
+	\label{eq:energy-cons}
+	\frac{\partial }{\partial t}\left( \rho e_0  \right) + \nabla \cdot \left( \rho e_0 \vec{v} \right) + \nabla \cdot \left( \vec{v}p + \vec{q} -\vec{v} \cdot \bm{\tau} \right) - \vec{v} \cdot \rho \vec{g} &=& 0
 \end{eqnarray}
+\end{subequations}
 
+where:
+\begin{itemize}
+	\item $\rho$ denotes density
+	\item $\vec{v}$ is flow velocity in all dimensions
+	\item \textit{p} denotes pressure
+	\item $\bm{\tau}$ is the viscous stress tensor
+	\item $\vec{g}$ represents the sum of all body forces
+	\item $e_0$ is the total energy per unit mass
+	\item $\vec{q}$ is the heat flux by conduction
+\end{itemize}
 
-%rho denotes density, t time, \textbf{u} flow velocities in all dimensions and p pressure. $\delta_{ij}$ is the Kronecker delta, $\tau$ the viscous stress tensor, $e_0$ total energy (per unit mass) and \textbf{q} heat flux (via conduction). For a Newtonian fluid the viscous stress tensor is given by
+They consist in the mass conservation equation (\ref{eq:cont}), the conservation of momentum equation (\ref{eq:mom-cons}) and the energy conservation equation (\ref{eq:energy-cons}). For a Newtonian fluid, the viscous stress tensor is given by:
 
 \begin{equation}
-	\tau_{ij} = -\frac{2}{3}\mu u_{k/k} \delta_{ij}+2\mu S_{ij} \quad \forall i,j = 1,2,3
+	\label{eq:tau}
+	\bm{\tau} = -\frac{2}{3}\mu \left( \nabla \cdot \vec{v} \right) I +2\mu S
 \end{equation}
 
-
-% With $\mu$ being the dynamic viscosity and \textbf{S} the rate of deformation tensor (symmetric part of the velocity gradient $\nabla u$):
+with $\mu$ being the dynamic viscosity and \textit{S} the rate of deformation tensor (i.e. the symmetric part of the velocity gradient $\nabla \vec{v}$):
 
 \begin{equation}
-	S_{i,j} = \frac{1}{2}u_{i/j}+u_{j/i} \quad \forall i,j = 1,2,3
+	\label{eq:def_tens}
+	\mathbf{S} = \frac{1}{2} \left( \nabla \vec{v} + \nabla \vec{v}^T \right)
 \end{equation}
 
-In order to form a closed set of these partial differential equations (PDE), it is necessary to choose a
-conductive heat flux model (usually Fourier’s Law), specify the caloric and thermodynamic equations of
-state and finally, choose appropriate initial and boundary conditions for the problem ([17], [14], [26]).
+A detailed derivation of such equations and the theory beyond can be found for example in  \cite{quartapelle2013fluidodinamicaI} and \cite{quartapelle2013fluidodinamicaC} or in \cite{pope2001turbulent}. 
 
-Simplification can be done to obtain easier models such as: adiabatic, inviscid, incompressible...
+The set of equations above, even with a Newtonian fluid model, lack some other information in order to form a closed set of ~\ac{PDE}. A conductive heat flux model is needed  (e.g. Fourier’s Law), the caloric and thermodynamic equations of state have to be chosen, a proper turbulence model if needed (see \cite{pope2001turbulent}) and finally, the appropriate initial and boundary conditions for the problem \cite{galdi2011introduction} must be defined.
+
+Simplifications can be done to obtain less sophisticated models such as: adiabatic, inviscid, incompressible, and many others. Dimensional Analysis is a powerful tool to determine to what extent some reduced models are meaningful, and it is widely used in fluid dynamics, as described in section \ref{sec:dimensional}. Most CFD software codes allow to set up simulations with the most suitable model which can be coupled with a solid model to build a FSI problem. Some further details are given in section \ref{sec:monolithic}. 
 
 
 \subsection{Solid domain}
+\label{sec:solid}
 
-As described in Section 2.2.2, in solid mechanics usually a Lagrangian point of view is used (as is here),
-because particles do not travel as far as they do in fluid dynamical problems. Also, the structural model
-explained in this section is limited to the Saint Venant-Kirchhoff model, which is very common since
-it is capable of handling large deformations often occurring in FSI problems ([18]). The model assumes
-that the solid material is homogenous, meaning that mechanical properties of a particle of the body do
-not depend on the location of the particle. In other words, these properties are the same throughout the
-whole solid domain. Moreover, isotropy is assumed, such that the direction in which a stress is applied
-to the solid does not matter, as the mechanical properties of the body are the same in all directions ([26],
-[45]).
+In solid mechanics, particles do not travel as much as they do in fluid dynamic problems, as described in \ref{subsec:lagrange}. For this reason, a Lagrangian perspective is generally used.  
 
-The following explanation is a short version, since this thesis does not focus on the solid mechanical
-aspects of FSI problems. It is inspired by and partly taken from [18] and [26], where derivations are given
-to a more detailed level.
-By analogy with the NSE (see Equations 2.5), the description of the solid arises from considering a control
-% volume and applying Newton Law to it. A typical equation of motion in the form Mass  Acceleration
-= Forces can be derived (again, the general three-dimensional case is considered):
+The  de-Saint Venant-Kirchhoff model \cite{ogden1997non} is very commonly used when describing the movement of a solid: it is also often used in FSI problems ad it is capable of handling large deformation. The material is considered:
+
+\begin{itemize}
+	\item \textit{homogeneous}: the material properties do not depend on the position of the particle
+	\item \textit{linear elastic}: the stress-strain relationship is linear
+	\item \textit{isotropic}: the stress-strain relationship is independent from the direction of the load
+\end{itemize}
+
+A general expression of the dynamic equation can be derived from the ~\ac{VWP} applied to an arbitrary control volume: 
 
 \begin{equation}
-	\rho u_{tt} = S_{ij/j} + \rho f_i \quad \forall i,j = 1,2,3
+	\label{eq:mech}
+	\frac{\partial^2 \vec{u} }{\partial t^2} = \nabla \cdot \mathbf{T} + \rho \vec{f}
 \end{equation}
 
-%Here,  corresponds to the structure density, the second derivative of the displacements u with respect
-to time t to the acceleration of a material particle and S to the second Piola-Kirchhoff stress tensor. X
-denotes the material coordinates as mentioned before. In this case, also the volume force f is considered,
-because gravity can often not be ignored for solid materials. Again, a constitutive law must be taken into
-account, defining the relationship between stress and strain:
+In equation \ref{eq:mech}:
+
+\begin{itemize}
+	\item $\rho$: is the material density
+	\item $\vec{u}$: is the particle displacement
+	\item $\mathbf{T}$: is the \textit{second Piola-Kirchhoff} stress tensor
+	\item $\vec{f}$: is the sum of body forces
+\end{itemize}
+
+
+In order to close the dynamic equation, a constitutive law which must be considered to relate stress and strain:
 
 \begin{equation}
-	S_{ij} = \lambda E_{kk} \delta_{ij} + 2\mu E_{ij} \quad \forall i,j,k = 1,2,3
+	\mathbf{T} = \lambda \mathbf{I} \mathrm{tr}\left[ \bm{\varepsilon_G}  \right]  + 2\mu \bm{\varepsilon_G}
 \end{equation}
 
-with
+where $\bm{\varepsilon_G}$ is the Green-Lagrange strain tensor:
 
 \begin{equation}
-	E_{ij} = \frac{1}{2}\left(\frac{\partial u_i}{\partial X_j}   + {\partial u_j}{\partial X_i} \right) + \frac{1}{2} \frac{\partial u_k}{\partial X_i}\frac{\partial u_k}{\partial X_j} \forall i,j,k = 1,2,3
+	\bm{\varepsilon_G} = \frac{1}{2}\left( \mathbf{F}^T \mathbf{F}-\mathbf{I}  \right)
 \end{equation}
 
-Note that E is the Lagrangian (finite) strain tensor. The latter summand in Equation 2.10 is nonlinear
-and can be neglected for small deformations, leading to the Lagrangian infinitesimal strain tensor.
-%However, since we deal with possibly large deformations, this relationship remains non-linear. ij again refers to the Kronecker delta.  and  are material parameters named Lamé constants. They relate directly to Young’s modulus E and Poisson ratio , which are of more practical use1. Their relationship is given as follows:
+and $\mathbf{F}$ is the deformation gradient. $\lambda$ and $\mu$ are material properties and are named Lamé constants. These relate to the Young modulus \textit{E} and the Poisson ratio $\nu$ which are more commonly used in practice. The relationship among the various parameters is the following:
+
 
 \begin{eqnarray}
 	E &=& \frac{\mu(3\lambda+2\mu)}{\lambda + \mu} \\
 	\nu &=& \frac{\lambda}{2(\lambda + \mu)}
 \end{eqnarray}
 
+The set of parameters $\left(E, \nu\right)$ or $\left(\lambda, \mu \right)$, together with the density $\rho$ fully define the material, under the assumptions of linear elasticity, isotropy and homogeneity.
 
-%Either (E; $\nu$) or ($\lambda$; $\mu$ ) are enough to fully characterize this material under specific assumptions:
+The set of PDEs is completed when suitable initial and boundary conditions are defined.
 
-\begin{itemize}
-	\item The solid is linearly elastic and isotropic. 
-	\item The strain tensor E is symmetric,
-	\item as well as the stress tensor S. 
-\end{itemize}
+\subsection{Reduced order models: beams}
+\label{sec:beam}
 
+The equations introduced in section \ref{sec:solid} may be a tough task to solve even of the case of isotropic hyperelasticity, when considering a 3D domain. Even with today's computers and using finite elements techniques, it is not always feasible or convenient to treat a solid as a three-dimensional continuum. Body with particular geometric features can be seen as lower dimension bodies, with respect to the governing equations \cite{hjelmstad2007fundamentals}. Such bodies are called \textit{beams} (one dimension) , \textit{plates} or \textit{shells} (two dimensions).
 
-Furthermore, a scalar, positive definite strain energy density function (not shown in this shortened
-explanation) relating stress and strain tensor via a potential formulation exists.
-For more sophisticated explanations the interested reader may refer to [26].
+Timoshenko beam theory is briefly considered here: \cite{ghiringhelli2008integrated}
+ 
 
-TODO beam model
 
 \subsection{Interface and interaction}
+\label{sec:interface}
 
 Since FSI problems are centered on the interaction of the fluid and solid domain, their common interface
 is of vital importance. A schematic picture of a sample situation at the wet surface is shown in Figure
@@ -275,7 +281,7 @@ What is R? It is the rank of the matrix of dimension exponents. This matrix is f
 
 
 \subsection{Dimensional analysis}
-
+\label{sec:dimensional}
 CFR w1-2
 
 we need to classify all these cases of mechanical coupling between fluids and solids. 
@@ -313,7 +319,7 @@ I've excluded the temperature. But we have to choose what is the kind of
 problems that we want to consider. And this is already quite general.
 
 \subsection{Dimensional analisys in fluid domain}
-
+\label{key}
 CFR w1-3
 
 We are going to start by
