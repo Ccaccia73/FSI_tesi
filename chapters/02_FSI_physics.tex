@@ -220,25 +220,48 @@ The set of parameters $\left(E, \nu\right)$ or $\left(\lambda, \mu \right)$, tog
 
 The set of PDEs is completed when suitable initial and boundary conditions are defined.
 
-\subsection{Reduced order models: beams}
+\subsection{Models with reduced dimensionality: beams}
 \label{sec:beam}
 
-The equations introduced in section \ref{sec:solid} may be a tough task to solve even of the case of isotropic hyperelasticity, when considering a 3D domain. Even with today's computers and using finite elements techniques, it is not always feasible or convenient to treat a solid as a three-dimensional continuum. Body with particular geometric features can be seen as lower dimension bodies, with respect to the governing equations \cite{hjelmstad2007fundamentals}. Such bodies are called \textit{beams} (one dimension) , \textit{plates} or \textit{shells} (two dimensions).
+The equations introduced in section \ref{sec:solid} may be a tough task to solve even of the case of isotropic hyperelasticity, when considering a 3-D domain. Even with today's computers and using finite elements techniques, it is not always feasible or convenient to treat a solid as a three-dimensional continuum. Body with particular geometric features can be seen as lower dimension bodies, with respect to the governing equations \cite{hjelmstad2007fundamentals}. Such bodies are called \textit{beams} (one dimension) , \textit{plates} or \textit{shells} (two dimensions).
 
-Timoshenko beam theory is briefly considered here: \cite{ghiringhelli2008integrated}
- 
+The \textit{beam} model splits the description of the geometry into two subproblems:
+\begin{enumerate}
+	\item a beam is defined by its \textit{reference line} and the movement (displacement and rotation) of the solid is completely defined by it (see Figure \ref{fig:beam-model}),
+	\item the beam \textit{cross section} is considered as a whole, its movement depends on the movement of the reference line, stresses are generalized into \textit{resultants} (axial, bending, shear, torsional) which represent the aggregate effect of all of the stresses acting on the cross section. The constitutive properties of the section (axial, shear, torsion and bending stiffness) allow to relate stresses and deformations (by means of VWP) and close the problem.
+\end{enumerate}
+
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/beam}
+	\caption{beam model, taken from \cite{ghiringhelli2008integrated}}
+	\label{fig:beam-model}
+\end{figure}
+
+
+The beam model can be used to build elements of a ~\ac{FEM}. For example, the beam element can be modeled by means of a Finite Volume approach, as described in \cite{ghiringhelli2000multibody}, which computes the internal forces as functions of the straining of the reference line and orientation at selected points along the line itself, called evaluation points.
+
+\hl{This approach is particularly interesting for FSI problems in which slender structures are involved. A mapping is needed between the fluid-solid interface and the reference line movement, which will be described in.}
 
 
 \subsection{Interface and interaction}
 \label{sec:interface}
 
-Since FSI problems are centered on the interaction of the fluid and solid domain, their common interface
-is of vital importance. A schematic picture of a sample situation at the wet surface is shown in Figure
-2.7. Note that all quantities related to the solid and fluid domain, as well as the interface are subscripted
+Since FSI problems are centered on the interaction of the fluid and solid domain, their common interface needs to be described properly. A simple representation of the situation at the so called \textit{wet surface} is shown in Figure \ref{fig:interface}. Quantities related to the solid use S and fluid domain, as well as the interface are subscripted
 with S, F and FS, respectively. Also, in order to avoid simultaneous usage of sub- and superscripts, I
 switch from index to direct notation in this section. In order to couple both domains via the interface
 in a physically correct way, some conditions must be met. These conditions are commonly used for FSI
 problems. However, in this specific case they are taken from [18] and [20].
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/interface}
+	\caption{fluid solid interface}
+	\label{fig:interface}
+\end{figure}
+
+
 First of all, fluid and solid domain should neither overlap, nor separate from each other at the interface
 as there can be no space occupied by fluid and solid particles at the same time and "empty" space is non-physical. Furthermore, for a viscous fluid the flow velocity at the domain boundary has to be equal
 to the boundary velocity itself, which is called no-slip condition. Together, this results in the kinematical
