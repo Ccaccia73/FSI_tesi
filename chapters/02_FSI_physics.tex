@@ -248,11 +248,7 @@ The beam model can be used to build elements of a ~\ac{FEM}. For example, the be
 \subsection{Interface and interaction}
 \label{sec:interface}
 
-Since FSI problems are centered on the interaction of the fluid and solid domain, their common interface needs to be described properly. A simple representation of the situation at the so called \textit{wet surface} is shown in Figure \ref{fig:interface}. Quantities related to the solid use S and fluid domain, as well as the interface are subscripted
-with S, F and FS, respectively. Also, in order to avoid simultaneous usage of sub- and superscripts, I
-switch from index to direct notation in this section. In order to couple both domains via the interface
-in a physically correct way, some conditions must be met. These conditions are commonly used for FSI
-problems. However, in this specific case they are taken from [18] and [20].
+Since FSI problems are centered on the interaction of the fluid and solid domain, their common interface needs to be described properly. A simple representation of the situation at the so called \textit{wet surface} is shown in Figure \ref{fig:interface}. Quantities related to the solid use S subscript, while fluid domain and the interface are labeled with F and FS, respectively. 
 
 \begin{figure}[htbp!]
 	\centering
@@ -261,31 +257,30 @@ problems. However, in this specific case they are taken from [18] and [20].
 	\label{fig:interface}
 \end{figure}
 
+In order to have a physically correct behavior, some conditions have to be met \cite{hou2012numerical}:
 
-First of all, fluid and solid domain should neither overlap, nor separate from each other at the interface
-as there can be no space occupied by fluid and solid particles at the same time and "empty" space is non-physical. Furthermore, for a viscous fluid the flow velocity at the domain boundary has to be equal
-to the boundary velocity itself, which is called no-slip condition. Together, this results in the kinematical
-requirement that the displacements of fluid and solid domain, as well as their respective velocities have
-to be equal at the wet surface (denoted by $\Gamma_{FS}$):
+\begin{itemize}
+	\item solid and fluid domains should not overlap nor separate,
+	\item for a viscous fluid model, the flow velocity at the interface must equal the boundary velocity (\textit{no-slip} condition),
+	\item for an inviscid fluid model, only velocity components normal to the wet surface have to be equal to the structural 	velocity as the fluid may slip freely in tangential direction at any boundary,
+	\item forces exchanged at the interface must at equilibrium.
+\end{itemize}
+
+The first conditions result in the \textit{kinematical requirement} that the displacements of fluid and solid domains, as well as their respective velocities have to be equal at the wet surface (denoted by $\Gamma_{FS}$): 
 
 \begin{eqnarray}
- \vec{x}_F &=& \vec{u}_S \\
+ \Delta\vec{x}_F &=& \vec{u}_S \\
  \vec{v}_F &=& \frac{\partial \vec{u}_S}{\partial t}
 \end{eqnarray}
 
-For inviscid fluids only velocity components normal to the wet surface have to be equal to the structural
-velocity as the fluid may slip freely in tangential direction at any boundary.
-It is not sufficient to consider only kinematic constraints at the interface. In addition, an equilibrium
-of forces at the wet surface is needed such that it is not torn apart by resultant forces. Force vectors
-originate from the stresses at the interface and the outward normal vectors of fluid and solid domain,
-respectively. They have to be equal and opposite leading to the dynamic coupling condition:
+The last condition results in the equilibrium requirement. Force vectors are computed from the stresses at the interface and the outward normal vectors of fluid and solid domain, respectively. They have to be equal and opposite leading to the dynamic coupling condition:
 
 \begin{equation}
-\sigma_F \cdot \hat{n}_F = -\sigma_S \cdot \hat{n}_F
+\bm{\sigma_F} \cdot \vec{n}_F + \bm{\sigma_S} \cdot \vec{n}_F = 0
 \end{equation}
 
-%$\sigma$ 2 R33 denotes the stress tensor and n 2 R3 the outward normal vector of the fluid and solid domain.
-Note that here viscous as well as inviscid stresses are included.
+$\bm{\sigma} \in \mathbb{R}^{3 \times 3}$ represents the stress tensor (note that for the fluid it comprises pressure and viscous stresses), while $\vec{n} \in \mathbb{R}$ is the outward normal unit vector.
+
 
 \section{Classification of FSI problems}
 \label{sec:classification}
