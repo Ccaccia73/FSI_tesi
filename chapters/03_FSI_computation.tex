@@ -11,6 +11,11 @@ on conforming or non-conforming mesh treatment of respective solver strategies. 
 by Section 3.4, having a look at the added mass effect (AME) - a stability issue arising from problems
 with strong interaction in partitioned FSI simulations.
 
+
+
+
+
+
 \section{Monolithic and Partitioned Approach}
 \label{sec:monolithic}
 
@@ -49,6 +54,7 @@ rather than the solvers themselves. Nevertheless, these advanced solvers can onl
 simulations if the coupling component is sufficiently precise ([8], [38], [20]).
 
 \section{Coupling Strategies}
+\label{sec:coupling}
 
 Partitioned strategies for solving FSI problems can be subclassed into weakly and strongly coupled approaches.
 They are also referred to as explicit and implicit methods in this thesis. Note that this
@@ -80,6 +86,7 @@ Figure 3.4 sums up the categorization of different coupling techniques mentioned
 section. They are ordered with respect to stability and programming effort.
 
 \section{Interface Mesh}
+\label{sec:interface}
 
 In this section, FSI methods are classified by means of two different mesh treatment procedures: conforming
 or non-conforming techniques. The basic question is, whether fluid and solid mesh need to align
@@ -126,6 +133,7 @@ mesh. Subsequently, the deformation of the solid material is calculated and the 
 interface is fed back to the fluid model in form of updated force-equivalent terms ([31], [20], [43]).
 
 \section{Stability: Added Mass Effect}
+\label{sec:addedd-mass}
 
 To conclude this chapter about computational aspects of FSI simulations, the AME is briefly described.
 Explanations of this effect can be found in a great variety throughout FSI literature, typically explicated

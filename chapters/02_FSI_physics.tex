@@ -284,197 +284,169 @@ $\bm{\sigma} \in \mathbb{R}^{3 \times 3}$ represents the stress tensor (note tha
 
 \section{Classification of FSI problems}
 \label{sec:classification}
-you have been interested in the effect of boundary conditions on the flow. For instance, here is the effect of a cylinder that deviates a uniform flow. In fluid mechanics, we consider solids as boundary conditions only,
-and not in terms of what they are made of.
-In solid mechanics, we usually consider fluids just as the cause of a loading at the boundary, a force type boundary condition. These two approaches are very useful, and I extensively used in engineering. For instance, in civil engineering you may find engineers that compute wind loads on a bridge. And then send them to other engineers that will check that this is acceptable in terms of the solid mechanics of the bridge. This is often quite sufficient.
-We mean situations where you cannot solve these two problems independently.
-Here schematically, the cylinder is deformed by the flow, which itself is modified by the deformation of the cylinder. This is coupled fluid and solid mechanics. Now, when you think of it, this question of coupling of models is actually quite fundamental.
 
-First, find a way to classify all these couplings. Why? Because the variety seems so large that it does not seem feasible to find a model that is applicable to all of them. The second objective, once we have classified them is to try and build relevant models for these classes.
-
-So when you want to go from considering dimensional quantities to dimensionless ones, what can you do?
-There is a rather general theorem called the Pi Theorem or the Vaschy-Buckingham Theorem, which tells you how many dimensionless quantities you need to look for.
-This theorem states that the number of dimensionless quantities, P, is equal to that of the dimensional ones, N, minus R
-What is R? It is the rank of the matrix of dimension exponents. This matrix is formed by the columns of the dimension exponents of all variables, as you can see here. Remember that the rank of a matrix is a number of independent lines or columns that you can find. Let us give an example
+In the previous chapters we have seen that there exist a lot of models that can describe fluid flow and solid mechanics. In FSI problems we need to couple two of them: the variety of coupled problems seems to be so large that  single FSI model that is applicable to every problem appears to be unfeasible. For this reason it is useful to classify FSI problems and look for specific properties in each class.  
+The first step is to switch from dimensional quantities to dimensionless ones.
 
 
 \subsection{Dimensional analysis}
 \label{sec:dimensional}
-CFR w1-2
 
-we need to classify all these cases of mechanical coupling between fluids and solids. 
-The tool we shall use is called Dimensional Analysis.
-It is dimensionless in the sense that we do not need any scale of unit to express it. It is just a number.
-Here, let us just take as a principle that a physical law should only relate dimensionless quantities.
-There is a rather general
-theorem called the Pi Theorem or the Vaschy-Buckingham Theorem, which tells you how many dimensionless
-quantities you need to look for. This theorem states that the number
-of dimensionless quantities, P, is equal to that of
-the dimensional ones, N, minus R. What is R? It is the rank of the matrix
-of dimension exponents. This matrix is formed by the columns of
-the dimension exponents of all variables, as you can see here.
-Let us consider, schematically,
-the fluid here in blue and a solid in red. To make things simpler, we assume that
-they stand in separate domain of space and that there is no mass
-transfer between them. As for the case of drag on a sphere,
-we now need to specify what quantities we want to use to define
-our problem and what we are looking for. First, the fluid on the left. Let us say that we're looking for
-the local velocity U in relation to the coordinate of the point
-we consider X and the time T. This is also going to depend on
-the viscosity of the fluid, mu, The density of the fluid rho and
-the gravity, G. Also the result is going to be different
-if I change the size of the domain. So I say the result depends on the size L. Of course, this velocity is also going to
-depend on some boundary condition. For instance, an upstream flow
-velocity that I call U naught. This is the list of quantities I'm
-considering in a given problem in the fluid. Second, the solid on the right. We might want to know the displacement,
-csi, at a position X, at a time T. It may depend on E,
-the stiffness of the solid, (I shall come back to this later) on it's density, rhoS and on gravity G. Again, it will also depend on the size. And there is somewhere the magnitude of this displacement that is set,
-say cdi naught. As you can see here,
-I'm quite general in stating what the problem is. Still by stating that this is
-the list of quantities that I want to relate by my physical law,
-I'm not that general. For instance,
-I've excluded the temperature. But we have to choose what is the kind of
-problems that we want to consider. And this is already quite general.
+We use the principle that a physical law should only relate to dimensionless quantities.  
+There exist a rather general theorem called the $\Pi$ Theorem or the \textit{Vaschy-Buckingham Theorem} \cite{HancheOlsen2004}, which tells how many dimensionless quantities are needed to rewrite a model in dimensionless fashion.
+This theorem states that the number of dimensionless quantities, P, is equal to that of the dimensional ones describing the problem, N, minus R, which is the rank of the matrix of dimension exponents. This matrix is formed by the columns of the dimension exponents of all variables \cite{hardtke2019buckingham}. An example is given in the following Section \ref{sec:dim-fluid}, Table \ref{table:dim-fluid}.
 
-\subsection{Dimensional analisys in fluid domain}
-\label{key}
-CFR w1-3
+\subsection{Dimensional analysis in fluid domain}
+\label{sec:dim-fluid}
 
-We are going to start by
-something very simple. Doing dimensional analysis separately
-in the fluid and in the solid. Imagine now that what
-happens in one domain is totally independent of
-what happens in the other. For instance, in the fluid. This is what you have
-done in fluid mechanics when you have ignored all possible
-influence of what happened inside a solid that bounds the fluid. So, we assume that there exist
-a physical low that relates the fluid velocity with all the other
-parameters, namely X, T and so on. This means that the flow is not going to
-depend on the deformation of the solid, because the stiffness E  for instance,
-is not included in there. This is pure fluid mechanics. Let us do the dimensional
-analysis of this. Here is a law F between
-the dimensional variables. There are eight. To use pi theorem, I need to build
-the matrix of dimension exponents. Here it is. X is the coordinate, so it is a length. T is a time. U is a  length per time and so on. As soon as you can put some
-units on these quantities, you can write the dimension exponents. Now, what is a rank of this matrix? We can find three independent vectors. For instance, here. And certainly no more than three
-because the dimension is three. So the rank is all equal to three. I can conclude that we
-should be looking for 8 minus 3 equals 5 dimensionless parameters. So, let us write the law
-we are looking for in the form of one depending on
-only five dimensionless parameters. What are these dimensionless parameters? We know that we should find
-five independent ones. I can easily start by defining a dimensional
-velocity by diving U by U naught. Both are velocities. So the ratio is dimensionless. Second, X divided by L. Third, something I shall
-explain in a moment. Then, of course, the Reynolds
-number that combines these four. What else? I haven't used the gravity G so far. So let us use it in
-a dimensionless number. Here is what is usually called the Froude
-number combining U naught, G and L. These five members are dimensionless and
-they are independent. You cannot get one by
-a combination of the others. Let us go back to the ratio
-U naught T over L. As all dimensionless quantity,
-this one can be understood as the ratio of two dimensional quantities,
-two lengths, two times. I can write this one as T over T fluid
-where T Fluid equals L over U naught. What is L over U naught? It is just the time taken by
-a particle of velocity U naught to travel across the distance L. So T fluid is a time scale associated
-with convection in the fluid. A very important quantity
-that we shall use later. At this stage, we have just written
-down the fact that the dimensionless velocity in  the fluid is dependent
-on a dimensionless coordinate, a dimensionless  time,
-the Reynolds number, the Froude number.
+Dimensional analysis is widely used in fluid dynamics. In order to keep the analysis simple,, we consider the adimensionalization of the incompressible Navier-Stokes momentum equation for a Newtonian fluid \cite{fox2020fox}:
+
+\begin{equation}
+	\frac{\partial \vec{v}}{\partial t} + \left(\vec{v} \cdot \nabla \right) \vec{v} = -\frac{\nabla p}{\rho} + \nu \nabla ^2 \vec{v} + \vec{g}
+	\label{eq:inc-ns}
+\end{equation}
+
+The variables involved in equation \ref{eq:inc-ns} are the following:
+
+\begin{itemize}
+	\item \textit{t}: time
+	\item $\vec{x}$: coordinates
+	\item $\vec{v}$: velocity field
+	\item \textit{p}: pressure field
+	\item $\rho$: fluid density
+	\item $\nu$: fluid kinematic viscosity
+	\item $\vec{g}$: gravity
+	\item \textit{L}: reference dimension
+	\item $V_0$: reference velocity
+\end{itemize}
+
+
+
+
+\begin{table}[!h]
+\begin{center}
+	\begin{tabular}{ c|c c c c c c c c c} 
+		  & \textit{t} & $\vec{x}$ & $\vec{v}$ & \textit{p} & $\rho$ & $\nu$ & $\vec{g}$ & \textit{L} & $V_0$  \\ 
+		\hline
+		L & 0 & 1 & 1  & -1 & -3 & 2  & 1  & 1 & 1  \\ 
+		M & 0 & 0 & 0  &  1 &  1 & 0  & 0  & 0 & 0  \\
+		T & 1 & 0 & -1 & -1 &  0 & -1 & -2 & 0 & -1 \\ 
+	\end{tabular}
+\end{center}
+\caption{fluid  matrix of dimension exponents}
+\label{table:dim-fluid}
+\end{table}
+
+The rank of the above matrix is 3 so 6 dimensionless parameters are needed to rewrite the equation \ref{eq:inc-ns}:
+
+\begin{itemize}
+	\item \textit{length}: $\vec{x}^* = \frac{\vec{x}}{L}$
+	\item \textit{velocity}: $\vec{v}^* = \frac{\vec{v}}{V_0}$
+	\item \textit{time}: $t^* = \frac{V_0 t}{L} = \frac{t}{T_{fluid}}$
+	\item \textit{pressure}: possible choices: $p^* = \frac{p}{\rho V_0^2}$ or, if viscous forces are dominant, $p*= \frac{p L}{\rho \nu V_0}$
+	\item \textit{Reynolds number}: $Re=\frac{V_0 L}{\nu}$. It defines the ratio between inertia and viscous forces.
+	\item \textit{Froude number}: $Fr = \frac{V_0}{\sqrt{g L}}$. It defines the ratio between the flow inertia to the body field forces
+\end{itemize} 
+
+
+The adimensionalized momentum equation becomes:
+
+\begin{equation}
+	\frac{\partial \vec{v}^*}{\partial t^*} + \left( \vec{v}^* \cdot \nabla \right) \vec{v}^* = -\nabla p^* +\frac{1}{Re} \nabla^2 \vec{v}^2 + \frac{1}{Fr^2}\vec{g}
+	\label{eq:adim-ns}
+\end{equation}
+
+From Equation \ref{eq:adim-ns} a lot of models might be derived: from \textit{Stokes regime} when viscosity is dominant, to \textit{Euler regime} when viscosity is negligible with respect to inertia forces.
+
 
 \subsection{Dimensional analysis in solid domain}
 
-Let us now do the same for
-the solid alone. Now, we look for a relation between
-all quantities on the solid side. F of X,T, csi, E, L, G, tho s chi naught, equals zero. I have singled out the displacement, which is unknown. 
-Let us use again the pi theorem. Here is the matrix of
-the dimension exponents. We have here, too,  8 quantities, a rank of 3, and so 5 dimensionless parameters to find. What are they? Here is a choice. The dimensionless  displacement where
-I've divided csi by the length L. The dimensionless coordinate or
-dimensionless time , I will discuss just after, and
-two other dimensionless parameters. The first one is the ratio between
-the displacement data csi naught  and the length scale of the system. We shall call it the displacement number. When large, the displacements
-are large with regard to the size. This is what we call
-usually large displacements. The second one combines gravity,
-density, length and stiffness and I shall call it
-the elastogravity number. When it is large, it means that the deformations induced 
-by gravity in the solid are large. For instance, in a jelly cake,
-the shape is really effected by gravity. Let us go back now to the dimensional
-time that I introduced. I can write this as T over Tsolid,
-where Tsolid is L over a velocity C, and this velocity us
-square root of E over rho s. What is it? It is actually the scale of elastic
-wave velocities inside the solid. So T solid is the time that an elastic
-wave takes to go across the solid.
+Even if it is seldom used, Dimensional Analysis can be made also for the solid domain \cite{longo2011analisi}.
 
+The variables involved in a solid dynamics equation are:
+
+\begin{itemize}
+	\item \textit{t}: time
+	\item $\vec{X}$: coordinates
+	\item $\vec{u}$: displacement field
+	\item $\rho_S$: solid density
+	\item \textit{E}: elastic modulus
+	\item $\vec{g}$: gravity
+	\item \textit{L}: reference dimension
+	\item $U_0$: reference displacement
+\end{itemize}
+
+From the variables above the following parameters can be derived:
+
+\begin{itemize}
+	\item \textit{length}: $\frac{\vec{X}}{L}$: dimensionless coordinate
+	\item \textit{displacement}: $\frac{\vec{u}}{L}$: dimensionless displacement
+	\item \textit{time}: $\frac{t \sqrt{\frac{E}{\rho_S}}}{L} = \frac{t}{T_{solid}}$ dimensionless time
+	\item entity of displacements: $\frac{U_0}{L} = \delta$: \textit{displacement number}
+	\item gravity: $\frac{\rho_S g L}{E}$: elastogravity number
+\end{itemize}
+
+$T_{solid}$ can be seen as $\frac{L}{c}$ with $c = \sqrt{\frac{E}{\rho_S}}$ which is the scale of elastic wave velocity. The displacement number $\delta$ tells how big the structure displacement are related to the overall dimension, and defines the \textit{large displacements} region.
+Finally, the \textit{elastogravity number} combines gravity (or body forces in general), density and stiffness: when large the deformation induced by body forces in the solid are large. 
 
 \subsection{Dimensional analysis of coupled problems}
 
-cfr W1-4
+It is now possible to undertake the dimensional analysis of a fully coupled fluid and solid interaction problem. Some of the parameters are only defined in the fluid side or in the solid side (e.g. viscosity or stiffnes). Some parameters are common to both domains (e.g. lenght scale or gravity). The variables of interest are now the velocity in the fluid and the displacements in the solid. Each of them can be related to all the parameters without separation. For example, the fluid velocity relationship is of the kind:
 
-We are now ready to undertake
-the dimensional analysis of a fully coupled fluid and solid interaction problem. We have done the case of the fluid alone and
-the case of the solid alone We're going to use exactly the same
-method but considering the fluid and the solid, simultaneously. We are back to our full list of
-parameters that define the problem. Let us discuss a bit what
-these quantities are. Some of them are only defined on
-the fluid side, or on the solid side. This is, for instance, the case of
-the viscosity mu in the fluid or the stiffness E in the solid. Others are common to both domains such as
-the gravity g or the scale of lengths L. What about our variables of interest, those that we want to
-relate to the parameters? I mean, the velocity U or
-the displacement csi. One of them is defined in the fluid and
-the other in the solid. But now, we are going to consider
-that they are related  to all the parameters of the problem without separation.
+\begin{eqnarray}
+	 g(\vec{v}; \vec{x},t; \rho, \mu, V_0; \rho_S. E; \vec{g}, L) = 0
+	 \label{eq:vel-param}
+\end{eqnarray}
 
-What are these dimensionless quantities
-in such of problem that mixes fluid and solid ? Let us try to give a set of eight
-independent dimensionless quantities out of the 11 dimensional ones. I'll start with the one I know. U over U naught, x over L, U naught t over L, the Reynolds number and the Froude  number. That makes five. Now, I  can also use the ones I
-know from the solid side, combining the three quantities in a solid,
-and that gives us the displacement number,
-csi naught  over L, and the elastogravity   number, G. That makes 5 + 2 equals 7. But from the pi theorem I know I should
-use eight dimensionless quantities. 
 
-It necessarily mixes things from
-the fluid and the solid side otherwise I would have found
-it before when doing the uncoupled case. So what is it? What can we imagine as the dimensionless
-quantity combining fluid and solid dimensional once.
+Equation \ref{eq:vel-param} is composed of 11 dimensional parameters. Applying $\pi$ theorem, the total number of independent dimensionless parameter expected is 8. Starting from the ones derived in the previous sections:
+
+\begin{itemize}
+	\item $\vec{x}^* = \frac{\vec{x}}{L}$: dimensionless coordinates
+	\item $\vec{v}^* = \frac{\vec{v}}{V_0}$: dimensionless fluid velocity
+	\item $t*_f = \frac{V_0 t}{L}$: dimensionless time
+	\item $Re = \frac{V_0 L}{\nu}$: Reynolds number
+	\item $Fr = \frac{V_0}{\sqrt{gL}}$: Froude number
+	\item $\delta = \frac{U_0}{L}$: displacement number
+	\item $\frac{\rho_S g L}{E}$: elastogravity number
+\end{itemize}
+
+The 7 quantities above derive from the separated problem. The last one necessarily mixes things from the fluid and the solid side otherwise it would have been found in one uncoupled case. There is no unique choice for this parameter, the following are the most common ones.
 
 \subsubsection{Mass number}
 
- The simplest one is the ratio
-of the two densities. Let us call it the Mass Number, M. This seems a very good choice because it
-simply tells you that it is different for a solid to interact with air or
-with water. In the hard-disk drive example, M is the  order of 1,  air,
-over 10 to the 4, metal, and so M is of the order of 10 to the minus 4. Conversely, for the dolphin skin, both media have about the same density,
-and M is the order of 1. 
+The simplest, but arguably most important parameter is the ratio of the two densities: the \textit{Mass Number} M.
+
+\begin{equation}
+	M = \frac{\rho}{\rho_S}
+	\label{eq:mass-number}
+\end{equation}
+
+This can range from $\mathcal{O}\left(10^{-4}\right)$ in air-steel interaction to $\mathcal{O}\left(1\right)$ when both media have about the same density. This parameter is particularly significant for the so called \textit{added mass} stability problem, described in Section \ref{sec:addedd-mass}.
 
 \subsubsection{Reduced velocity}
 
-Here is another possible choice,
-the reduced velocity. It is the ratio between our free velocity,
-U naught, and the velocity of elastic waves in a solid, c. This also seems a good idea
-because it contains information on the way the two dynamics are related. It would be quite different between
-two examples I considered before. The inflatable dam and the dolphin's skin. [MUSIC] As possible new dimensionless parameters I
-have proposed the ratio of two densities, that was the mass number and the ratio of
-two velocities, that was the reduced  velocity.
+Another possible choice is the reduced velocity:
+
+\begin{equation}
+	 U_R = \frac{V_0}{\sqrt{\frac{E}{\rho_S}}}
+\end{equation}
+
+It is the ratio between the fluid free velocity and the velocity of elastic waves in a solid, \textit{c}. It contains information on the way the two dynamics are related and it can range different orders of magnitude.
 
 \subsubsection{Cauchy number}
 
- I can also imagine something
-combining stresses or stiffnes. This here is the Cauchy number. What does it mean? It is the ratio between the fluid loading
-quantified by the dynamic pressure over a  unit square and
-the stiffness of the solid E. 
-The higher it is, the more the solid
-is elastically deformed by the flow.
+Another possible parameter combines stresses or stiffness: the  Cauchy number, as defined in \cite{de2001fluides}:
+
+\begin{equation}
+	C_Y = \frac{\rho V_0^2}{E}
+\end{equation}
+
+It is the ratio between the fluid inertial forces, quantified by the dynamic pressure and the stiffness of the solid E. 
+The higher it is, the more the solid is elastically deformed by the flow.
 
 
- These three are actually the most
-important ones, and are used a lot. Which one should you choose for
-your problem? Well as I said before, there is no
-good choice of dimensionless numbers. But there are efficient choices, that would be more helpful
+These are actually the most important parameters involving FSI problems. Among them, there is no universally better choice. But there are efficient choices, that would be more helpful
 in solving a given problem. 
 
 
-
-Figure~\ref{fig:first_figure}.
-\begin{figure}[htbp!]
-\centering
-\includegraphics[height=0.24\textheight]{images/logo_poli}
-\caption{First Figure}
-\label{fig:first_figure}
-\end{figure}
-\\
