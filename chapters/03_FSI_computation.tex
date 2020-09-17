@@ -1,57 +1,109 @@
 \chapter{Computational aspects of Fluid-Structure Interaction problems}
 \label{cha:computation}
 
-Subsequent to the basic physics of FSI problems drawn up in the last chapter, this section goes into detail
-on computational treatment, which also allows for FSI techniques to be categorized. Two fundamentally
-different classes of procedures for solving FSI simulations have been established, namely monolithic and
-partitioned approaches. They are discussed in Section 3.1. Since this thesis focuses on the latter kind,
-a characterization of weak and strong coupling in partitioned approaches is described in Section 3.2.
-Subsequently, in Section 3.3, a different way of categorizing FSI techniques is presented, which is based
-on conforming or non-conforming mesh treatment of respective solver strategies. The chapter is closed
-by Section 3.4, having a look at the added mass effect (AME) - a stability issue arising from problems
-with strong interaction in partitioned FSI simulations.
-
-
-
-
+This section deals with the computational aspects of FSI problems. The first possible categorization of solution techniques distinguishes between monolithic and partitioned approach, as discussed in Section \ref{sec:monolithic}. This work is based on the latter approach, so the two different coupling strategies, namely strong and weak, are discussed in Section \ref{sec:coupling}. As strong coupling is generally needed for accurate solution, ad overview of strong coupling algorithms is given in Section \ref{sec:strong-coupling}. Section \ref{sec:interface-mesh} focuses on aspects concerning the interface mesh, and how the solid and the fluid exchange data between them. Finally \ref{sec:addedd-mass} briefly describes a common issue arising in strongly coupled problems: the ~\ac{AME}.
 
 
 \section{Monolithic and Partitioned Approach}
 \label{sec:monolithic}
 
-First of all, I want to point out that the terms monolithic and partitioned are interpreted differently
-throughout FSI literature. However, in this thesis, they are only used in the hereafter explained sense.
-Again, let the name fluid-structure interaction serve as a motivation for this section: On the one hand,
-it implies a single (but coupled) physical problem while on the other hand, its clear multiphysical characteristic
-is emphasized. This is also reflected in the monolithic and partitioned approaches, respectively.
-However, monolithic and partitioned approaches should not be interpreted as solely oppositional. There
-exist solver strategies for which the boundaries between the two approaches blur.
-Monolithically treating both fluid and solid domain implies that they are solved simultaneously. This
-means that one multiphysics solver deals with a single system of equations describing fluid, solid and their
-coupling. Figure 3.1 depicts this strategy schematically. Such monolithic solvers are designed specifically
-for the sole purpose of solving FSI problems. Therefore, a high level of specialization can be realized.
-Simultaneously treating both flow and structural equations often results in good numerical stability of
-the calculations. Furthermore, monolithic approaches solve the system of equations exactly, meaning
-there are no errors (other than those which are inherent to numerical techniques) introduced by this form
-of numerical treatment. However, development of such solvers from scratch requires a lot of coding work
-and is often cumbersome ([8], [38], [20], [18]).
-In contrast, partitioned approaches make use of existing single-physics solvers. The FSI problem is split
-into a fluid and solid problem, which are both treated by their respective solvers separately, while a third
-software module, the coupling component, incorporates the interaction aspects. It communicates forces or stresses (dynamic data) calculated by the fluid solver at the wet surface to the solid component and
-exchanges displacements or velocities (kinematic data) computed by the solid solver at the interface to
-the fluid component in return ([18], [38]). A schematic sketch of this situation is shown in Figure 3.2.
-More detailed and practical explanations about the coupling component are given in Section 4.1. For
-now it is sufficient to know that the coupling component exchanges kinematic and dynamic data between
-the single-physics solvers in order to preserve the coupled nature of the overall problem. In the end,
-fluid and structural solutions together yield the FSI solution. By analogy with the monolithic approach,
-it is graphically depicted in Figure 3.3. A big advantage of this approach is that existing solvers for
-the fluid and solid problem can be reused, ranging from commercial to academic and open-source codes.
-Especially in the commercial sector, these are often highly elaborate solvers with decades of experience in
-their particular single-physics fields. They typically support very sophisticated solution techniques. Also,
-those solvers are usually well-validated and compared to monolithic procedures the programming efforts
-are lower for partitioned approaches, as only the coupling of the existing solvers has to be implemented
-rather than the solvers themselves. Nevertheless, these advanced solvers can only be of good use for FSI
-simulations if the coupling component is sufficiently precise ([8], [38], [20]).
+Analytical solutions are impossible to obtain for the large majority of FSI problems; on the other hand, laboratory experiments may be costly, unfeasible or limited. For those reasons, numerical simulations may be employed to analyze the physics involved in the interaction between fluids and solids. With the current capabilities of computer technology, simulations of scientific and engineering models have become increasingly detailed and sophisticated.
+
+The numerical methods used to solve FSI problems may be roughly classified into two classes: the \textit{monolithic approach} and the \textit{partitioned approach}. There is no exact distinction between the two approaches, as they might be seen differently among fields of applications. The idea here is to consider how many solvers are used to find a solution.
+
+In the \textit{monolithic approach}, the whole problem is treated as a unique entity and solved simultaneously with a specialized ad hoc solver (see Figure \ref{fig:monolithic}). The fluid and structure dynamics form a single system of equations for the entire problem, which is solved simultaneously by a unified algorithm. The interface conditions are implicit in the solution procedure \cite{hubner2004monolithic}, \cite{ryzhakov2010monolithic}.
+
+This approach can potentially achieve better accuracy, as they solve the system of equations exactly the interface conditions are implicit in the model \cite{richter2017fluid}, but it may require more resources and expertise to develop from scratch a specialized code (it solves a very specific model) that can be cumbersome to maintain.
+
+\begin{figure}[htbp!]
+	\centering
+	\begin{tikzpicture}[scale=1]
+
+
+	\tikzstyle{status}=[draw,rectangle,rounded corners,fill=green!10,text centered,inner sep=10pt, anchor=south west, minimum width=3cm,minimum height=2.6cm]
+	\draw[->] (0,1.3)-- (2,1.3) node[] {};
+	
+	\draw[->] (5,1.3)-- (8,1.3) node[midway,above] {computation} node[midway,below] {step};
+
+	\draw[->] (11,1.3)-- (13,1.3) node[] {};
+
+	\node[status] (t1) at (2,0)  {
+		\begin{tabular}{c}
+			$S^f(t_n)$ \\
+			\\
+			$S^s(t_n)$
+	\end{tabular}};
+
+	\node[status] at (8,0) {
+	\begin{tabular}{c}
+		$S^f(t_{n}+1)$ \\
+		\\
+		$S^s(t_{n+1})$
+\end{tabular}};
+	
+%		\draw (0,1.3) node[below] {$B$} --
+%		(3,1.3) node[below] {$C$} --
+%		(1.5,4.3) node[above] {$A$} -- cycle;
+%		\draw (1.5,4.3) -- (1.5,1.3) node[below] {$D$};
+%		\draw (1.5,1.5) -- (1.7,1.5) -- (1.7,1.3);
+%		\node[draw,text width=3cm] at (4.5,4) {some text spanning three lines with automatic line breaks};
+%		\draw[rounded corners=5pt] (4,0) rectangle ++(2,1);
+	\end{tikzpicture}
+	\caption{monolithic approach: $S^f$, $S^s$ denote the fluid and the structure solutions}
+	\label{fig:monolithic}
+\end{figure}
+
+
+On the other hand, in the \textit{partitioned approach}, the fluid and the solid domains are treated as two distinct computational fields, with their respective meshes, that have to be solved separately (see Figure \ref{fig:partitioned}: how data are passed between solvers is detailed in Section \ref{sec:coupling}). The interface conditions are used explicitly to communicate information between the fluid and structure solutions. This implies that the flow does not change while the solution of the structural equations is calculated and vice versa \cite{degroote2009performance}. The partitioned approach thus requires a third software module (i.e. a coupling algorithm) to incorporate the interaction aspects. It communicates the boundary conditions described in Section \ref{sec:interface}: that is forces or stresses (dynamic data) calculated by the fluid solver at the wet surface are passed to the solid component and displacements or velocities (kinematic data) computed by the solid solver at the interface are sent to the fluid component in return. Finally, fluid and structural solutions together yield the FSI solution.
+
+\begin{figure}[htbp!]
+	\centering
+	\begin{tikzpicture}[scale=1]
+
+	\tikzstyle{solver}=[draw,rectangle,rounded corners,text centered,inner sep=10pt, anchor=south west, minimum width=3cm,minimum height=1.2cm]
+	\tikzstyle{coupling}=[draw, ellipse, fill=yellow!75, minimum width=3cm, minimum height=1.2cm, align=center]
+
+	\node[solver,fill=blue!20] at (2,4.4) {$S^f(t_n)$};
+	\node[solver,fill=blue!20] at (8,4.4) {$S^f(t_{n+1})$};
+	
+	\node[solver,fill=orange!50] at (2,0) {$S^s(t_n)$};
+	\node[solver,fill=orange!50] at (8,0) {$S^s(t_{n+1})$};
+	
+	\draw[->] (0,0.6)-- (2,0.6) node[] {};
+	\draw[->] (5,0.6)-- (8,0.6) node[midway,above] {computation} node[midway,below] {step};
+	\draw[->] (11,0.6)-- (13,0.6) node[] {};
+
+
+	\draw[->] (0,5)-- (2,5) node[] {};
+	\draw[->] (5,5)-- (8,5) node[midway,above] {computation} node[midway,below] {step};
+	\draw[->] (11,5)-- (13,5) node[] {};
+	
+	\node[draw,fill=yellow!50,ellipse,minimum width=3cm, minimum height=1cm] at (3.5,2.8) {coupling};
+	\node[draw,fill=yellow!50,ellipse,minimum width=3cm, minimum height=1cm] at (9.5,2.8) {coupling};
+
+	\draw[->] (3,1.2)-- (3,2.3) node[midway,left] {$\vec{v}$};
+	\draw[->] (4,2.3)-- (4,1.2) node[midway,right] {$\bm{\sigma}$};
+
+	\draw[->] (3,3.3)-- (3,4.4) node[midway,left] {$\vec{v}$};
+	\draw[->] (4,4.4)-- (4,3.3) node[midway,right] {$\bm{\sigma}$};
+
+	\draw[->] (9,1.2)-- (9,2.3) node[midway,left] {$\vec{v}$};
+	\draw[->] (10,2.3)-- (10,1.2) node[midway,right] {$\bm{\sigma}$};
+
+	\draw[->] (9,3.3)-- (9,4.4) node[midway,left] {$\vec{v}$};
+	\draw[->] (10,4.4)-- (10,3.3) node[midway,right] {$\bm{\sigma}$};
+		
+	\end{tikzpicture}
+	\caption{partitioned approach: $S^f$, $S^s$ denote the fluid and the structure solutions, while $\bm{\sigma}$ and $\vec{v}$ represent coupling data}
+	\label{fig:partitioned}
+\end{figure}
+
+A big advantage of this approach is that software modularity is preserved: different and efficient solution techniques can be used for the flow equations and structural equations. Provided that they can exchange data, existing solvers for the fluid and solid problem can be reused, ranging from commercial to academic and open-source codes. Those solvers are usually well-validated.
+Besides, compared to monolithic procedures, the programming efforts are lower for partitioned approaches, as only the coupling of the existing solvers has to be implemented rather than the solvers themselves.
+The challenge of this approach is, however, to define and implement algorithms to achieve accurate and efficient fluid-structure interaction solution with minimal code modification. Particularly, the interface
+location that divides the fluid and the structure domains changes in time. The partitioned approach requires that the fluid solver has ALE capabilities, as introduced in Section \ref{subsec:ALE}.
+More detailed and practical explanations about the coupling component used in this work are given in Section \ref{sec:precice}. 
+
 
 \section{Coupling Strategies}
 \label{sec:coupling}
@@ -85,8 +137,13 @@ computational effort ([18], [38], [2]).
 Figure 3.4 sums up the categorization of different coupling techniques mentioned in this and the previous
 section. They are ordered with respect to stability and programming effort.
 
+
+
+\section{Strong coupling algorithms}
+\label{sec:strong-coupling}
+
 \section{Interface Mesh}
-\label{sec:interface}
+\label{sec:interface-mesh}
 
 In this section, FSI methods are classified by means of two different mesh treatment procedures: conforming
 or non-conforming techniques. The basic question is, whether fluid and solid mesh need to align
