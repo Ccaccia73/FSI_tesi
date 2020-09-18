@@ -23,22 +23,22 @@ This approach can potentially achieve better accuracy, as they solve the system 
 	\tikzstyle{status}=[draw,rectangle,rounded corners,fill=green!10,text centered,inner sep=10pt, anchor=south west, minimum width=3cm,minimum height=2.6cm]
 	\draw[->] (0,1.3)-- (2,1.3) node[] {};
 	
-	\draw[->] (5,1.3)-- (8,1.3) node[midway,above] {computation} node[midway,below] {step};
+	\draw[->] (5,1.3)-- (8,1.3) node[midway,above] {$\Delta t$}; % node[midway,below] {step};
 
 	\draw[->] (11,1.3)-- (13,1.3) node[] {};
 
 	\node[status] (t1) at (2,0)  {
 		\begin{tabular}{c}
-			$S^f(t_n)$ \\
+			$S_f(t_n)$ \\
 			\\
-			$S^s(t_n)$
+			$S_s(t_n)$
 	\end{tabular}};
 
 	\node[status] at (8,0) {
 	\begin{tabular}{c}
-		$S^f(t_{n}+1)$ \\
+		$S_f(t_{n}+1)$ \\
 		\\
-		$S^s(t_{n+1})$
+		$S_s(t_{n+1})$
 \end{tabular}};
 	
 %		\draw (0,1.3) node[below] {$B$} --
@@ -49,7 +49,7 @@ This approach can potentially achieve better accuracy, as they solve the system 
 %		\node[draw,text width=3cm] at (4.5,4) {some text spanning three lines with automatic line breaks};
 %		\draw[rounded corners=5pt] (4,0) rectangle ++(2,1);
 	\end{tikzpicture}
-	\caption{monolithic approach: $S^f$, $S^s$ denote the fluid and the structure solutions}
+	\caption{monolithic approach: $S_f$, $S_s$ denote the fluid and the structure solutions}
 	\label{fig:monolithic}
 \end{figure}
 
@@ -63,19 +63,19 @@ On the other hand, in the \textit{partitioned approach}, the fluid and the solid
 	\tikzstyle{solver}=[draw,rectangle,rounded corners,text centered,inner sep=10pt, anchor=south west, minimum width=3cm,minimum height=1.2cm]
 	\tikzstyle{coupling}=[draw, ellipse, fill=yellow!75, minimum width=3cm, minimum height=1.2cm, align=center]
 
-	\node[solver,fill=blue!20] at (2,4.4) {$S^f(t_n)$};
-	\node[solver,fill=blue!20] at (8,4.4) {$S^f(t_{n+1})$};
+	\node[solver,fill=blue!20] at (2,4.4) {$S_f(t_n)$};
+	\node[solver,fill=blue!20] at (8,4.4) {$S_f(t_{n+1})$};
 	
-	\node[solver,fill=orange!50] at (2,0) {$S^s(t_n)$};
-	\node[solver,fill=orange!50] at (8,0) {$S^s(t_{n+1})$};
+	\node[solver,fill=orange!50] at (2,0) {$S_s(t_n)$};
+	\node[solver,fill=orange!50] at (8,0) {$S_s(t_{n+1})$};
 	
 	\draw[->] (0,0.6)-- (2,0.6) node[] {};
-	\draw[->] (5,0.6)-- (8,0.6) node[midway,above] {computation} node[midway,below] {step};
+	\draw[->] (5,0.6)-- (8,0.6) node[midway,above] {$\Delta t$}; % node[midway,below] {step};
 	\draw[->] (11,0.6)-- (13,0.6) node[] {};
 
 
 	\draw[->] (0,5)-- (2,5) node[] {};
-	\draw[->] (5,5)-- (8,5) node[midway,above] {computation} node[midway,below] {step};
+	\draw[->] (5,5)-- (8,5) node[midway,above] {$\Delta t$}; % node[midway,below] {step};
 	\draw[->] (11,5)-- (13,5) node[] {};
 	
 	\node[draw,fill=yellow!50,ellipse,minimum width=3cm, minimum height=1cm] at (3.5,2.8) {coupling};
@@ -94,7 +94,7 @@ On the other hand, in the \textit{partitioned approach}, the fluid and the solid
 	\draw[->] (10,4.4)-- (10,3.3) node[midway,right] {$\bm{\sigma}$};
 		
 	\end{tikzpicture}
-	\caption{partitioned approach: $S^f$, $S^s$ denote the fluid and the structure solutions, while $\bm{\sigma}$ and $\vec{v}$ represent coupling data}
+	\caption{partitioned approach: $S_f$, $S_s$ denote the fluid and the structure solutions, while $\bm{\sigma}$ and $\vec{v}$ represent coupling data}
 	\label{fig:partitioned}
 \end{figure}
 
@@ -108,39 +108,258 @@ More detailed and practical explanations about the coupling component used in th
 \section{Coupling Strategies}
 \label{sec:coupling}
 
-Partitioned strategies for solving FSI problems can be subclassed into weakly and strongly coupled approaches.
-They are also referred to as explicit and implicit methods in this thesis. Note that this
-nomenclature is in no way fully consistent throughout FSI literature. However, all usage of these terms
-in this thesis is limited to the sense of the explanations given in this section.
-The distinction between explicit and implicit techniques is based upon the question, how often solutions
-for the fluid and solid subproblem are computed within one time step and also, how frequently the
-relevant kinematic and dynamic quantities are exchanged. For weakly coupled strategies solving is done
-a certain, fixed number of times (often only once) per time step and data may not even be communicated
-after each discrete time instance. In general, this is not sufficient to regain the monolithic ("exact")
-solution of the FSI problem as the coupling conditions are not enforced within each time step. Thus,
-no balance between fluid and structural domain with respect to energy, forces and displacements at the
-interface can be guaranteed ([8], [18], [38], [2]). However, this coupling strategy can still yield good
-results if the interaction between fluid and solid is rather weak (further explanations about the strength
-of the interaction follow in Section 3.4). E.g. in aeroelastic simulations, where small displacements of
-the structure appear within single time steps, the flow field is influenced by the structural displacements
-only to a little extent ([13], [8], [2]).
-In contrast, strongly coupled strategies make use of subiterations possibly resulting in multiple computations
-of the separate solvers and exchanges of the interface coupling quantities (as a reminder, see Figure 3.2) per physical time step. However, acceleration techniques are necessary to converge the underlying
-coupling equation system. The coupling conditions at the wet surface are enforced in each time step up to
-a convergence criterion. If the criterion is not met sufficiently, another subiteration within the same time
-instance is calculated. Therefore, the solution can approximate the monolithic solution to an arbitrary
-accuracy as the convergence criterion can be chosen as strict as needed. Such a method is in general
-applicable to both FSI problems, which can be solved by weakly coupled approaches and those, for which
-explicit procedures fail due to dominant interaction. However, strongly coupled algorithms are usually
-used in the latter case - when weak coupling reaches its limits - since the implicit approach requires more
-computational effort ([18], [38], [2]).
-Figure 3.4 sums up the categorization of different coupling techniques mentioned in this and the previous
-section. They are ordered with respect to stability and programming effort.
+Because of the modularity, the partitioned approach has gained much attention in research. The structure sketched in Figure \ref{fig:partitioned} needs to be detailed and specialized in function of the coupling strategies.
 
+In an interface multi-physics coupling like FSI, the boundary surface is in common between the two sides of the simulation. The results make sense and are numerically stable only if the two sides of the interface are in agreement, since the output values of the one simulation become input values for the other (and vice-versa).
+The solution strategies can be roughly divided into weakly and strongly coupled approaches. They are often referred to as \textit{explicit} and \textit{implicit} methods in the literature.
+When the fluid and solid solutions are computed iteratively until some convergence criteria within the same time step, the scheme is called \textit{implicit coupling}. The faster, simpler but less precise \textit{explicit coupling} consists in executing a fixed number of iterations (typically one per time step) and exchange coupling values without convergence checks. 
+
+\subsection{Explicit coupling schemes}
+
+As in the previous Section, $S_f$ represents the fluid solver, which computes the pressures (named $d_f$ here) at the deformable boundary and $S_s$ is the structure solver, which uses these forces to compute the displacement and velocity of the boundary (named $d_s$). In a \textit{serial-explicit} (or \textit{conventional staggered}) coupling scheme, the solver $S_f$ uses the old time step boundary values $d_s^{(n)}$ to compute the values of $d_f^{(n+1)}$ for the next time step:
+
+\begin{equation}
+	d_f^{(n+1)} = S_f\left(d_s^{(n)}\right)
+	\label{eq:stag1}
+\end{equation}
+
+When the fluid solver completes the time step, data are passed to the structural solver:
+
+\begin{equation}
+	d_s^{(n+1)} = S_s\left( d_f^{(n+1)} \right)
+	\label{eq:stag2}
+\end{equation}
+
+Note that Equation \ref{eq:stag1} uses values computed at $t^n$, while Equation \ref{eq:stag2} uses values computed at $t^{(n+1)}$. The order of execution might be inverted.
+
+In order reduce execution time, the solvers might run in parallel, using data from the same time step (\textit{parallel-explicit coupling}:
+
+\begin{subequations}
+\begin{eqnarray}
+	d_f^{(n+1)} &=& S_f\left(d_s^{(n)}\right) \\
+	d_s^{(n+1)} &=& S_s\left( d_f^{(n)} \right)
+	\label{eq:par-exp}
+\end{eqnarray} 
+\end{subequations}
+
+
+The two explicit schemes are shown schematically in Figures \ref{fig:serial-explicit} and \ref{fig:parallel-explicit}.
+
+\begin{figure}[htbp!]
+	\centering
+	\begin{subfigure}{.8\textwidth}
+	\centering
+	% include first image
+		\begin{tikzpicture}[scale=1]
+		\tikzstyle{solver}=[draw,rectangle,rounded corners,text centered,inner sep=10pt, anchor=south west, minimum width=3cm,minimum height=1.6cm]
+		
+		\node[solver,fill=blue!20] at (3,5) {$S_f\left( d_s^{(n)} \right)$};
+		\node[solver,fill=orange!50] at (8,5) {$S_s\left(d_f^{(n+1)}\right)$};
+		
+		\draw[->] (1,5.8)-- (3,5.8) node[midway,above] {$d_s^{(n)}$};
+		\draw[->] (6,5.8)-- (8,5.8) node[midway,above] {$d_f^{(n+1)}$};
+		\draw[-] (11,5.8)-- (13,5.8) node[midway,above] {$d_s^{(n+1)}$};
+		
+		\draw[-] (13,5.8)-- (13,3.5);
+		\draw[-] (1,5.8)-- (1,3.5);
+		
+		\draw[-] (1,3.5)-- (13,3.5) node[midway,above] {$n \leftarrow n+1$};
+		
+		\end{tikzpicture}
+		\caption{serial explicit coupling}
+		\label{fig:serial-explicit}
+	\end{subfigure}
+	\newline
+	\centering
+	\begin{subfigure}{.8\textwidth}
+	\centering
+	% include second image
+		\begin{tikzpicture}[scale=1]
+		\tikzstyle{solver}=[draw,rectangle,rounded corners,text centered,inner sep=10pt, anchor=south west, minimum width=3cm,minimum height=1.6cm]
+
+		\node[solver,fill=blue!20] at (2.5,4) {$S_f\left( d_s^{(n)} \right)$};
+		\node[solver,fill=orange!50] at (2.5,0) {$S_s\left(d_f^{(n)}\right)$};
+		
+		\draw[->] (0,4.8)-- (2.5,4.8) node[midway,above] {$d_s^{(n)}$};
+		\draw[->] (0,0.8)-- (2.5,0.8) node[midway,above] {$d_f^{(n)}$};
+
+		\draw[-] (5.5,4.8)-- (8,4.8) node[midway,above] {$d_f^{(n+1)}$};
+		\draw[-] (5.5,0.8)-- (8,0.8) node[midway,above] {$d_s^{(n+1)}$};
+		
+		\draw[-] (0,0.8)-- (0,2);
+		\draw[-] (8,0.8)-- (8,2);
+		
+		\draw[-] (0,3.6)-- (0,4.8);
+		\draw[-] (8,3.6)-- (8,4.8);
+		
+		\draw[-] (8,3.6)-- (0,2) node[midway,above] {$n \leftarrow n+1$};
+		\draw[-] (0,3.6)-- (8,2);
+
+	
+		\end{tikzpicture}
+		\caption{parallel explicit coupling}
+		\label{fig:parallel-explicit}
+	\end{subfigure}
+	\caption{Explicit coupling schemes}
+\end{figure}
+
+In general, an explicit coupling is not enough to regain the exact (as in the monolithic approach) solution of the problem as the matching coupling conditions between the solvers is not enforced within each time step: no balance between fluid and structural domain with respect to forces and displacements at the interface can be guaranteed (\cite{hou2012numerical}, \cite{degroote2009performance}). Nevertheless, explicit coupling yields good results if the interaction between fluid and solid is weak as in aeroelastic simulations, where in general the simulations show small displacements of the structure within a single time step and the flow field isn't much influenced by the structural displacements (\cite{farhat2006provably}).
+
+\subsection{Implicit coupling schemes}
+
+
+On the other hand, strongly (implicit) coupling techniques require an iterative method to solve the fixed-point equation that derives from enforcing the agreement of the interface variables.
+The coupling conditions at the wet surface are enforced in each time step up to a convergence criterion. If the criterion is not met, another subiteration within the same time instance is computed. Therefore, the solution can approximate the monolithic solution to an arbitrary accuracy.
+
+As in the explicit case, solvers may run in a sequential mode: the coupling is then named \textit{serial} (or staggered) and the solvers wait for each other. 
+
+\begin{subequations}
+	\begin{eqnarray}
+		d_f^{(n+1),i+1} &=& S_f\left(d_s^{(n+1),i}\right) \\
+		d_s^{(n+1),i+1} &=& S_s\left( d_f^{(n+1),i+1} \right)
+	\end{eqnarray} 
+	\label{eq:ser-imp}
+\end{subequations}
+
+Equations \ref{eq:ser-imp} show that, in contrast with explicit coupling, both solvers use interface values at time step $n+1$, but one of them uses data from previous iteration.
+If run in parallel mode \cite{mehl2016parallel}, the system becomes:
+
+\begin{subequations}
+	\begin{eqnarray}
+		d_f^{(n+1),i+1} &=& S_f\left(d_s^{(n+1),i}\right) \\
+		d_s^{(n+1),i+1} &=& S_s\left( d_f^{(n+1),i} \right)
+	\end{eqnarray} 
+	\label{eq:par-imp}
+\end{subequations}
+
+At convergence, the following relation holds of serial (or \textit{Gauss-Seidel}) coupling:
+
+
+\begin{subequations}
+	\begin{eqnarray}
+		d_s^{(n+1)} &=&  S_s\left(S_f\left(d_s^{(n+1)}\right) \right) \\
+		\label{eq:ser-fp-comp}
+		d_s^{(n+1)} &=& S_s  \circ S_f \left( d_s^{(n+1)} \right)
+	\end{eqnarray} 
+	\label{eq:ser-fp}
+\end{subequations}
+
+
+and the following relation holds for parallel (or \textit{Jacobi}) coupling:
+
+\begin{equation}
+	\begin{pmatrix}
+		d_s^{(n+1)} \\
+		d_f^{(n+1)}
+	\end{pmatrix} = 
+	\begin{pmatrix}
+		0 & S_f \\
+		S_s & 0
+	\end{pmatrix} 
+	\begin{pmatrix}
+		d_s^{(n+1)} \\
+		d_f^{(n+1)}
+	\end{pmatrix}
+	\label{eq:par-fp}
+\end{equation}
+
+
+Acceleration techniques are necessary to bring fixed point equation \ref{eq:ser-fp-comp} or \ref{eq:par-fp} to convergence. Those techniques are described in Section \ref{sec:strong-coupling}.
+
+The two implicit schemes are shown schematically in Figures \ref{fig:serial-implicit} and \ref{fig:parallel-implicit}: \textit{accel} refers to the post-processing step implemented to speedup convergence. After every non-converged iteration, the latest stored state of the solver (\textit{checkpoint}) is reloaded and coupling iteration \textit{i} for the current time step is incremented. When the solution converges, the time step \textit{n} is incremented.
+
+
+\begin{figure}[htbp!]
+	\centering
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		% include first image
+		\begin{tikzpicture}[scale=1]
+			\tikzstyle{solver}=[draw,rectangle,rounded corners,text centered,inner sep=10pt, anchor=south west, minimum width=2cm,minimum height=1.6cm]
+			
+			\node[solver,fill=blue!20] at (2,5) {$S_f\left( d_s\right)$};
+			\node[solver,fill=orange!50] at (6,5) {$S_s\left(d_f\right)$};
+			\node[solver,fill=yellow!75] at (10,5) {accel};
+			
+			\draw[->] (0,5.8)-- (2,5.8) node[midway,above] {$d_s^{(n+1),i}$};
+			\draw[->] (4,5.8)-- (6,5.8) node[midway,above] {$d_f^{(n+1),i+1}$};
+			\draw[-] (8,5.8)-- (10,5.8) node[midway,above] {$\tilde{d}_s^{(n+1)}$};
+			\draw[-] (12,5.8)-- (14,5.8) node[midway,above] {$d_s^{(n+1),i+1}$};
+			
+			\draw[-] (14,5.8)-- (14,3.5);
+			\draw[-] (0,5.8)-- (0,3.5);
+			
+			\draw[-] (0,3.5)-- (14,3.5) node[midway,above] {$i \leftarrow i+1$};
+			
+		\end{tikzpicture}
+		\caption{serial implicit coupling}
+		\label{fig:serial-implicit}
+	\end{subfigure}
+	\newline
+	\centering
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		% include second image
+		\begin{tikzpicture}[scale=1]
+			\tikzstyle{solver}=[draw,rectangle,rounded corners,text centered,inner sep=10pt, anchor=south west, minimum width=2.5cm,minimum height=1.6cm]
+			
+			\node[solver,fill=blue!20] at (2.5,4) {$S_f\left( d_s \right)$};
+			\node[solver,fill=orange!50] at (2.5,0) {$S_s\left(d_f\right)$};
+			
+			\node[solver,fill=yellow!75] at (7.5,2) {accel};
+			
+			\draw[->] (0,4.8)-- (2.5,4.8) node[midway,above] {$d_s^{(n+1),i}$};
+			\draw[->] (0.5,0.8)-- (2.5,0.8) node[midway,above] {$d_f^{(n+1),i}$};
+			
+			\draw[-] (5,4.8)-- (7,4.8) node[midway,above] {$\tilde{d}_f^{(n+1),i}$};
+			\draw[-] (5,0.8)-- (7,0.8) node[midway,above] {$\tilde{d}_s^{(n+1),i}$};
+			
+			\draw[->] (7,4.8)-- (7.5,3.2);
+			\draw[->] (7,0.8)-- (7.5,2.4);
+			
+			\draw[-] (10,3.2)-- (10.5,4.8);
+			\draw[-] (10,2.4)-- (10.5,0.8);
+
+			\draw[-] (10.5,4.8)-- (13,4.8) node[midway,above] {$d_f^{(n+1),i+1}$};
+			\draw[-] (10.5,0.8)-- (13,0.8) node[midway,above] {$d_s^{(n+1),i+1}$};
+
+			\draw[-] (13,4.8)-- (13,6.2);
+			\draw[-] (13,0.8)-- (13,-0.8);
+
+			\draw[-] (13,6.2)-- (0.5,6.2) node[midway,above] {$i \leftarrow i+1$};
+			\draw[-] (13,-0.8)-- (0,-0.8) node[midway,above] {$i \leftarrow i+1$};
+			
+			\draw[-] (0,-0.8)-- (0,4.8);
+			\draw[-] (0.5,6.2)-- (0.5,0.8);
+
+			%\draw[-] (0,0.8)-- (0,2);
+			%\draw[-] (8,0.8)-- (8,2);
+			
+			%\draw[-] (0,3.6)-- (0,4.8);
+			%\draw[-] (8,3.6)-- (8,4.8);
+			
+			%\draw[-] (8,3.6)-- (0,2) node[midway,above] {$n \rightarrow n+1$};
+			%\draw[-] (0,3.6)-- (8,2);
+			
+			
+		\end{tikzpicture}
+		\caption{parallel implicit coupling}
+		\label{fig:parallel-implicit}
+	\end{subfigure}
+	\caption{Implicit coupling schemes}
+\end{figure}
+
+Implicit methods are generally applicable to any kind of FSI problems, in contrast with explicit methods. When fluid and structure are strongly coupled, explicit coupling can be subject to numerical instabilities, a problem that cannot always be solved by reducing the coupling time step size \cite{van2009added}. These instabilities can be overcome by implicit methods, even if several coupling iterations may be executed every time step, until the values on both sides of the interface converge.
 
 
 \section{Strong coupling algorithms}
 \label{sec:strong-coupling}
+
+As mentioned in the previous chapter, 
+
+
+
+
 
 \section{Interface Mesh}
 \label{sec:interface-mesh}
