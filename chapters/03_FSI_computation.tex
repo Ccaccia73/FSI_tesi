@@ -364,7 +364,7 @@ As mentioned in the previous section, implicit methods require some post-process
 		\label{eq:fp-2}
 		d_s &=& H(d_s)  \\
 		\label{eq:fp3}
-		R(d) &\coloneqq& H(d) - d
+		R(d) &\coloneqq& H(d) - d = 0
 	\end{eqnarray} 
 	\label{eq:fp-equations}
 \end{subequations}
@@ -377,7 +377,11 @@ The basic approach to solve the fixed point equation is to perform the correspon
 	x_{i+1} = H(x_i) \quad i=1,2,\ldots
 \end{equation} 
 
-which is known to converge if the mapping \textit{H} is a contraction, but this is not the general case in FSI computations \cite{mehl2016parallel}. The way to stabilize the iterations is to perform a FPI with \textit{under-relaxation} as illustrated in the following algorithm:
+which is known to converge if the mapping \textit{H} is a contraction, but this is not the general case in FSI computations \cite{mehl2016parallel}. 
+
+\subsection{under-relaxation}
+
+The way to stabilize the iterations is to perform a FPI with \textit{under-relaxation} as illustrated in the following algorithm:
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -400,17 +404,55 @@ The under-relaxation is defined by:
 	\label{eq:ur}
 \end{equation} 
 
-Where $\omega$ in Equation \ref{eq:ur} is the \textit{relaxation factor}. Constant under-relaxation often leads to divergence or very slow convergence, some adaptive factor is needed, like the \textit{Aitken under-relaxation} \cite{irons1969version} which adapts the factor at each iteration:
+Where $\omega$ in Equation \ref{eq:ur} is the \textit{relaxation factor}. The relaxation parameter has to be small enough to keep the iteration from diverging, but as large as possible in order to use as much of the new solution as possible \cite{kuttler2008fixed}. The optimal $\omega$ value is problem specific and not known a priori.
+A suitable dynamic relaxation parameter, is a better choice, like the \textit{Aitken under-relaxation} \cite{irons1969version} which adapts the factor at each iteration with the following relation:
 
 \begin{equation}
 	\omega_i = -\omega_{i-1} \frac{r_{i-1}^T \left(r_i - r_{i-1}\right)}{ \lVert r_i - r_{i-1} \rVert ^2}
 \end{equation}
 
+Aitken under-relaxation can be a good choice for strong interaction with a fluid solvers that does not fully converge in every iteration or for compressible fluid solvers.
+
+% da citare: @article{kuttler2008fixed,
+%  title={Fixed-point fluid--structure interaction solvers with dynamic relaxation},
+%  author={K{\"u}ttler, Ulrich and Wall, Wolfgang A},
+%  journal={Computational mechanics},
+%  volume={43},
+%  number={1},
+%  pages={61--72},
+%  year={2008},
+%  publisher={Springer}
+%}
+
+\subsection{Quasi Newton Least Squares schemes}
+
+Under-relaxation is a good choice for easy stable problems, but is outperformed by more sophisticated quasi-Newton coupling schemes. Equation \ref{eq:fp3} could be solved iteratively with a Newton method:
+
+\begin{subequations}
+	\begin{eqnarray}
+		\label{eq:nm1}
+		R(d_k) &\coloneqq&  r_k  \\
+		\label{eq:nm2}
+		R(d_k) + \left. \frac{\partial R}{\partial d}\right|_{d_k} \left( d_{k+1} - d_k \right) &=& 0 \\
+		\label{eq:nm3}
+		d_k + \left(  \left. \frac{\partial R}{\partial d} \right|_{d_k} \right)^{-1} \left(-r_k \right) &=&  d_{k+1}
+	\end{eqnarray} 
+	\label{eq:fp-equations}
+\end{subequations}
+
+The \textit{residual} at iteration \textit{k} is defined in Equation \ref{eq:nm1}, if the Jacobian matrix of the equation is known, a Newton iteration can be performed as in Equation \ref{eq:nm2}. The updated values can be computed in Equation \ref{eq:nm3}.
+
+Unfortunately, the exact Jacobian of \textit{R} is unknown 
+
+%da citare:@phdthesis{uekermann2016partitioned,
+%  title={Partitioned fluid-structure interaction on massively parallel systems},
+%  author={Uekermann, Benjamin Walter},
+%  year={2016},
+%  school={Technische Universit{\"a}t M{\"u}nchen}
+%}
 
 
-
-
-
+\subsection{Convergence criteria}
 
 
 
