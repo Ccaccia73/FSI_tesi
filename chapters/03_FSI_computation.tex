@@ -355,7 +355,79 @@ Implicit methods are generally applicable to any kind of FSI problems, in contra
 \section{Strong coupling algorithms}
 \label{sec:strong-coupling}
 
-As mentioned in the previous chapter, 
+As mentioned in the previous section, implicit methods require some post-processing (generally called \textit{acceleration}) techniques to to make the solution of the single time step of the coupled partitioned FSI problem converge. This requires to solve a a \textit{fixed-point equation}, in fact:
+
+\begin{subequations}
+	\begin{eqnarray}
+		\label{eq:fp-def}
+		H(d_s) &\coloneqq&  S_s  \circ S_f(d_s)  \\
+		\label{eq:fp-2}
+		d_s &=& H(d_s)  \\
+		\label{eq:fp3}
+		R(d) &\coloneqq& H(d) - d
+	\end{eqnarray} 
+	\label{eq:fp-equations}
+\end{subequations}
+
+Equation \ref{eq:fp-def} represents the composition of the solid and the fluid solution, while Equation \ref{eq:fp-2} represents the resulting fixed point equation. As the order of execution can be switched, in Equation \ref{eq:fp3}, where the \textit{residual} is defined, the input data $d_s$ is generically substituted with $d$.
+
+The basic approach to solve the fixed point equation is to perform the corresponding ~\ac{FPI}:
+
+\begin{equation}
+	x_{i+1} = H(x_i) \quad i=1,2,\ldots
+\end{equation} 
+
+which is known to converge if the mapping \textit{H} is a contraction, but this is not the general case in FSI computations \cite{mehl2016parallel}. The way to stabilize the iterations is to perform a FPI with \textit{under-relaxation} as illustrated in the following algorithm:
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\KwResult{$d_k$}
+	initialization of $d_0$\;
+	k = 0\;
+	$\tilde{d}_1 = S_s \circ S_f(d_0)$\;
+	$r_0$ = $\tilde{d}_1 - d_0$\;
+	\While{$\lVert r_k \rVert > \varepsilon$}{
+		compute $d_k$ by relaxation\;
+		k = k +1\;
+	}
+	\caption{FPI with relaxation}
+\end{algorithm}
+
+The under-relaxation is defined by:
+
+\begin{equation}
+	d_{k+1} = d_{k} + \omega \left( H(d_k)  - d_k  \right)
+	\label{eq:ur}
+\end{equation} 
+
+Where $\omega$ in Equation \ref{eq:ur} is the \textit{relaxation factor}. Constant under-relaxation often leads to divergence or very slow convergence, some adaptive factor is needed, like the \textit{Aitken under-relaxation} \cite{irons1969version} which adapts the factor at each iteration:
+
+\begin{equation}
+	\omega_i = -\omega_{i-1} \frac{r_{i-1}^T \left(r_i - r_{i-1}\right)}{ \lVert r_i - r_{i-1} \rVert ^2}
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
