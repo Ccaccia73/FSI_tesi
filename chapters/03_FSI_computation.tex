@@ -497,61 +497,186 @@ A more common \textit{relative convergence criterion}, defined in Equation \ref{
 
 
 
-\section{Interface Mesh}
+\section{Interface Mesh and Data Mapping}
 \label{sec:interface-mesh}
 
+FSI methods can also be classified considering how the fluid and solid meshes are treated. The \textit{conforming mesh methods} consider the interface as a physical boundary condition (see Section \ref{sec:conforming-mesh}), while \textit{non-conforming mesh methods} treat the boundary location as a constraint imposed on the model equations (see Section \ref{sec:nonconforming-mesh}) \cite{hou2012numerical}.
+
+
+\subsection{Non-conforming Mesh methods}
+\label{sec:nonconforming-mesh}
+
+In non-conforming mesh strategies all interface conditions are imposed as constraints on the flow and structural governing equations. It is possible to use non-conforming meshes for fluid and solid domains as they remain geometrically independent from each other (see Figure \ref{fig:nonconf-mesh}).
+
+This approach is mostly used in \textit{immersed boundary} methods \cite{kajishima2017immersed}. Coupling is imposed by means of additional force terms appearing in the model equations of the fluid, which impose the kinematic and dynamic conditions.
+The forces represent the effects of a boundary or body being immersed in the fluid domain. A purely Eulerian mesh (see Section \ref{subsec:euler}) can be used for the whole computational domain, since
+the force terms are dynamically added at specific locations to represent the structure.
+
+The fluid forces applied on the solid at the wet surface are computed and used as input for the structural solver, which employs a standard Lagrangian mesh (see Section \ref{subsec:lagrange}).
+
+Immersed boundary methods are particularly innovative and are useful to overcome some issues in CFD computations, on the other hand most of the current implementations of FSI problem implement a conforming mesh strategy.
+
+\begin{figure}[htbp!]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.9\linewidth]{images/nonconf1c}
+		\caption{mesh at $t=t_1$}
+		\label{fig:nc1}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.9\linewidth]{images/nonconf2c}
+		\caption{mesh at $t=t_2$}
+		\label{fig:nc2}
+	\end{subfigure}
+	\caption{non conforming mesh example}
+	\label{fig:nonconf-mesh}
+\end{figure}
+
+
+\subsection{Conforming Mesh methods}
+\label{sec:conforming-mesh}
+
+Conforming mesh methods adapt very well to the partitioned approach described in Section \ref{sec:monolithic} as they usually consists in the computational steps described above, namely: computation in the fluid, computation in the solid, enforcing of interface condition and mesh movement (see Figure \ref{fig:conf-mesh}).   
+
+Fluid and structure meshes need share the boundary of the wet surface, as the coupling conditions are enforced by applying kinematic or dynamic conditions to those boundaries.
+Node-to-node matching of fluid and structure meshes at the interface is not required, as long as a suitable mapping between the interface nodes is performed (see Section \ref{sec:data-mapping}).
+
+The match between the interfaces must hold at each time step: this implies that both solid and fluid domains need to deform. Deformation is easily expressed in the solid domain as the structural mesh is usually represented in Lagrangian perspective (see Section \ref{subsec:lagrange}). ALE perspective (Section \ref{subsec:ALE}) for the fluid domain becomes necessary in this case.
+
+Mesh deformation can turn out to be a complicated task as in general the fluid mesh is deformed during motion (see Figure \ref{fig:ale-mesh}). Mesh smoothing techniques need to be applied in order to keep a good mesh quality in terms of distorted elements which can lead to accuracy loss in simulations. (the following video shows high distorted fluid elements during FSI motion: \href{https://youtu.be/zJ7PR90Y2TI}{video}). 
+
+Mesh smoothing is generally applied to keep the fluid mesh as uniform and undistorted as possible during movement.
+There is a wide variety of mesh updating procedures \cite{van2007comparison}.
+The \textit{torsional spring analogy} \cite{degand2002three} is a fairly simple technique that computes mesh movement considering mesh edges as springs and solving the subsequent Laplace equation that derives from the mesh movement. 
+
+Some other references about mesh motion alternatives can be found in \cite{gonzalez2009mesh}.
+
+
+\begin{figure}[htbp!]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.9\linewidth]{images/conf1c}
+		\caption{mesh at $t=t_1$}
+		\label{fig:c1}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=.9\linewidth]{images/conf2c}
+		\caption{mesh at $t=t_2$}
+		\label{fig:c2}
+	\end{subfigure}
+	\caption{conforming mesh example}
+	\label{fig:conf-mesh}
+\end{figure}
 
 
 
+\subsection{Data Mapping}
+\label{sec:data-mapping}
+
+When partitioned coupling is involved and the meshes are conforming but not node-to-node coincident, the challenge is to correctly map the data between the solid and the fluid sides. This is a common situation as fluid and solid require a different mesh refinement at the interface.
+
+The mapping procedure needs not only to find the closest available mesh point (or points) on the opposite mesh, but also to preserve mass and energy balance. Variables are basically mapped in two ways: \textit{consistent} and \textit{conservative} forms.
+
+In the \textit{consistent mapping} a value on a node of one grid has the same value of the corresponding node on another grid: that is, it reproduces the values on both meshes. In the \textit{conservative form}, integral values are preserved between meshes. In an FSI problem, nodal forces are mapped in conservative form, while velocities or displacements are mapped in consistent form. An example is shown in Figure \ref{fig:mapping}.
 
 
 
-In this section, FSI methods are classified by means of two different mesh treatment procedures: conforming
-or non-conforming techniques. The basic question is, whether fluid and solid mesh need to align
-with each other at the FSI interface or not. Unless stated otherwise, the explanations of this section are
-taken from [20]. Note that some aspects of conforming mesh methods are already included in the previous
-sections without explicitly mentioning so, in order to develop a better understanding of partitioned FSI
-simulations.
-Conforming mesh methods usually consist of three major subtasks, namely computation in the fluid and
-solid domain, as well as interface and mesh movement. They require both fluid and structural meshes
-to conform to the wet surface, because the coupling conditions are applied via the interface as physical
-boundary conditions for the respective domains. This does not necessarily imply node-to-node matching
-of fluid and structure meshes at the interface. This must hold for all time instances, which means that
-both fluid and structural grids need to be moved in case deformations of the solid appear. This is a
-simple task for the solid mesh, since it is usually expressed in a Lagrangian fashion anyway. However, as
-a typical Eulerian fluid mesh would not follow the interface motion, the necessity of the ALE method as
-discussed in Section 2.2.3 becomes apparent. Also, mesh smoothing techniques need to be introduced in order to prevent quality losses of the fluid mesh in terms of distorted elements. These irregularities lead
-to accuracy loss in simulations. In Figure 3.5, a conforming mesh is shown at two different points in time.
-At the first instance (Figure 3.5a) the solid is undeformed and therefore, also the fluid mesh remains in
-its initial configuration. In contrast, at the second point in time (Figure 3.5b) the solid is deformed and
-the fluid mesh conforms to the displaced wet surface. Consequently, also mesh smoothing is applied.
-There is a wide variety of such mesh updating procedures. Some common techniques compute the mesh
-movement by considering mesh edges as springs ((torsional) spring analogy), solving the Laplace equation
-or solving a pseudo-structural system of equations (see e.g. [18], [43], [20] and their respective references
-for further explanations of these techniques). Conforming mesh strategies are widely, but not exclusively
-used in partitioned FSI approaches. Furthermore, they typically also utilize the ALE method ([20]).
-In contrast, in non-conforming mesh strategies all interface conditions are directly imposed as constraints
-on the flow and structural governing equations. Therefore, it is possible to use non-conforming meshes
-for fluid and solid domains as they remain geometrically independent from each other. Thus, also mesh
-smoothing techniques are obsolete [43]. Figure 3.6 depicts such a situation. By analogy with Figure 3.5,
-again the initial configuration (Figure 3.6a) and an instance when the solid is deformed (Figure 3.6b) are
-shown. It is clearly visible that the fluid mesh does not conform to the wet surface as all nodes stay at
-the same position regardless of the solid deformation.
-This approach is mostly used in immersed methods. The considerations in this section are limited to them,
-as they are also very common for FSI simulations. Coupling is imposed via additional force-equivalent
-terms appearing in the model equations of the fluid, enforcing the kinematic and dynamic conditions.
-These FSI forces are computed from the structural model, which is dealt with separately together with
-tracking the position of the interface. The forces represent the effects of a boundary or body being
-immersed in the fluid domain (leading to immersed boundary and immersed domain methods). A purely
-Eulerian mesh can be applied to the whole computational domain for solving the fluid equations, since
-the force-equivalent terms are dynamically added in a spatially specific manner to those locations, which
-are currently occupied by the structure. After solving the fluid equations, forces exerted on the solid at
-the wet surface are computed and used as input for the structural solver, which still employs a Lagrangian
-mesh. Subsequently, the deformation of the solid material is calculated and the displacement of the FSI
-interface is fed back to the fluid model in form of updated force-equivalent terms ([31], [20], [43]).
+\begin{figure}[htbp!]
+	\centering
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		% include first image
+		\begin{tikzpicture}[scale=1]
+			\tikzstyle{n} = [draw, very thick, circle, minimum width=30]
+			\node [n,draw=blue!20] (f1) at (1,2.5) {\scriptsize{$1mm$}};
+			\node [n,draw=blue!20] (f2) at (3,2.5) {\scriptsize{$3mm$}};
+			\node [n,draw=blue!20] (f3) at (5,2.5) {\scriptsize{$2mm$}};
+			\node [n,draw=blue!20] (f4) at (7,2.5) {\scriptsize{$1mm$}};
+			\node [n,draw=blue!20] (f5) at (9,2.5) {\scriptsize{$0mm$}};
+			\node [n,draw=orange!50] (s1) at (3,0) {\scriptsize{$2mm$}};
+			\node [n,draw=orange!50] (s2) at (7,0) {\scriptsize{$1mm$}};
+			
+			\draw [very thick, blue!20] (0,2.5) -- (f1);
+			\draw [very thick, blue!20] (f1) -- (f2);
+			\draw [very thick, blue!20] (f2) -- (f3);
+			\draw [very thick, blue!20] (f3) -- (f4);
+			\draw [very thick, blue!20] (f4) -- (f5);
+			\draw [very thick, blue!20] (f5) -- (10,2.5);
+			
+			\draw [very thick, orange!50] (0,0) -- (s1);
+			\draw [very thick, orange!50] (s1) -- (s2);
+			\draw [very thick, orange!50] (s2) -- (10,0);
+			
+			\draw[->] (f2)-- (s1) node[midway,left] {\scriptsize{$2mm$}};
+			\draw[->] (f4)-- (s2) node[midway,right] {\scriptsize{$1mm$}};
+			
+		\end{tikzpicture}
+		\caption{consistent mapping}
+		\label{fig:consistent}
+	\end{subfigure}
+	\newline
+	\centering
+	\begin{subfigure}{.8\textwidth}
+		\centering
+		% include second image
+		\begin{tikzpicture}[scale=1]
+			\tikzstyle{n} = [draw, very thick, circle, minimum width=30]
+			\node [n,draw=blue!20] (f1) at (1,2.5) {\scriptsize{$3N$}};
+			\node [n,draw=blue!20] (f2) at (3,2.5) {\scriptsize{$1N$}};
+			\node [n,draw=blue!20] (f3) at (5,2.5) {\scriptsize{$4N$}};
+			\node [n,draw=blue!20] (f4) at (7,2.5) {\scriptsize{$2N$}};
+			\node [n,draw=blue!20] (f5) at (9,2.5) {\scriptsize{$3N$}};
+			\node [n,draw=orange!50] (s1) at (3,0) {\scriptsize{$6N$}};
+			\node [n,draw=orange!50] (s2) at (7,0) {\scriptsize{$7N$}};
+
+			\draw [very thick, blue!20] (0,2.5) -- (f1);
+			\draw [very thick, blue!20] (f1) -- (f2);
+			\draw [very thick, blue!20] (f2) -- (f3);
+			\draw [very thick, blue!20] (f3) -- (f4);
+			\draw [very thick, blue!20] (f4) -- (f5);
+			\draw [very thick, blue!20] (f5) -- (10,2.5);
+
+			\draw [very thick, orange!50] (0,0) -- (s1);
+			\draw [very thick, orange!50] (s1) -- (s2);
+			\draw [very thick, orange!50] (s2) -- (10,0);
+
+			\draw[->] (f1)-- (s1) node[midway,left] {\scriptsize{$3N$}};
+			\draw[->] (f2)-- (s1) node[midway,left] {\scriptsize{$1N$}};
+			\draw[->] (f3)-- (s1) node[midway,left] {\scriptsize{$2N$}};
+			\draw[->] (f3)-- (s2) node[midway,right] {\scriptsize{$2N$}};
+			\draw[->] (f4)-- (s2) node[midway,right] {\scriptsize{$2N$}};
+			\draw[->] (f5)-- (s2) node[midway,right] {\scriptsize{$3N$}};
+			
+		\end{tikzpicture}
+		\caption{conservative mapping}
+		\label{fig:conservative}
+	\end{subfigure}
+	\caption{Examples of mapping data between non-coincident meshes: consistent (a) and conservative (b) schemes.}
+	\label{fig:mapping}
+\end{figure}
+
+
+different mapping strategies can be implemented \cite{bungartz2016precice}:
+
+\begin{itemize}
+	\item \textit{Nearest Neighbor}: finds the closest point on the source mesh and uses its value for the target mesh. It does not require any topological information and is first-order accurate. It is the computationally easiest implementation and it is useful when interface meshes are coincident.
+	\item \textit{Nearest Projection}: projects the points of the target mesh on the source mesh, interpolates the data linearly and assigns the values to the target mesh. It requires topology information for the source mesh. The interpolation on the mesh elements is second order accurate.
+	\item \textit{~\ac{RBF}}: this method does not requires topological information and works well on general meshes. The mapping uses radial basis functions centered at the grid points of the source mesh \cite{lindner2017radial}.
+\end{itemize}
+
 
 \section{Stability: Added Mass Effect}
 \label{sec:added-mass}
+
+
+\cite{van2009added}
+\cite{causin2005added}
+\cite{forster2006artificial}
+\cite{degroote2008stability}
 
 To conclude this chapter about computational aspects of FSI simulations, the AME is briefly described.
 Explanations of this effect can be found in a great variety throughout FSI literature, typically explicated
