@@ -33,7 +33,7 @@
 \usepackage{cite} % serve per mettere le citazioni bibliografiche
 \usepackage{amsmath,amsfonts,amsthm,bm} % Math packages
 
-\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 
 \usepackage{soul}
 \usepackage{color}
@@ -43,6 +43,9 @@
 \renewcommand{\sectionmark}[1]{\markright{\thesection.\ #1}} % modifica l'intestazione con il nome/numero dela sezione
 \renewcommand{\cftfigfont}{Figure } % per aggiungere "Figure " nella lista delle figure
 \renewcommand{\cfttabfont}{Table } % per aggiungere "Table " nella lista delle tabelle
+
+
+\DeclareMathOperator*{\argmin}{argmin} % thin space, limits underneath in displays
 
 
 % Keywords command

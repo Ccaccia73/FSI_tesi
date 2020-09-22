@@ -1,7 +1,7 @@
 \chapter{Computational aspects of Fluid-Structure Interaction problems}
 \label{cha:computation}
 
-This section deals with the computational aspects of FSI problems. The first possible categorization of solution techniques distinguishes between monolithic and partitioned approach, as discussed in Section \ref{sec:monolithic}. This work is based on the latter approach, so the two different coupling strategies, namely strong and weak, are discussed in Section \ref{sec:coupling}. As strong coupling is generally needed for accurate solution, ad overview of strong coupling algorithms is given in Section \ref{sec:strong-coupling}. Section \ref{sec:interface-mesh} focuses on aspects concerning the interface mesh, and how the solid and the fluid exchange data between them. Finally \ref{sec:addedd-mass} briefly describes a common issue arising in strongly coupled problems: the ~\ac{AME}.
+This section deals with the computational aspects of FSI problems. The first possible categorization of solution techniques distinguishes between monolithic and partitioned approach, as discussed in Section \ref{sec:monolithic}. This work is based on the latter approach, so the two different coupling strategies, namely strong and weak, are discussed in Section \ref{sec:coupling}. As strong coupling is generally needed for accurate solution, ad overview of strong coupling algorithms is given in Section \ref{sec:strong-coupling}. Section \ref{sec:interface-mesh} focuses on aspects concerning the interface mesh, and how the solid and the fluid exchange data between them. Finally \ref{sec:added-mass} briefly describes a common issue arising in strongly coupled problems: the ~\ac{AME}.
 
 
 \section{Monolithic and Partitioned Approach}
@@ -413,20 +413,10 @@ A suitable dynamic relaxation parameter, is a better choice, like the \textit{Ai
 
 Aitken under-relaxation can be a good choice for strong interaction with a fluid solvers that does not fully converge in every iteration or for compressible fluid solvers.
 
-% da citare: @article{kuttler2008fixed,
-%  title={Fixed-point fluid--structure interaction solvers with dynamic relaxation},
-%  author={K{\"u}ttler, Ulrich and Wall, Wolfgang A},
-%  journal={Computational mechanics},
-%  volume={43},
-%  number={1},
-%  pages={61--72},
-%  year={2008},
-%  publisher={Springer}
-%}
 
 \subsection{Quasi Newton Least Squares schemes}
 
-Under-relaxation is a good choice for easy stable problems, but is outperformed by more sophisticated quasi-Newton coupling schemes. Equation \ref{eq:fp3} could be solved iteratively with a Newton method:
+Under-relaxation is a good choice for easy stable problems, but is outperformed by more sophisticated quasi-Newton coupling schemes. Equation \ref{eq:fp3} could be solved iteratively with a Newton method \cite{uekermann2016partitioned}:
 
 \begin{subequations}
 	\begin{eqnarray}
@@ -437,46 +427,84 @@ Under-relaxation is a good choice for easy stable problems, but is outperformed 
 		\label{eq:nm3}
 		d_k + \left(  \left. \frac{\partial R}{\partial d} \right|_{d_k} \right)^{-1} \left(-r_k \right) &=&  d_{k+1}
 	\end{eqnarray} 
-	\label{eq:fp-equations}
+	\label{eq:fp-jac}
 \end{subequations}
 
-The \textit{residual} at iteration \textit{k} is defined in Equation \ref{eq:nm1}, if the Jacobian matrix of the equation is known, a Newton iteration can be performed as in Equation \ref{eq:nm2}. The updated values can be computed in Equation \ref{eq:nm3}.
+The \textit{residual} at iteration \textit{k} is defined in Equation \ref{eq:nm1}, if the Jacobian matrix of the equation is known, a Newton iteration can be performed as in Equation \ref{eq:nm2}. The updated values can be computed using Equation \ref{eq:nm3}.
 
-Unfortunately, the exact Jacobian of \textit{R} is unknown 
+In situations where:
+\begin{itemize}
+	\item \textit{black-box} systems are considered (i.e. the Jacobian is unknown),
+	\item the cost of a function evaluation is sufficiently high that numerical estimation of the Jacobian is prohibitive, 
+\end{itemize}
 
-%da citare:@phdthesis{uekermann2016partitioned,
-%  title={Partitioned fluid-structure interaction on massively parallel systems},
-%  author={Uekermann, Benjamin Walter},
-%  year={2016},
-%  school={Technische Universit{\"a}t M{\"u}nchen}
-%}
+there exist a number of matrix-free methods that use only information derived from the consecutive iterates and that build an approximation based on those values. This approach is known as \textit{quasi-Newton method} \cite{haelterman2009quasi}.
+Input and output data of $H$ and $R$ are used to approximate the solution of \ref{eq:nm3}. Algorithm \ref{alg:qnls} (taken from \cite{uekermann2013parallel}) shows the basics steps to estimate data at next step using the \textit{Quasi Newton Least Squares Method}:
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\KwResult{$d_{k+1}$}
+	initial value $d_0$\;
+	$\tilde{d}_0 = H(d_0)$ and $R_0 = \tilde{d}_0 +- d_0$\;
+	$d_1 = d_0 + \omega r_0$\;
+	\For{$k = 1 \ldots$}{
+		$\tilde{d}_k = H(d_k)$ and $r^k = \tilde{d}_k - d_k$\;
+		$V^k = \left[\Delta r_0^k, \ldots , \Delta r^k_{k-1} \right]$ with $\Delta r^k_i =r^i - r^k$\;
+		$W^k = \left[\Delta \tilde{d}^k_0, \ldots , \Delta \tilde{d}^k_{k-1}  \right]$ with $\Delta \tilde{d}^k_i = \tilde{d}_i - d_k$\;
+		decompose $V^k = Q^kU^k$\;
+		solve the first $k$ lines of $U^k \alpha = - Q^{k^T}R^k$\;
+		$\Delta \tilde{d}^k = W^k\alpha$\;
+		$d_{k+1} = \tilde{d}_k + \Delta \tilde{d}_k$\;
+		
+	}
+	\label{alg:qnls}
+	\caption{Quasi Newton Least Squares method}
+\end{algorithm}
+
+In algorithm \ref{alg:qnls} the matrices $V^k$ and $W^k$ are constructed from the previous iterations and the known values of $d_0, \ldots d_k$ and $\tilde{d}_0, \ldots, \tilde{d}_k$. $\Delta \tilde{d}^k$ is constructed in the column space of $W^k$ (line 10). For this reason a least squares problem is solved:
+
+\begin{equation}
+	\alpha = \argmin_{\beta \in \mathbb{R}^k} \lVert V^k\beta + R(d_k) \rVert
+\end{equation}
+
+The least squares problem is solved  computing the decomposition of $V^k$ into an orthogonal matrix $Q^k \in \mathbb{R}^{k \times k} $ and an upper triangular matrix $U^k \in \mathbb{R}^{n \times k}$ (line 8). Then $\alpha$ is computed in line 9.
+
+When building matrices $V^k$ and $W^k$ (lines 6-7 ), it is possible to use information from previous time steps.
+
+Finally, to ensure linear independence of columns in the multi-secant system for Jacobian estimation, a filter can be used \cite{haelterman2016improving}, in order to drop nearly dependent columns of $Q^k$ and avoid singularity of the approximated Jacobian.
+
+The above algorithm is usually denominated in FSI  ~\ac{IQN-ILS} (or Anderson acceleration). There exist other algorithms, like generalized Broyden (IQN-IMVJ) or manifold mapping to solve the problem. A complete desciption of those methods goes beyond the scope of this work: a description of the most common algorithms can be found in \cite{blom2016review}, while a comparison of the performances can be found in \cite{lindner2015comparison}.
 
 
 \subsection{Convergence criteria}
 
+At each time step, the coupling algorithm enforce matching conditions at the wet surface up to a convergence criterion. If not sufficiently met, another iteration within the same time step is performed. The fixed point formulation itself induces a criterion based on the residual itself $r_{k+1}$.
+
+A scalar, \textit{absolute convergence criterion} can de defined as in Equation \ref{eq:abscrit}: it is useful for close to zero values of the coupling quantities, when rounding errors become important:
+
+\begin{equation}
+	\lVert r_{k+1} \rVert \leq \epsilon_{abs}
+	\label{eq:abscrit}
+\end{equation}
+
+A more common \textit{relative convergence criterion}, defined in Equation \ref{eq:relcrit} is particularly useful when different quantities (e.g. forces and displacements) are compared together to evaluate convergence:
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\begin{equation}
+	\frac{\lVert  r_{k+1} \rVert}{\lVert  \tilde{d}_{k+1} \rVert} \leq \epsilon_{rel}
+	\label{eq:relcrit}
+\end{equation}
 
 
 
 \section{Interface Mesh}
 \label{sec:interface-mesh}
+
+
+
+
+
+
 
 In this section, FSI methods are classified by means of two different mesh treatment procedures: conforming
 or non-conforming techniques. The basic question is, whether fluid and solid mesh need to align
@@ -523,7 +551,7 @@ mesh. Subsequently, the deformation of the solid material is calculated and the 
 interface is fed back to the fluid model in form of updated force-equivalent terms ([31], [20], [43]).
 
 \section{Stability: Added Mass Effect}
-\label{sec:addedd-mass}
+\label{sec:added-mass}
 
 To conclude this chapter about computational aspects of FSI simulations, the AME is briefly described.
 Explanations of this effect can be found in a great variety throughout FSI literature, typically explicated
