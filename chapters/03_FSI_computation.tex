@@ -445,7 +445,7 @@ Input and output data of $H$ and $R$ are used to approximate the solution of \re
 	\SetAlgoLined
 	\KwResult{$d_{k+1}$}
 	initial value $d_0$\;
-	$\tilde{d}_0 = H(d_0)$ and $R_0 = \tilde{d}_0 +- d_0$\;
+	$\tilde{d}_0 = H(d_0)$ and $R_0 = \tilde{d}_0 - d_0$\;
 	$d_1 = d_0 + \omega r_0$\;
 	\For{$k = 1 \ldots$}{
 		$\tilde{d}_k = H(d_k)$ and $r^k = \tilde{d}_k - d_k$\;
@@ -672,13 +672,18 @@ different mapping strategies can be implemented \cite{bungartz2016precice}:
 \section{Stability: Added Mass Effect}
 \label{sec:added-mass}
 
-When a solid moves or vibrates in a fluid domain, the interaction changes the way in which the structure behaves. There exist a vast variety of literature (e.g.: \cite{chen1976added}, \cite{conca1997added}, \cite{gauthier2017numerical}, \cite{ricciardi2015modelling}) describing the effects of FSI in terms of \textit{added mass}, \textit{added damping} or even \textit{added stiffness} effects on a vibrating structure in function of fluid properties (e.g. density or viscosity), or flow properties (e.g. velocity).
+When a solid moves or vibrates in a fluid domain, the interaction changes the way in which the structure behaves. There exist a vast variety of literature (e.g.: \cite{chen1976added}, \cite{conca1997added}, \cite{gauthier2017numerical}, \cite{ricciardi2015modelling}) describing the effects of FSI in terms of \textit{added mass}, \textit{added damping} or even \textit{added stiffness} on a vibrating structure in function of fluid properties (e.g. density or viscosity), or flow properties (e.g. velocity).
 
 Besides the physical aspects of the interaction, some numerical issues arise when trying to simulate this kind of problems.
 
 The numerical issue named \textit{~\ac{AME}} is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
 
 Weakly coupled algorithms give good results in aeroelasticity studies, but 
+
+
+
+
+
 
 
 \cite{van2009added}
