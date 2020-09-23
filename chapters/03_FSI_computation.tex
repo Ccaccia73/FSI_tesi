@@ -672,19 +672,21 @@ different mapping strategies can be implemented \cite{bungartz2016precice}:
 \section{Stability: Added Mass Effect}
 \label{sec:added-mass}
 
+When a solid moves or vibrates in a fluid domain, the interaction changes the way in which the structure behaves. There exist a vast variety of literature (e.g.: \cite{chen1976added}, \cite{conca1997added}, \cite{gauthier2017numerical}, \cite{ricciardi2015modelling}) describing the effects of FSI in terms of \textit{added mass}, \textit{added damping} or even \textit{added stiffness} effects on a vibrating structure in function of fluid properties (e.g. density or viscosity), or flow properties (e.g. velocity).
+
+Besides the physical aspects of the interaction, some numerical issues arise when trying to simulate this kind of problems.
+
+The numerical issue named \textit{~\ac{AME}} is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
+
+Weakly coupled algorithms give good results in aeroelasticity studies, but 
+
 
 \cite{van2009added}
 \cite{causin2005added}
 \cite{forster2006artificial}
 \cite{degroote2008stability}
 
-To conclude this chapter about computational aspects of FSI simulations, the AME is briefly described.
-Explanations of this effect can be found in a great variety throughout FSI literature, typically explicated
-for specific solver strategies or flow regimes (see e.g. [5], [42], [15], [2]). Therefore, in the scope of
-this thesis only a short phenomenological introduction to the concept of added mass and numerical
-problems arising from it is given. However, this suffices to focus on both weakly and strongly coupled partitioned approaches, which are practically relevant in this thesis. The AME is inherent to partitioned
-FSI approaches as the single-physics fields are not continuously coupled but interaction only occurs at a
-finite number of discrete time instances, when coupling quantities are exchanged.
+
 As already mentioned in Section 2.3.3, there can be no gaps between structure and fluid. Also their
 respective particles cannot occupy the same spatial locations simultaneously. Thus, if the solid is moved,
 also fluid particles move. Changing the state of motion of the structural component consequently requires
@@ -735,3 +737,17 @@ algorithms. It is independent of the size of time increments1. Furthermore, in o
 method to achieve the monolithic solution (assuming its convergence is given, i.e. the before mentioned
 stability limit is not exceeded) the number of subiterations must be increased as time step size decreases
 ([15], [42]).
+
+
+
+
+
+
+
+To conclude this chapter about computational aspects of FSI simulations, the AME is briefly described.
+Explanations of this effect can be found in a great variety throughout FSI literature, typically explicated
+for specific solver strategies or flow regimes (see e.g. [5], [42], [15], [2]). Therefore, in the scope of
+this thesis only a short phenomenological introduction to the concept of added mass and numerical
+problems arising from it is given. However, this suffices to focus on both weakly and strongly coupled partitioned approaches, which are practically relevant in this thesis. The AME is inherent to partitioned
+FSI approaches as the single-physics fields are not continuously coupled but interaction only occurs at a
+finite number of discrete time instances, when coupling quantities are exchanged.
