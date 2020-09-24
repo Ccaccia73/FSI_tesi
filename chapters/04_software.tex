@@ -1,9 +1,409 @@
 \chapter{Software Packages used in this work}
 \label{cha:software}
-Lorem ipsum dolor sit amet, consectetur adipisci elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+
+This chapter illustrates the main software tools used in this work. First, the coupling library \textit{preCICE} is introduced in Section \ref{sec:precice}. Then, the multibody dynamics solver \textit{MBDyn} being connected to preCICE is shortly presented in Section \ref{sec:mbdyn}.
 
 
 \section{preCICE}
 \label{sec:precice}
 
+The main information concerning preCICE is taken from the official documentation: that is \cite{gatzhammer2014efficient} and  \cite{bungartz2016precice}. The preCICE website is also a source of documentation\footnote{\href{http://www.precice.org}{www.precice.org}}.
+
+The open-source\footnote{The code can be accessed via Github: \href{https://github.com/precice/precice}{github.com/precice/precice}} software library preCICE provides the components to connect traditional single-physics solvers and create a partitioned multi-physics simulation (e.g. fluid-structure interaction, conjugated heat transfer, solid-solid interaction, etc.).
+It aims at coupling existing solvers in a partitioned black-box manner (see Section \ref{sec:coupling}):  only minimal information abut the solver is available and connection involves just interface nodes. 
+In order to be flexible and easily implemented, the impact on the solvers should be as minimal as possible: for this reason, preCICE offers a high level ~\ac{API} (Section \ref{sec:pc-api}) different languages, such as C/C++, Fortran and Python.
+The ability to switch among different solvers is advantageous as it provides a lot of flexibility in developing and testing new coupled components.
+
+In a nutshell, preCICE simply affects the input and observes the output of the solvers (called \textit{participants}). The required data and control elements are accessed using an \textit{adapter}, i.e. a "glue code" that is attached to the corresponding solver and communicates the information with the library.
+
+preCICE performs all the actions required to perform a coupled simulation: implements the coupling strategy and convergence criteria (Section \ref{sec:pc-coupling}), the communication
+between the participants (Section \ref{sec:pc-comm}), the mapping of data between meshes (Section \ref{sec:pc-map}). preCICE is configured by means of an ~\ac{XML} file (Section \ref{sec:pc-config}).
+
+
+
+\subsection{Implemented coupling strategies}
+\label{sec:pc-coupling}
+
+Because preCICE treats the individual solvers as
+“black boxes”, this information is not available. What is available, however, is the history
+of the coupling iterations. This can be used to compute an approximate Jacobian and
+therefore solve Equation 2.10. using a quasi-Newton step. Two variants of this method are
+offered in preCICE: the classical interface quasi-Newton (IQN-ILS) and the multi-vector
+quasi-Newton (IQN-IMVJ). The reader can find more information about these methods in
+the presentation article of preCICE [6.]. A comparison between them has been published
+by Lindner et al. [11.]. In the preCICE-terminology, this additional step for improving the
+stability and accelerating the convergence is called “post-processing”.
+To summarize, preCICE offers four coupling schemes: serial-explicit, parallel-explicit,
+serial-implicit, and parallel-implicit. The serial schemes execute the solvers sequentially (the
+one solver after the other, irrelevant of their internal parallelization) and the second solver
+uses the updated information from the first one. The parallel schemes execute the solvers in
+parallel, without updating their input before both solvers complete. In an explicit scheme,
+the solvers only exchange information once or a fixed number of times. This is simple and
+fast, but also unstable. An implicit scheme modifies the result of the fixed-point iteration,
+by solving a fixed-point equation until convergence, either with an under-relaxation or with
+a more sophisticated quasi-Newton method. In the preCICE terminology, this is called
+“post-processing” and, together with “checkpointing” are important in an implicit coupling
+scheme. Please note that, although we refer here to two solvers, preCICE is also capable of
+coupling multiple solvers at the same time.
+
+
+%% RUSCH
+
+preCICE allows both for usage of explicit and implicit coupling techniques. See Section 3.2 to recapitulate
+the main differences of these approaches. Also, serial and parallel algorithms have been implemented, as
+well as elaborate procedures particularly suited for black-box coupling.
+Concerning notation, for all algorithms explained in this section n denotes the current time step of
+the computation, Fn and Sn are operators representing the fluid and solid solver computation at time
+instance n, respectively. They yield the particular fluid and solid solutions fn+1 and sn+1 at time instance
+n + 1.
+
+Explicit, Serial Algorithm
+
+A serial, weakly coupled algorithm implemented in preCICE is the conventional serial staggered (CSS)
+procedure ([18]). The algorithm is graphically depicted in Figure 4.3. The fluid solver uses the solid
+solution at the last time step to compute its current solution (explicit). In contrast, the solid solver needs
+the current flow solution to compute the structure solution at the same time instance (implicit). Because
+of this dependency, fluid and structural solvers are said to be executed in a serial, staggered way as they
+cannot run in parallel and their succession is strictly alternating ([12]).
+
+Explicit, Parallel Algorithm
+
+The conventional parallel staggered (CPS) algorithm is similar to the CSS procedure, but allows for
+parallel execution of both fluid and structure solvers and represents a parallel, explicit coupling algorithm
+implemented in preCICE ([18]). No implicit dependency as in the case of CSS is present. The succession
+of this algorithm is shown in Figure 4.4. Fluid and solid solver advance in parallel and exchange coupling
+data at the end of the time step. However, a drawback compared to the CSS algorithm is the loss of
+implicitly involving the two solvers, which yields a less stable procedure. Since fluid and solid solvers have
+to exchange coupling data after each iteration, the overall computation time of the scheme is dependent
+on the most time-consuming solver, which makes an efficient distribution of computational effort between
+flow and structure solvers crucial ([12], [18]).
+
+Implicit, Serial Strategies
+
+In the following only one time step is discussed, unless stated otherwise. Therefore, all superscripts
+indicating the time step are neglected. However, subscripts are used to denote subiterations within one
+time instance.
+Several implicit algorithms are implemented in preCICE including a Block Gauss-Seidel method with
+either constant or dynamic Aitken under-relaxation (see Algorithm 1). The Block Gauss-Seidel method
+is basically an implicit extension of the CSS procedure employing a fixed-point iteration of the form:
+%~sk+1 = S  F(sk): (4.1)
+First of all, the fluid solver runs using the old structural solution. Afterwards, the updated fluid solution
+is used by the solid solver to compute the new structure solution. Note that ~sk+1 is used to indicate
+that the structural solution is solely obtained by the respective solvers without any modification like
+e.g. relaxation, while sk+1 indicates that such postprocessing has been applied to the solution. The
+fixed-point formulation allows to define a residual as shown in Equation 4.2, which can be used to obtain
+a scalar, absolute convergence criterion (see Equation 4.3), useful for close to zero values of the coupling
+quantities, when rounding errors become important:
+% rk+1 = S  F(sk) 􀀀 sk = ~sk+1 􀀀 sk;
+%k  k denotes the Euclidean norm. Also, a scalar, relative convergence criterion is defined in order to keep
+track of convergence between two subsequent subiterations:
+%where 0 < rel;abs < 1. By analogy with the CSS algorithm, the solid solver depends implicitly on the
+updated solution of the fluid solver, thus not allowing for parallel execution of the single-physics solvers.
+Since the fluid solver needs a value of the structural solution as input, which is not available for the first
+iteration of a time step, a predictive value sp (Line 1, Algorithm 1) is used. The convergence criterion
+mentioned in Line 3 can be understood as a combination of the absolute and relative limits defined in
+Equations 4.3 and 4.4.
+Relaxation techniques as mentioned in Line 6 are used to stabilize the subiteration method. For the
+case of constant under-relaxation, the relaxed value of the kinematic coupling data is computed as a
+combination of the old, relaxed and the new, unrelaxed value:
+%sk+1 = (1 􀀀 !)sk + !~sk+1; (4.5)
+with 0 < ! < 1. Roughly speaking, values of ! close to 1 have little stabilizing effect, but result in fast
+convergence (assuming the method is stable and convergent), whereas for values close to 0 the stabilization
+is strong, yet convergence is slow and this leads to high computational effort as more subiteration steps
+are necessary. Consequently, the value should be chosen such that the subiteration process is stable and
+moreover, converges as fast as possible. Therefore, the choice of ! can be difficult in practice.
+In contrast to constant under-relaxation, where the relaxation factor ! is fixed, dynamic Aitken relaxation
+allows for a new factor to be computed in each subiteration. Basically, the dynamic factor is computed
+from the last two subiteration solutions via linear extrapolation in order to find the solution of the
+fixed-point system with zero residual, analogous to a root-finding problem with the secant method. The
+algorithm for obtaining the dynamic Aitken factor is not further described here, as it exceeds the scope
+of this thesis. Refer to [18], [21] and [25] for details.
+
+Procedures Predestinated for Black-Box Coupling
+As coupling of black-box solvers is one of the major issues of preCICE, no Newton methods can be used
+for implicit coupling, since they require interface Jacobian information, which is typically not accessible
+for this kind of solvers. Therefore, algorithms which make use of approximations of the Jacobian are
+of importance. Two variants of these are implemented in preCICE, for serial and parallel usage. The
+serial algorithm is called IQN-ILS, which stands for Interface Quasi-Newton with Approximation of the
+Inverse of the Interface Jacobian Matrix by Least-Squares. In a sequential manner, fluid and structural
+solvers are executed, followed by the IQN-ILS algorithm, which modifies the structural solution such that
+the underlying fixed-point iteration converges. This solution is then fed back to the fluid solver and the
+computation circle starts over, as long as the fixed-point is not yet reached up to a specified convergence
+criterion.
+The parallel procedure is named V-IQN, originating from a vectorial fixed-point formulation of the
+problem (displacements and forces are gathered in a single vector). Again the procedure is based on an
+Interface Quasi-Newton approach. The method allows for fluid and solid solver to be run simultaneously,
+before the V-IQN algorithm modifies the vector of displacements and forces such that the fixed-point
+iteration converges. If the convergence limit is not yet reached after a subiteration, these modified values
+are used as input for the next iteration of fluid and structure solvers, respectively.
+I do not explain these elaborate methods further. Refer to [8] for the IQN-ILS method and to [40] and
+[27] for the V-IQN algorithm.
+4.1.2
+
+\subsection{Communication strategies}
+\label{sec:pc-comm}
+
+The individual participants need to communicate with each other, in order to exchange
+information. The participants may be executed in multiple processes, possibly running on
+different nodes of a supercomputing system. The simulation software may not use MPI and
+may not be open-source. However, these are no obstacles for preCICE, since it allows for
+communication using either MPI ports (MPI 2.0), or TCP/IP sockets (implemented with
+Boost.Asio3
+.), which are lower-level and allow to couple closed-source software as well.
+In each parallel solver, one “master” process is chosen to manage the steering of the simulation.
+However, no central instance (“server”) is required in preCICE. The participating
+processes use asynchronous point-to-point (M:N) communication. The communication
+channels are static and set in the beginning of the coupled simulation. This currently poses
+limitations in using preCICE with dynamically adaptive meshes or immersed boundaries,
+limitations that are going to be surpassed in future releases [6., 16.].
+
+%% RUSCH
+
+Interfield parallelism is an important topic when it comes to high-performance computing (HPC) on
+massively parallel systems. But the execution time of the solver processes does not solely determine
+overall runtimes of simulations. A high level of parallelization also induces the necessity of efficient forms
+of communication between the distributed processes so that data transfer does not become a dominant
+bottleneck. preCICE offers three different means of communication based on files, sockets and message
+passing interface (MPI) ([18]). A fully parallel process-to-process communication approach (both via
+sockets and MPI) for preCICE is implemented in [37].
+Files
+File communication is a very basic form of communication. Solver processes write data to and read data
+from files, which are stored on the hard drive of a computer. Communication is limited to a one-to-one
+fashion, meaning that a single writer and a single reader communicate with each other. Each file is
+named uniquely in order to identify the writer and reader by their respective names. Furthermore, the
+file name contains a message counting number. In order to avoid writer and reader processing the same
+file simultaneously, the currently working process renames the file and hides it by that manner from the
+communication partner. Reading is implemented such that busy waiting is used to check for the correctly
+named file. This is a drawback of file communication as it blocks computational resources. Moreover,
+due to the inherent latency of the hard drive, the technique is not feasible for frequent data exchange. It
+is implemented in preCICE solely for testing purposes as it allows to easily trace back errors ([18]).
+MPI
+MPI ([16]) is typically used for parallelizing applications (intrafield parallelism) in a way that parallel
+processes run the same code, differing by the MPI rank/index3. However, in preCICE, MPI communication
+is used to exchange data between processes of different applications, namely the instances of
+the single-physics solvers. A big advantage of this communication method is that MPI is available on
+most scientific computers and offers qualities, which are relevant in the field of HPC, such as high data
+throughput and small latency. In preCICE, MPI communication can be set up either via a single communication
+space containing all executables (which are then subgrouped for the individual solvers) or via
+different spaces. This means of communication can be quite prone to incompatibilities of software with
+different implemented versions of MPI. Therefore, it may be necessary to adapt/change the underlying
+MPI versions of the respective single-physics solvers or of preCICE. Especially in the case of closed-source
+solvers, this adaption might not be possible and thus communication via MPI might have to be discarded.
+Communication is performed asynchronously (non-blocking), which is highly relevant for fully parallel
+process-to-process communication ([37], [18]).
+Sockets
+preCICE also supports communication via Transmission Control Protocol/Internet Protocol (TCP/IP)
+sockets. Although their usage is rather unconventional in HPC, they are used in preCICE as they are
+a very elaborate, well-known means of network communication and therefore, mostly bug-free. Furthermore,
+unlike in the case of MPI, different TCP/IP socket versions for different solvers to be coupled
+do usually not yield runtime incompatibilities. Again, the communication procedure is asynchronous
+(non-blocking) ([37]).
+Gatzhammer shows in [18] that, indeed, MPI is the best-performing communication technique implemented
+in preCICE as it outperforms socket- and file-based communication especially for use cases of
+data exchange with higher numbers of nodes4. However, socket communication follows closely, such that
+both techniques are very well-suited for larger-scale simulations.
+
+\subsection{Data mapping}
+\label{sec:pc-map}
+
+A challenge in partitioned coupling is to map the required data between non-conforming
+meshes. The mapper not only needs to find the closest available mesh point, but also to not
+disrupt the mass and energy balances. Therefore, preCICE maps variables between meshes
+either in a consistent or in a conservative form. In the consistent mapping, the value of a
+node at the one grid is the same as the value of the corresponding node at the other grid.
+The consistent form simply reproduces the values from the one mesh to the other. The
+conservative form, on the other hand, makes sure that the integral values are preserved.
+For example, forces are mapped in a conservative fashion, since the sum of forces on both
+sides of an interface needs to be the same. On the contrary, fields such as temperatures or
+velocities are mapped consistently. An example is shown in Figure 2.3..
+The following mapping methods are implemented in preCICE [6.] (in their consistent
+variant):
+• Nearest neighbor: Finds the closest point on the source mesh and uses its value.
+It does not require any topological information and is first-order accurate.
+• Nearest projection: Projects the target mesh points on the mesh elements of the
+source mesh, performs linear interpolation on them and assigns the interpolated values
+11
+2. Tools
+back on the target mesh. Because of the usually small distance between two meshes
+(normal to the interface), in relation to the size of the elements, this method is secondorder
+accurate.
+• Radial Basis Function: Requires no topological information, and it does not search
+or project any points. It constructs an interpolant on the source mesh, using radial basis
+functions centered at the grid points and evaluates it on the target mesh. preCICE
+offers a wide variety of basis functions, but Gaussian and thin plate splines are the
+most widely used. A cut-off radius bounds the support of these functions and allows
+to keep the communication in a parallel environment local. In preCICE, the RBF
+mapping uses the PETSc library2
+. [2., 16.].
+All the respective conservative mapping methods are also available
+
+%% RUSCH
+
+In FSI simulations, fluid and structure meshes do not necessarily coincide in a node-to-node manner at
+the wet surface. In fact, typically fluid and structural domains are spatially discretized to different levels
+of refinement. In most cases, fluid meshes are finer than solid grids, meaning that at the wet surface more
+fluid than structural nodes appear. This situation is sketched in Figure 4.5. Therefore, when coupling
+data needs to be exchanged at the wet surface, some mapping between fluid and solid nodes must be
+applied in order to be able to interpolate data between them. preCICE offers three different methods
+for this, namely nearest-neighbor (NN) and nearest-projection (NP) mapping, as well as an interpolation
+method based on radial basis functions (RBF) ([18]).
+For all implemented procedures in preCICE, mapping can be applied in either consistent or conservative
+fashion, which must be chosen dependent on what quantities are exchanged at the wet surface (e.g. forces
+or stresses, displacements or velocities) ([18]). As is the case for the coupling described in this thesis (and
+most of the numerical testcases, which are shown), a fine fluid mesh and a coarse solid mesh meet at their
+common interface (as depicted in Figure 4.5). Forces need to be mapped from fluid to corresponding
+structural nodes and displacements in reverse from solid to fluid nodes. As the number of fluid nodes
+exceeds that of the structure, in general a single solid node is assigned to several fluid nodes5. If forces are
+mapped from these multiple fluid nodes to the solid node, all of the assigned fluid nodes contribute to the
+overall force value at the structural node in an additive manner. Such a mapping is called conservative, as
+the overall sum of the forces on both fluid and structure side at the wet surface remains constant, i.e. it is
+conserved. In contrast, when displacements are mapped from a single solid node to the fluid nodes, it is
+not useful to distribute the single displacement value among the fluid nodes such that the displacements
+of the fluid nodes sum up to the displacement of the solid node. Rather, all fluid nodes assigned to that
+single solid node experience the same displacement. Such a mapping is called consistent, as the mapped
+value is transferred exactly ([18], [7]). A schematic example of conservative and consistent interpolation
+is depicted in Figure 4.6 for the NN method. Conservative mapping of forces and consistent mapping of
+displacements is used in the coupling procedure performed in this thesis.
+
+Nearest-Neighbor
+NN mapping is the most basic method available in preCICE. Each node at the wet surface of a mesh
+searches for the corresponding closest neighboring node of the other mesh. In this context, "closest" is
+to be interpreted in the sense of the shortest Euclidean distance ([6]). Of course, this allows for multiple
+nodes of a fine mesh to be assigned to a single node of a coarse mesh as mentioned before. For this kind
+of mapping, preCICE needs no information regarding mesh connections and elements, the sole position
+of the nodes at the wet surface is sufficient ([18]).
+
+Nearest-Projection
+In the case of NP mapping, the shortest distance of a node of one mesh to the other mesh is detected. For
+a general three-dimensional case, when the interface between fluid and solid is a surface, a node’s shortest
+distance to the other mesh may occur at either a node, an edge or a surface element of the partner mesh.
+Thus, for each node, preCICE computes the distance to the NN, the nearest edge and the nearest surface
+element ([18]). For a graphical representation of this situation, see Figure 4.7. Consequently, the shortest
+distance is chosen among those three, which determines whether one node (node is nearest), two nodes
+%(edge is nearest) or multiple ( 3) nodes (surface element is nearest6) have to be taken into account for
+mapping. If the shortest distance occurs at an edge or a surface element, in general, not all nodes of the
+respective edge or surface element have the same influence on the assigned node of the partner mesh.
+Depending on how close these nodes are to the projected one, weights are calculated, which describe the
+differently strong influence. As for this method preCICE needs to know not only about the positions of
+all interface nodes, but also mesh connections in order to recognize edges and elements, at least one full
+mesh representation must be fed to preCICE during startup of a simulation ([18]).
+Radial Basis Functions
+Interpolation with RBF can be done with either compactly or globally supported functions. This means
+that the spatial influence of nodes, from which data is to be mapped, is either limited to a certain
+Euclidean range, the support radius r, or not. In the latter case, each node at the wet surface of one
+mesh influences each node at the interface of the other mesh. In contrast, with compactly supported
+RBF, only those nodes of the partnering mesh are influenced, which are located within a sphere around
+a node of the first mesh with radius equal to the support radius. In both cases the exact strength of the
+influence (and its dependency on distance between two nodes) is then determined by the RBF itself:
+
+where kxk denotes the Euclidean distance between a node of the first and the second mesh. Moreover,
+%for compactly supported RBF holds: (kxk) = 0 for kxk > r.
+Generally, the wider the support of a basis function is, the better is the approximation. Yet the computation
+of the interpolation requires more effort as influences of a lot of nodes have to be taken into
+account. In reverse, a narrow support yields an interpolation system, which is easy to solve, but the
+approximation might suffer from it resulting in larger mapping errors. Choosing an adequate support
+radius is, therefore, a difficult task in practice. Moreover, the support radius should be kept fixed for all
+wet surface nodes of a mesh as varying from node to node might not lead to an interpolation solution
+([1], [33]).
+Several different RBF are available in preCICE7. Globally supported functions include a thin-plate spline,
+(inverse) multiquadrics, a volume spline and a Gaussian, while the following compactly supported RBF
+are implemented: A thin-plate spline of continuity C2, as well as polynomials of continuity C0 and C6,
+respectively ([18]).
+
+\subsection{Configuration}
+\label{sec:pc-config}
+
+In order to start a multi-physics simulation with preCICE, all the participating, adapted
+solvers are started normally, in arbitrary order. Two configuration files are expected:
+• Adapter’s configuration file: Normally this is a YAML file and contains information
+about the boundaries that are used for the coupling, the kinds of exchanged data,
+the name of the used mesh and the name of the common preCICE configuration file.
+It may also contain other parameters, special to each adapter.
+• preCICE configuration file: This is an XML file and it is shared among all the
+participants. It defines the coupling interfaces between the participating solvers, the
+meshes over which coupling data is exchanged, the kinds of exchanged data, the way
+these data are mapped from the one mesh to the other and it provides all the necessary
+options for the respective coupling scheme.
+The OpenFOAM adapter’s configuration file is described in Section 5.4.. For the configuration
+of preCICE, the reader is referred to the wiki of preCICE for the latest information
+and detailed tutorials4
+
+
+\subsection{Application Program Interface}
+\label{sec:pc-api}
+
+Each participating solver needs to be modified to link to the preCICE library and call
+methods from its application programming interface. Usually, the calls to the API are
+grouped together in a preCICE adapter. While preCICE is written in C++, it provides an
+API also for C, Fortran and Python. An excerpt from the C++ API is shown in Listing 2.1.,
+as drawn from the preCICE source code documentation5
+..
+A coupling consists of a configuration and an initialization phase, multiple coupling advancements
+and a finalization phase. First, a SolverInterface object needs to be created.
+The constructor expects the rank of the process and the size of the communicator in the
+parallel execution environment. The configure() method sets the name of the preCICE
+configuration file, reads and validates it and sets up the communication inside the solver.
+The methods that follow in Listing 2.1. are called “steering methods”. The initialize()
+method sets up the data structures and communication channels to other participants. Here
+the first communication happens, as the participants exchange meshes and, if necessary,
+re-partition them. It returns the maximum time step size that the solver is allowed to
+execute next. It is followed by the initializeData(), which is optional and transfers any
+initial non-zero coupling data values among participants. The equation coupling, the data
+mapping and the communication are all hidden inside the advance() method. This method
+also returns the maximum time step size allowed. The last method to call is finalize(),
+which destroys the data structures and closes the communication channels.
+The solvers need to define their interface meshes. Only some of the methods for mesh
+definition are listed in Listing 2.1.. Each mesh and each node on the mesh are assigned an
+integer ID. The getMeshID() gets the ID of the mesh over which the coupling data of the
+specific kind are exchanged. The setMeshVertex() creates a vertex on the specified mesh
+and position and returns the id of the vertex. For performance reasons, multiple vertices
+can be defined at once with setMeshVertices(). Additionally, topological information,
+such as edges or triangles can be passed to preCICE with additional methods which are not
+listed here.
+After defining the meshes, they need to be assigned data values. This is done by methods
+with names write*Data(), which fill the “buffers” with data from the solver’s mesh or
+with methods read*Data(), which read data from the buffers into the solver’s mesh. Since
+preCICE distinguishes between scalar and vector data, both kinds of methods are available.
+Again, for performance reasons, blocks of data can be processed together using the
+respective writeBlock*Data() and readBlock*Data(). Please note that these data are
+not communicated among participants before the next advance() (or initializeData()).
+A number of auxiliary methods allow to access information important for the coupling,
+such as whether the coupled simulation is still running, if writing or reading data is expected
+or if the current coupling time step has finished successfully. The solver can also inquire if
+it is required to execute a specific action (e.g. to write or to read a checkpoint) and it can
+inform preCICE that it fulfilled these tasks [16.].
+An example of an adapted solver is shown in Listing 2.2., as published in the presentation
+article of preCICE [6.]. A more detailed example is presented in the wiki of preCICE6
+..
+
+
+
+
+..
+
+
+\subsection{Official Adapters}
+\label{sec:pc-adapters}
+
+This thesis presents an OpenFOAM adapter for preCICE. It is based on previous work and
+it considers other available adapters for specific solvers that use or are part of OpenFOAM
+or foam-extend. These adapters are described in Chapter 4..
+OpenFOAM is only one of the simulation software packages that preCICE supports.
+Official adapters are currently available for several other free solvers, inluding CalculiX,
+Code-Aster and SU2 [17.]. Closed-source software is also supported, including COMSOL
+and Fluent. The adapters are available in their own repositories, under the umbrella of the
+preCICE organization on GitHub7
+.. A detailed list, including several third-party adapters,
+can be found in the website of preCICE8
+.. Adapting an in-house solver is also possible and
+more, unpublished adapters are known to exist [5.].
+6preCICE
+
 \cite{uekermann2017official} Official adapters
+
+
+
+
+\section{MBDyn}
+\label{sec:mbdyn}
+
