@@ -115,6 +115,7 @@ The solution strategies can be roughly divided into weakly and strongly coupled 
 When the fluid and solid solutions are computed iteratively until some convergence criteria within the same time step, the scheme is called \textit{implicit coupling}. The faster, simpler but less precise \textit{explicit coupling} consists in executing a fixed number of iterations (typically one per time step) and exchange coupling values without convergence checks. 
 
 \subsection{Explicit coupling schemes}
+\label{subsec:explicit}
 
 As in the previous Section, $S_f$ represents the fluid solver, which computes the pressures (named $d_f$ here) at the deformable boundary and $S_s$ is the structure solver, which uses these forces to compute the displacement and velocity of the boundary (named $d_s$). In a \textit{serial-explicit} (or \textit{conventional staggered}) coupling scheme, the solver $S_f$ uses the old time step boundary values $d_s^{(n)}$ to compute the values of $d_f^{(n+1)}$ for the next time step:
 
@@ -206,7 +207,7 @@ The two explicit schemes are shown schematically in Figures \ref{fig:serial-expl
 In general, an explicit coupling is not enough to regain the exact (as in the monolithic approach) solution of the problem as the matching coupling conditions between the solvers is not enforced within each time step: no balance between fluid and structural domain with respect to forces and displacements at the interface can be guaranteed (\cite{hou2012numerical}, \cite{degroote2009performance}). Nevertheless, explicit coupling yields good results if the interaction between fluid and solid is weak as in aeroelastic simulations, where in general the simulations show small displacements of the structure within a single time step and the flow field isn't much influenced by the structural displacements (\cite{farhat2006provably}).
 
 \subsection{Implicit coupling schemes}
-
+\label{subsec:implicit}
 
 On the other hand, strongly (implicit) coupling techniques require an iterative method to solve the fixed-point equation that derives from enforcing the agreement of the interface variables.
 The coupling conditions at the wet surface are enforced in each time step up to a convergence criterion. If the criterion is not met, another subiteration within the same time instance is computed. Therefore, the solution can approximate the monolithic solution to an arbitrary accuracy.
@@ -477,6 +478,7 @@ The above algorithm is usually denominated in FSI  ~\ac{IQN-ILS} (or Anderson ac
 
 
 \subsection{Convergence criteria}
+\label{sec:convergence}
 
 At each time step, the coupling algorithm enforce matching conditions at the wet surface up to a convergence criterion. If not sufficiently met, another iteration within the same time step is performed. The fixed point formulation itself induces a criterion based on the residual itself $r_{k+1}$.
 
@@ -672,87 +674,45 @@ different mapping strategies can be implemented \cite{bungartz2016precice}:
 \section{Stability: Added Mass Effect}
 \label{sec:added-mass}
 
-When a solid moves or vibrates in a fluid domain, the interaction changes the way in which the structure behaves. There exist a vast variety of literature (e.g.: \cite{chen1976added}, \cite{conca1997added}, \cite{gauthier2017numerical}, \cite{ricciardi2015modelling}) describing the effects of FSI in terms of \textit{added mass}, \textit{added damping} or even \textit{added stiffness} on a vibrating structure in function of fluid properties (e.g. density or viscosity), or flow properties (e.g. velocity).
+When a solid moves or vibrates in a fluid domain, the interaction changes the way in which the structure behaves. There exist a vast variety of literature (e.g.: \cite{chen1976added}, \cite{conca1997added}, \cite{gauthier2017numerical}, \cite{ricciardi2015modelling}) describing the effects of FSI in terms of \textit{added mass}, \textit{added damping} or even \textit{added stiffness} on a vibrating structure in function of fluid properties (e.g. density or viscosity), or flow properties (e.g. velocity), or geometry.
 
 Besides the physical aspects of the interaction, some numerical issues arise when trying to simulate this kind of problems.
 
 The numerical issue named \textit{~\ac{AME}} is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
 
-Weakly coupled algorithms give good results in aeroelasticity studies, but 
+Weakly coupled algorithms give good results in aeroelasticity studies, but they are known to become unstable under certain conditions, in particular when fluid and structure densities are comparable ($M \approx 1$, see Section \ref{subsec:mass-ratio}) and when the structure is particularly slender \cite{causin2005added}.
+Under the same conditions, strongly coupled algorithms exhibit convergence problems.
+
+For this reason, the mass ratio $M$ is a suitable indicator to determine the kind of interaction between solid and fluid: when $M \ll 1$ (i.e. when the solid is much denser than the fluid), the interaction is weak, while when densities are comparable the interaction is strong and imposes some limits on the partitioned solution techniques.
+
+The problem has been analyzed in literature by means of "toy FSI models" (in \cite{causin2005added}, \cite{degroote2008stability} or \cite{mehl2016parallel}). Even though the number of parameters affecting stability is big and not completely understood in complex scenarios, all of the studies point out the mass-ratio $M$ as the most relevant parameter.
+
+A simplistic explanation of the phenomenon stems from the idea that at the interface, fluid and structure have no gaps (Section \ref{sec:interface}). For this reason, if the structure moves, also the fluid particles around it have to move: the acceleration of the surrounding fluid results in more inertial forces and the structure appears more inert. 
+
+Added mass effect appears both in incompressible and in compressible fluid models, but with slightly different effects and implications.
 
 
+\subsection{AME in compressible regime}  
+
+In compressible regime, using a weakly coupled algorithm which doesn't enforce mass and energy balance at the interface (see Section \ref{subsec:explicit}) imposes a limit to the mass ratio above which the simulation becomes unstable and the algorithm fails to find a solution \cite{bodnar2014fluid}.
+
+A strongly coupled algorithm (Section \ref{subsec:implicit}) does not become unstable, but converges slowly: many subiterations are needed at each time step in order to reach the required convergence criteria (Section \ref{sec:convergence}).
+
+It can be shown that, in the compressible case, changing the time step of the partitioned simulation can be beneficial to the solution. The time step reduction to an arbitrarily small value cannot stabilize a weakly coupled algorithms when the stability criterion on the mass ratio is not met, but has an effect on strongly coupled ones \cite{van2009added}.  
+
+A step size reduction can compensate a higher mass-ratio value \cite{forster2006artificial}:
+the convergence of a strongly coupled algorithm improves proportionally to the time step reduction. At the theoretical limit of vanishing time step, the monolithic solution could be found. 
 
 
+\subsection{AME in incompressible regime}
 
+AME is a much greater issue in incompressible regime than in compressible flows. A simple physical explanation of this fact could be as follows: a deformation of the structure results in a perturbation of the fluid domain close to the structure, which then propagates through the rest of the fluid domain. In compressible models, the speed at which a perturbation propagates (speed of sound) has a finite value. For this reason the the effect of a perturbation is spatially limited during a time step. In contrast, in an incompressible model, the speed at which the aforementioned perturbation propagates through the domain is infinitely large. A change in the geometry affects the whole domain without delay and impacts the whole domain at each time step \cite{causin2005added}.
 
+It has been observed that loose coupling of fluid and structural part in the context of incompressible flow and slender structures frequently yields unstable computations \cite{forster2006artificial}. However, strict stability limits exist also for strongly coupled algorithms. Those limits have a different relation to the time step with respect to compressible models.
 
-\cite{van2009added}
-\cite{causin2005added}
-\cite{forster2006artificial}
-\cite{degroote2008stability}
+Simulations show that reducing of the time step may result in an increased instability. The AME is inherent in the coupling itself: in sequentially staggered schemes the fluid forces depend upon predicted structural
+interface displacements rather than the correct ones and thus contain a portion of incorrect coupling forces. This contribution yields the instability \cite{degroote2008stability}.
 
+Provided that the stability limit is not exceeded, implicit methods behave differently n incompressible regime: the number or subiterations required to reach convergence during a single time step increases when the time step decreases. Besides, achieving the monolithic solution limit is not guaranteed (\cite{forster2006artificial}, \cite{van2009added}).
 
-As already mentioned in Section 2.3.3, there can be no gaps between structure and fluid. Also their
-respective particles cannot occupy the same spatial locations simultaneously. Thus, if the solid is moved,
-also fluid particles move. Changing the state of motion of the structural component consequently requires
-taking into account inertial effects not only of the solid itself, but also of the surrounding fluid, which
-artificially rests for the span of a single structure solver time step. In more descriptive words: Moving the
-solid also implies moving fluid particles close to the solid. Therefore, the structure behaves more inert
-due to artificially added mass ([42], [2]). Since inertia is dependent on mass and therefore density, the
-% AME is also. More precisely, it is dependent on the ratio (MA) of structural (S) und fluid density (F )
-([42], [5]):
-%MA = S F : (3.1)
-This ratio is often used to describe how strong the interaction between solid and fluid is. For cases, in
-%which the solid density is much higher than the fluid density (MA  1), this effect does not dominantly
-influence the FSI problem (weak interaction). But as fluid and structure densities approach each other
-%(MA  1) or the fluid becomes even denser than the solid (MA < 1), its consideration is crucial (strong
-interaction) and imposes stability limits on partitioned solution techniques ([5], [42], [2]). Note that the
-AME is not only governed by the density ratio of Equation 3.1 but also by geometric properties of the
-problem, the stiffness of the solid ([5]) and the speed of sound in the flow domain ([42]). Nonetheless,
-for the sake of simplicity and intuitiveness, explanations in this thesis are mostly limited to the density
-ratio.
-In general, the AME is of bigger concern for incompressible flows than for compressible regimes. From
-a physical point of view, deformations of the structural domain can be interpreted as perturbations for
-the flow field. In compressible flows the speed of sound (speed at which perturbations propagate through
-the flow) is finitely large. Thus, the influence of a geometrical change of the fluid domain caused by
-deformations of the solid is locally limited during a certain period of time. In contrast, in incompressible
-flows the speed of sound is infinitely large, hence all perturbations propagate through the flow without
-time delay. Therefore, regardless of how much time has passed since a perturbation, the whole flow field
-is directly affected ([42], [5]).
-In the following it is assumed that a weakly coupled algorithm allows computation of the fluid and solid
-solution only once per time step. In addition, coupling data is also exchanged once per time instance. In
-contrast, a strongly coupled solver does the same at least twice per time increment (for a reminder see
-Section 3.2 and compare Figure 3.4). As can be shown, in the compressible case a more dominant AME
-can be compensated for by reducing the time step size of strongly coupled, partitioned solution algorithms.
-This however, does not hold for the incompressible regime, where even in the limit of vanishing time step
-size strongly coupled, partitioned algorithms might fail ([42]). These observations are consistent with the
-above mentioned physical explanation.
-First of all, considering compressible flows, indeed, the lack of repeated subiterations in weakly coupled
-partitioned techniques leads to a strict limit for the density ratio (of Equation 3.1) due to the fact that
-the interface conditions are not enforced and energy balance at the wet surface is generally not given.
-If that limit is exceeded the algorithm fails due to instability ([2]). Likewise, in such a case a strongly
-coupled partitioned algorithm converges slowly, resulting in possibly many necessary subiterations, which
-is computationally costly. Yet it does not become unstable, given that the time step size is chosen sufficiently
-small. Reducing the time step size to an arbitrarily small extent cannot stabilize a weakly coupled
-approach if the stability criterion on the density ratio is not met ([15]). Conversely, the convergence
-rate of strongly coupled algorithms increases by the same factor, by which the time step size decreases,
-meaning that in the limit of vanishing time step size the monolithic solution is obtained ([5], [42]).
-In the incompressible case however, a strict stability limit exists for both weakly and strongly coupled
-algorithms. It is independent of the size of time increments1. Furthermore, in order for an implicit
-method to achieve the monolithic solution (assuming its convergence is given, i.e. the before mentioned
-stability limit is not exceeded) the number of subiterations must be increased as time step size decreases
-([15], [42]).
-
-
-
-
-
-
-
-To conclude this chapter about computational aspects of FSI simulations, the AME is briefly described.
-Explanations of this effect can be found in a great variety throughout FSI literature, typically explicated
-for specific solver strategies or flow regimes (see e.g. [5], [42], [15], [2]). Therefore, in the scope of
-this thesis only a short phenomenological introduction to the concept of added mass and numerical
-problems arising from it is given. However, this suffices to focus on both weakly and strongly coupled partitioned approaches, which are practically relevant in this thesis. The AME is inherent to partitioned
-FSI approaches as the single-physics fields are not continuously coupled but interaction only occurs at a
-finite number of discrete time instances, when coupling quantities are exchanged.
+These observations are consistent with the aforementioned physical explanation.
