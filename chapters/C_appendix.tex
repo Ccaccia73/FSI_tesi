@@ -1,0 +1,156 @@
+\chapter{preCICE API}
+\label{app:pc-api}
+
+\section{preCICE API calls}
+\label{sec:api-code}
+
+Each participating solver needs to be modified to link to the preCICE library and call
+methods from its application programming interface. Usually, the calls to the API are
+grouped together in a preCICE adapter. While preCICE is written in C++, it provides an
+API also for C, Fortran and Python. An excerpt from the C++ API is shown in Listing 2.1.,
+as drawn from the preCICE source code documentation
+
+
+\lstset{language=C++}
+\begin{lstlisting}[caption=preCICE API methods]
+class SolverInterface
+{
+public:
+SolverInterface(
+%const std::string& solverName,
+int solverProcessIndex,
+int solverProcessSize);
+
+%void configure(const std::string& configurationFileName);
+
+double initialize();
+void initializeData();
+double advance(double computedTimestepLength);
+void finalize();
+
+%int getMeshID(const std::string& meshName);
+int setMeshVertex(int meshID, const double* position);
+void setMeshVertices(int meshID, int size, double* positions, int* ids);
+
+void writeScalarData(int dataID, int valueIndex, double value);
+void writeVectorData(int dataID, int valueIndex, const double* value);
+void writeBlockScalarData(
+int dataID,
+int size,
+int* valueIndices,
+double* values);
+
+bool isCouplingOngoing();
+bool isReadDataAvailable();
+bool isWriteDataRequired(double computedTimestepLength);
+bool isTimestepComplete();
+
+%bool isActionRequired(const std::string& action);
+%void fulfilledAction(const std::string& action);
+
+// ...
+};
+\end{lstlisting}
+
+
+\section{preCICE adapter structure}
+\label{sec:adapter-code}
+
+First, a SolverInterface object needs to be created.
+The constructor expects the rank of the process and the size of the communicator in the
+parallel execution environment. The configure() method sets the name of the preCICE
+configuration file, reads and validates it and sets up the communication inside the solver.
+The methods that follow in Listing 2.1. are called “steering methods”. The initialize()
+method sets up the data structures and communication channels to other participants. Here
+the first communication happens, as the participants exchange meshes and, if necessary,
+re-partition them. It returns the maximum time step size that the solver is allowed to
+execute next. It is followed by the initializeData(), which is optional and transfers any
+initial non-zero coupling data values among participants. The equation coupling, the data
+mapping and the communication are all hidden inside the advance() method. This method
+also returns the maximum time step size allowed. The last method to call is finalize(),
+which destroys the data structures and closes the communication channels.
+The solvers need to define their interface meshes. Only some of the methods for mesh
+definition are listed in Listing 2.1.. Each mesh and each node on the mesh are assigned an
+integer ID. The getMeshID() gets the ID of the mesh over which the coupling data of the
+specific kind are exchanged. The setMeshVertex() creates a vertex on the specified mesh
+and position and returns the id of the vertex. For performance reasons, multiple vertices
+can be defined at once with setMeshVertices(). Additionally, topological information,
+such as edges or triangles can be passed to preCICE with additional methods which are not
+listed here.
+After defining the meshes, they need to be assigned data values. This is done by methods
+with names write*Data(), which fill the “buffers” with data from the solver’s mesh or
+with methods read*Data(), which read data from the buffers into the solver’s mesh. Since
+preCICE distinguishes between scalar and vector data, both kinds of methods are available.
+Again, for performance reasons, blocks of data can be processed together using the
+respective writeBlock*Data() and readBlock*Data(). Please note that these data are
+not communicated among participants before the next advance() (or initializeData()).
+A number of auxiliary methods allow to access information important for the coupling,
+such as whether the coupled simulation is still running, if writing or reading data is expected
+or if the current coupling time step has finished successfully. The solver can also inquire if
+it is required to execute a specific action (e.g. to write or to read a checkpoint) and it can
+inform preCICE that it fulfilled these tasks [16.].
+An example of an adapted solver is shown in Listing 2.2., as published in the presentation
+article of preCICE [6.]. A more detailed example is presented in the wiki of preCICE6
+..
+
+
+
+
+..
+
+
+
+
+\lstset{language=C++}
+\begin{lstlisting}[caption=preCICE adapter structure]
+turnOnSolver(); //e.g. setup and partition mesh 
+
+precice::SolverInterface precice("FluidSolver","precice-config.xml",rank,size); // constructor
+
+%const std::string& coric = precice::constants::actionReadIterationCheckpoint(); 
+%const std::string& cowic = precice::constants::actionWriteIterationCheckpoint();
+
+int dim = precice.getDimension();
+int meshID = precice.getMeshID("FluidMesh");
+int vertexSize; // number of vertices at wet surface 
+// determine vertexSize
+double* coords = new double[vertexSize*dim]; // coords of vertices at wet surface 
+// determine coordinates
+int* vertexIDs = new int[vertexSize];
+precice.setMeshVertices(meshID, vertexSize, coords, vertexIDs); 
+delete[] coords;
+
+int displID = precice.getDataID("Displacements", meshID); 
+int forceID = precice.getDataID("Forces", meshID); 
+double* forces = new double[vertexSize*dim];
+double* displacements = new double[vertexSize*dim];
+
+double dt; // solver timestep size
+double precice_dt; // maximum precice timestep size
+
+precice_dt = precice.initialize();
+while (precice.isCouplingOngoing()){
+	if(precice.isActionRequired(cowic)){
+		saveOldState(); // save checkpoint
+		precice.markActionFulfilled(cowic);
+	}
+	precice.readBlockVectorData(displID, vertexSize, vertexIDs, displacements);
+	setDisplacements(displacements);
+	dt = beginTimeStep(); // e.g. compute adaptive dt 
+	dt = min(precice_dt, dt);
+	computeTimeStep(dt);
+	computeForces(forces);
+	precice.writeBlockVectorData(forceID, vertexSize, vertexIDs, forces);
+	precice_dt = precice.advance(dt);
+	if(precice.isActionRequired(coric)){ // timestep not converged
+		reloadOldState(); // set variables back to checkpoint
+		precice.markActionFulfilled(coric);
+	}
+	else{ // timestep converged
+		endTimeStep(); // e.g. update variables, increment time
+	}
+}
+precice.finalize(); // frees data structures and closes communication channels
+delete[] vertexIDs, forces, displacements;
+turnOffSolver();
+\end{lstlisting}
