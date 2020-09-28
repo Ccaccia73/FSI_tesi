@@ -24,7 +24,7 @@ between the participants (Section \ref{sec:pc-comm}), the mapping of data betwee
 \subsection{Implemented coupling strategies}
 \label{sec:pc-coupling}
 
-The \textit{partitione approach} (Section \ref{sec:coupling}) is obviously the coupling strategy adopted by preCICE. It allows both \textit{explicit} (Section \ref{subsec:explicit}) and \textit{implicit} coupling (Section \ref{subsec:implicit}). The possible variants are four:
+The \textit{partitioned approach} (Section \ref{sec:coupling}) is obviously the coupling strategy adopted by preCICE. It allows both \textit{explicit} (Section \ref{subsec:explicit}) and \textit{implicit} coupling (Section \ref{subsec:implicit}). The possible variants are four:
 
 \begin{itemize}
 	\item \texttt{serial-explicit}: a serial, weakly coupled algorithm (Figure \ref{fig:serial-explicit}). The first solver uses the second solver solution at the last time step to compute its current solution. In contrast, the second solver needs the current first solution to compute its solution at the same time instance. The order of execution is user defined.
@@ -109,163 +109,76 @@ A coupling consists of a configuration and an initialization phase, multiple cou
 
 
 This work introduces an adapter to preCICE for MBDyn. It is based on previous MBDyn adapters and on the examples given on the preCICE website\footnote{\href{https://github.com/precice/precice/wiki/Adapter-Example}{github.com/precice/precice/wiki/Adapter-Example}}.
-Official adapters are currently available for several free solvers, e.g. CalculiX, Code-Aster and SU2. Also some closed-source software packages are supported. A (maybe outdated) list od official adapters can be found in \cite{uekermann2017official}, while the current status of coupled codes can be found at the following link: \href{https://www.precice.org/codes/}{preCICE adapters}.
+Official adapters are currently available for several free solvers, e.g. CalculiX, Code-Aster and SU2. Also some closed-source software packages are supported. A (maybe outdated) list of official adapters can be found in \cite{uekermann2017official}, while the current status of coupled codes can be found at the following link: \href{https://www.precice.org/codes/}{preCICE adapters}.
 
 
 \section{MBDyn}
 \label{sec:mbdyn}
 
 
-MBDyn is the first and possibly the only free* general purpose Multibody Dynamics analysis software, released under GNU's GPL 2.1 (get a cached copy here).
+MBDyn is free and open-source\footnote{the software is available through a public git repository \href{https://gitlab.polimi.it/Pub/mbdyn}{gitlab.polimi.it/Pub/mbdyn}} general purpose Multibody Dynamics analysis software developed at the \textit{Dipartimento di Scienze e Tecnologie Aerospaziali}  of the University Politecnico di Milano.
 
-It has been developed at the Dipartimento di Scienze e Tecnologie Aerospaziali (formerly Dipartimento di Ingegneria Aerospaziale) of the University "Politecnico di Milano", Italy.
+Most of the information concerning MBDyn is taken from the official documentation given in the software website\footnote{MBDyn website: \href{https://www.mbdyn.org/}{mbdyn.org}} and form the input manual\footnote{a copy can be found at the following link [\href{https://www.mbdyn.org/userfiles/documents/mbdyn-input-1.7.3.pdf}{input manual}] or in the code repository}.
 
-Multibody system is the study of the dynamic behavior of interconnected rigid or flexible bodies, each of which may undergo large translational and rotational displacements.
+MBDyn allows to build a simulate multibody system, which\footnote{see Wikipedia entry: \href{https://en.wikipedia.org/wiki/Multibody_system}{Multibody system}} is the study of the dynamic behavior of interconnected rigid or flexible bodies, each of which may undergo large translational and rotational displacements.
 
-MBDyn features the integrated multidisciplinary simulation of multibody, multiphysics systems, including nonlinear mechanics of rigid and flexible bodies (geometrically exact & composite-ready beam and shell finite elements, component mode synthesis elements, lumped elements) subjected to kinematic constraints, along with smart materials, electric networks, active control, hydraulic networks, and essential fixed-wing and rotorcraft aerodynamics.
+MBDyn can simulate linear and non-linear dynamic or rigid and flexible bodies (including geometrically exact and composite-ready beam and shell finite elements, component mode synthesis elements, lumped elements) subjected to kinematic constraints, external forces and control subsystems\cite{masarati2014efficient}. 
+MBDyn has been developed to serve as an analysis tool for rotorcraft research and cab simulate essential fixed-wing and rotorcraft aerodynamics.
 
-Note: since the software became available through a public git repository (https://gitlab.polimi.it/Pub/mbdyn),
+As explained more in detail later, MBDyn is open to be connected to other software components to perform multiphysics simulations. In particular, it is possible to pass externally computed forces  and to steer the multibody simulation from an external API: this feature has been particularly useful in building and \textit{adapter} to couple MBDyn with the library preCICE (see Chapter \ref{cha:adapter}).
 
-to be cited \cite{masarati2014efficient}
+In this section we give a short introduction to some of the relevant features of MBDyn, starting form basic information on the input file syntax (Section \ref{sec:mbd-syntax}), and the output files (Section \ref{sec:mbd-output}). Then some of the elements relevant for the description of the models used in the this work are presented: nodes (Section \ref{sec:mbd-node}), beam elements (Section \ref{sec:mbd-beam}), bodies (Section \ref{sec:mbd-body}) and forces (Section \ref{sec:mbd-forces}). 
 
 
-%MBDyn has been developed to serve as an analysis tool for rotorcraft research. It has been used in the past, and is currently used, in a number of research projects,
-%
-%1.1 Basic Syntax
-%A brief summary of the basic syntax is presented first. The syntax of an input file for
-%MBDyn is structured in terms of statements. A statement follows the syntax:
-%<card> [ : <arglist> ] ;
-%that is, a valid card name, depending on its nature, may be followed by a colon and
-%by a list of (comma separated) arguments; it is always terminated by a semicolon.
-%Statements are logically divided in blocks. Each block is opened by a begin statement
-%and it is closed by an end statement:
-%begin: <block> ;
-%# block data
-%end: <block> ;
-%The valid blocks (and their sequence) is:
-%• data
-%• <problem>
-%• control data
-%• nodes
-%• drivers (optional)
-%• elements
-%• parallel (only if the parallel solver is used and explicit directives are required)
-%The data block at present contains the type of problem that is solved by the analysis. The most significant one is initial value.
-%The <problem> block takes the name of the problem defined in the data block; it
-%contains all the information required by the integration method to perform the desired
-%simulation regardless of the nature of the problem.
-%The control data block mostly contains information about the problem that is
-%required to ensure that a consistent model will be generated.
-%The nodes block contains all the nodes required by the simulation. They are
-%separated from the rest of the data for historical reasons, because the nodes are defined
-%as the entities that make degrees of freedom available to the simulation, so they must
-%exist before any element is generated.
-%The drivers block is optional. It may contain some special driver data.
-%Finally, the elements block contains all the elements. They are defined as the
-%entities that generate equations using the degrees of freedom provided by the nodes.
-%A layout of a typical input file is:
-%begin: data;
-%# global simulation data
-%problem: initial value;
-%end: data;
-%begin: initial value;
-%# problem-dependent data
-%end: initial value;
-%begin: control data;
-%# global model data
-%end: control data;
-%begin: nodes;
-%# nodes
-%end: nodes;
-%begin: drivers;
-%# drivers
-%end: drivers;
-%begin: elements;
-%# elements
-%end: elements;
-%
-%
-%output
-%
-%If we copy the above written code to a file called, say, “rigidbody”, and invoke
-%mbdyn -f rigidbody
-%after a while we obtain the results of the simulation in a set of files called “rigidbody.<ext>”.
-%In this case, the extensions will be:
-%• out for miscellaneous output
-%• mov for the kinematic output of the node
-%• ine for the dynamic output of the node
-%• frc for the output of the force
-%The first file (out) will be ignored at present. The second file (mov) will contain Nnodes
-%by Ntimesteps lines formatted as:
-%• the node label
-%• the three coordinates of the position of the node
-%• the three Euler-like angles that define the orientation of the node (following the
-%1, 2, 3 convention)
-%• the three components of the velocity of the node
-%• the three components of the angular velocity of the node
-%all the above mentioned quantities are expressed in the global inertial frame
-%
-%
-%MODAL. see chap 8 del tutorial
-%
-%The modal body represents a very versatile manner to introduce the modeling of the
-%essential dynamics of very complex deformable components, with some restrictions,
-%into the multibody modeling environment. In essence, the dynamics of a deformable
-%component is described as a linear combination of a reduced set of shapes and the
-%related generalized mass, damping and stiffness matrices, plus some terms that describe
-%selected nonlinearities in the inertia forces. This linear change in configuration with
-%respect to the reference condition is superimposed to the finite motion of a regular
-%multibody node, that accounts for the rigid body motion of the deformable component.
-%Modal bodies are classified as joints in MBDyn, although they bring together features of bodies (inertia forces) and of joints (connections between multibody nodes).
-%The interface between a modal element and the multibody environment is defined
-%by means of regular multibody nodes that are “clamped” to the corresponding FEM
-%nodes; as a consequence, the modal element can naturally connect to any multibody
-%entity that can be connected to regular multibody structural nodes. The interface nodes
-%must be separately defined in the control data and in the nodes sections. Since
-%they are rigidly attached to the modal element, static multibody structural nodes
-%can be used, unless some inertia is to be added in the multibody domain; in that case, a
-%dynamic multibody structural node must be used.
-%This tutorial uses the two hand-made FEM data files illustrated in Appendix A of
-%the input manual to perform some basic analysis with trivial static and dynamic modal
-%models. More sophisticated modal models can be manually prepared, or generated
-%by means of NASTRAN following the procedure detailed in Appendix A of the input
-%manual, or even generated from any FEM analysis software by manipulating the output
-%as illustrated in the same reference.
-%
-%
-%
-%2.10 Constitutive Law
-%
-%Chapter 3
-%Data
-%The data section is read directly by the driver program. It is included between the cards:
-%begin : data ;
-%# ...
-%end : data ;
-%3.1 Problem
-%The only active card is the problem card.
-%The syntax is
-%<card> ::= problem : <problem_name> ;
-%<problem_name> ::= { initial value | inverse dynamics } ;
-%For long time the only supported problem type was the initial value problem. As a consequence, if
-%no problem card is present, an initial value problem is assumed. An experimental inverse dynamics
-%problem is supported as well
-%initial value, the time integration of mechanical and multidisciplinary problems formulated as
-%Differential-Algebraic Equations (DAE). It can be downgraded to the solution of static and kinematic problems, by selecting purely static or kinematic contributions to the governing equations,
-%thus giving time the role of an ordinal parameter.
-%
-%
-%
-%Chapter 5
-%Control Data
-%This section is read by the manager of all the bulk simulation data, namely the nodes, the drivers and
-%the elements. It is used to set some global parameters closely related to the behavior of these entities,
-%to tailor the initial assembly of the joints in case of structural simulations, and to tell the data manager
-%how many entities of every type it should expect from the following sections. Historically this is due to
-%the fact that the data structure for nodes and elements is allocated at the beginning with fixed size. This
-%is going to change, giving raise to a “free” and resizeable structure. But this practice is to be considered
-%reliable since it allows a sort of double-check on the entities that are inserted.
-%
+\subsection{Basic syntax}
+\label{sec:mbd-syntax}
+
+MBDyn is a command line tool and can be generally started from a terminal passing an input file containing all the information required to perform a simulation. 
+
+The input files is structured in blocks and each block has a syntax described in Backus Naur form in the input manual.
+
+\lstset{language=mbdyn}
+\begin{lstlisting}[caption=MBDyn input file structure,label=lst:mbd-struct]
+begin : data ;
+    # select a problem
+    problem : initial value ;
+end : data ;
+
+begin : initial value ;
+    # problem-specific data
+end : initial value ;
+
+begin : control data ;
+    # model control data
+end : control data ;
+
+begin : nodes ;
+    # nodes data
+end : nodes ;
+
+begin : elements ;
+    # elements data
+end : elements ;
+\end{lstlisting}
+
+As illustrated in listing \ref{lst:mbd-struct}, statements are logically divided in blocks. Each block is opened by a \texttt{begin} statement and it is closed by an \texttt{end} statement.
+
+The sequence of relevant valid blocks is:
+
+\begin{itemize}
+    \item \texttt{data}: defines the kind of problem to be solved by the analysis. The most significant one is \texttt{initial value} and is already defined in the example. 
+    \item type of problem:  block takes the name of the problem defined in the data block (\texttt{initial value} in this case) and contains all the information required by the integration method to perform the desired simulation (e.g. simulation type, time step, number of iterations, tolerance ...).
+    \item \texttt{control data}: mostly contains information about the problem that is required to ensure that a consistent model will be generated (i.e. the number of nodes, elements, forces...).
+    \item \texttt{nodes}: The nodes block contains all the nodes required by the simulation. They are are defined as the entities that make degrees of freedom available to the simulation, so they must exist before any element is generated.
+    \item \texttt{elements}: contains all the elements. They are defined as the entities that generate equations using the degrees of freedom provided by the nodes.
+\end{itemize}
+
+We focus now on the main entities of a MBDyn simulation, namely nodes and elements. A detailed example of the input file used in most simulations in this work can be found in Appendix \ref{sec:mbdyn-input-file}.
+
+
+\subsection{Nodes}
+\label{sec:mbd-node}
+
 %
 %6.1 Structural Node
 %Structural nodes can have 6 degrees of freedom (position and orientation), and thus describe the kinematics of rigid-body motion in space, or 3 degrees of freedom (position) and thus describe the kinematics
@@ -279,7 +192,13 @@ to be cited \cite{masarati2014efficient}
 %equilibrium equations.
 %Elements that require both displacement and orientation can only be connected to 6 degree of freedom
 %nodes
-%
+
+\subsection{Elements}
+\label{sec:mbd-elem}
+
+\subsubsection{Beam elements}
+\label{sec:mbd-beam}
+
 %8.3 Beam Elements
 %The family of finite volume beam elements implemented in MBDyn allows to model slender deformable
 %structural components with a high level of flexibility.
@@ -403,10 +322,18 @@ to be cited \cite{masarati2014efficient}
 %The relative_offset_<i>, with i=1,2,3, are the vectors oi
 %, with i=1,2,3, of Figure 8.4.
 %The orientation matrices orientation_matrix_section_<j>, with j=I,II, are the section orientation
-%matrices Rj , with j=I,II, of Figure 8.4.
+%matrices Rj , with j=I,II, of Figure 8.4.
+
+
 %
 %
 %
+%2.10 Constitutive Law
+%
+%
+%
+\subsubsection{Bodies}
+\label{sec:mbd-body}
 %
 %
 %8.4 Body
@@ -414,6 +341,39 @@ to be cited \cite{masarati2014efficient}
 %structural node, or a point mass when connected to a rotationless, 3 degree of freedom structural node.
 %
 %
+%MODAL. see chap 8 del tutorial
+%
+%The modal body represents a very versatile manner to introduce the modeling of the
+%essential dynamics of very complex deformable components, with some restrictions,
+%into the multibody modeling environment. In essence, the dynamics of a deformable
+%component is described as a linear combination of a reduced set of shapes and the
+%related generalized mass, damping and stiffness matrices, plus some terms that describe
+%selected nonlinearities in the inertia forces. This linear change in configuration with
+%respect to the reference condition is superimposed to the finite motion of a regular
+%multibody node, that accounts for the rigid body motion of the deformable component.
+%Modal bodies are classified as joints in MBDyn, although they bring together features of bodies (inertia forces) and of joints (connections between multibody nodes).
+%The interface between a modal element and the multibody environment is defined
+%by means of regular multibody nodes that are “clamped” to the corresponding FEM
+%nodes; as a consequence, the modal element can naturally connect to any multibody
+%entity that can be connected to regular multibody structural nodes. The interface nodes
+%must be separately defined in the control data and in the nodes sections. Since
+%they are rigidly attached to the modal element, static multibody structural nodes
+%can be used, unless some inertia is to be added in the multibody domain; in that case, a
+%dynamic multibody structural node must be used.
+%This tutorial uses the two hand-made FEM data files illustrated in Appendix A of
+%the input manual to perform some basic analysis with trivial static and dynamic modal
+%models. More sophisticated modal models can be manually prepared, or generated
+%by means of NASTRAN following the procedure detailed in Appendix A of the input
+%manual, or even generated from any FEM analysis software by manipulating the output
+%as illustrated in the same reference.
+
+\subsection{Joints}
+\label{sec:mbd-joint}
+
+E i giunti?
+
+\subsubsection{Forces}
+\label{sec:mbd-forces}
 %
 %8.8 Force
 %The force element is a general means to introduce a right-hand side to the equations, i.e. an explicit
@@ -421,7 +381,8 @@ to be cited \cite{masarati2014efficient}
 %nodes and have a spatial characterization. Essentially, structural forces have three components that may
 %187
 %depend on arbitrary parameters (usually the simulated time), and a location in space. Structural couples
-%have three parameter-dependent components. The syntax of the force element is:
+%have three parameter-dependent components. The syntax of the force element is:
+
 %
 %8.8.9 External forces
 %External forces are elements that allow to communicate with an external software that computes forces
@@ -483,7 +444,8 @@ to be cited \cite{masarati2014efficient}
 %mbdynHT fpeer (8.67)
 %which implies
 %fmbdyn = HT fpeer (8.68)
-%To compute matrix H one needs to:
+%To compute matrix H one needs to:
+
 %
 % gather the coordinates of the set of points used by the peer process (subscript ‘peer’ in the formulas
 %above) in a file, formatted as
@@ -509,7 +471,10 @@ to be cited \cite{masarati2014efficient}
 %From this point on, when MBDyn is executed it loads the mapping matrix from file output_file_name
 %using sparse storage, automatically ignoring coefficients whose absolute value is below threshold (defaults to 0).
 %The parameters of the mapping, as documented in create_mls_interface, are
-%
+
+
+
+
 %[14] Dewey H. Hodges. Review of composite rotor blade modeling. AIAA Journal, 28(3):561–565, March
 %1990.
 %
@@ -518,3 +483,47 @@ to be cited \cite{masarati2014efficient}
 %4):403–413, 1983.
 %[16] Pierangelo Masarati. On the semi-analytical solution of beams subjected to distributed loads. In
 %XVI Congresso Nazionale AIDAA, pages 72.1–10, Palermo, 24–28 Settembre 2001.
+
+
+\subsection{Simulation output}
+\label{sec:mbd-output}
+
+There are a bunch of output files regarding a simulation performed with MBDyn. the name of those files is specified with the option \texttt{-o} (otherwise the name is the same as the input file) and the extensions are:
+
+\begin{itemize}
+    \item \texttt{.out}: for miscellaneous output
+    \item \texttt{.mov}: for kinematic output of the nodes
+    \item \texttt{.ine}: for the dynamic output of the nodes
+    \item \texttt{.frc}: for the output of force elements
+    \item \texttt{.act}: for the output of beam elements
+    \item \texttt{.jnt}: for the output of joint elements
+\end{itemize}
+
+The \texttt{.out} file contains information regarding the simulation iterations residuals while other files are described in more detail in Appendix \ref{sec:mbdyn-output-file}.
+
+
+
+%
+%output
+%
+%If we copy the above written code to a file called, say, “rigidbody”, and invoke
+%mbdyn -f rigidbody
+%after a while we obtain the results of the simulation in a set of files called “rigidbody.<ext>”.
+%In this case, the extensions will be:
+%• out for miscellaneous output
+%• mov for the kinematic output of the node
+%• ine for the dynamic output of the node
+%• frc for the output of the force
+%The first file (out) will be ignored at present. The second file (mov) will contain Nnodes
+%by Ntimesteps lines formatted as:
+%• the node label
+%• the three coordinates of the position of the node
+%• the three Euler-like angles that define the orientation of the node (following the
+%1, 2, 3 convention)
+%• the three components of the velocity of the node
+%• the three components of the angular velocity of the node
+%all the above mentioned quantities are expressed in the global inertial frame
+%
+
+
+

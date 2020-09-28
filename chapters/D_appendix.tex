@@ -1,0 +1,111 @@
+\chapter{MBDyn input/output file example}
+\label{app:mbdyn-file}
+
+\section{MBDyn input file}
+\label{sec:mbdyn-input-file}
+
+\subsubsection{Main File}
+
+\lstinputlisting[language=mbdyn, caption=MBDyn input file example, label=map10]{listings/map_10n_3x_21j.mbd}
+
+\subsubsection{Beam nodes}
+
+\lstinputlisting[language=mbdyn, caption=MBDyn beam nodes, label=mbd-nodes]{listings/beam.nod}
+
+\subsubsection{Beam elements and Bodies}
+
+\lstinputlisting[language=mbdyn, caption=MBDyn beam elements, label=mbd-elems]{listings/beam.elm}
+
+\subsubsection{Joints}
+
+\lstinputlisting[language=mbdyn, caption=MBDyn joints, label=mbd-joints]{listings/joint.elm}
+
+\section{MBDyn output file structure}
+\label{sec:mbdyn-output-file}
+
+\subsubsection{\texttt{.mov} file}
+
+For each time step the file contains one row for each node whose output is required. The rows contain the following columns:
+\begin{itemize}
+    \item 1: the label of the node
+    \item 2–4: the three components of the position of the node
+    \item 5–7: the three Euler angles that define the orientation of the node
+    \item 8–10: the three components of the velocity of the node
+    \item 11–13: the three components of the angular velocity of the node
+    \item 14–16: the three components of the linear acceleration of the dynamic and modal nodes (optional)
+    \item 17–19: the three components of the angular acceleration of the dynamic and modal nodes (optional)
+\end{itemize}
+
+All the quantities are expressed in the global frame, except for the relative frame type of dummy node, whose quantities are, by definition, in the relative frame.
+
+\subsubsection{\texttt{.ine} file}
+
+This output file refers only to dynamic nodes, and contains their inertia. For each time step, it contains information about the inertia of all the nodes whose output is required. Notice that more than one inertia body can be attached to one node; the information in this file refers to the sum of all the inertia related to the node.
+The rows contain the following columns:
+
+\begin{itemize}
+    \item 1: the label of the node
+    \item 2–4: item the three components of the momentum in the absolute reference frame
+    \item 5–7: item the three components of the momenta moment in the absolute reference frame, with respect to the coordinates of the node, thus to a moving frame
+    \item 8–10: the three components of the derivative of the momentum
+    \item 11–13: the three components of the derivative of the momentum moment
+\end{itemize}
+ 
+\subsubsection{\texttt{.frc} file}
+
+An external structural element writes one line for each connected node at each time step in this file. Each line contains the following columns:
+
+\begin{itemize}
+    \item 1: the label of the element and that of the corresponding node; the format of this field is \texttt{element\_label@node\_label}
+    \item 2–4: the three components of the force
+    \item 5–7: the three components of the moment
+\end{itemize}
+
+If a reference node is defined, a special line is output for the reference node, containing the following columns:
+
+\begin{itemize}
+    \item 1: the label of the element and that of the corresponding node; the format of this field is \texttt{element\_label\#node\_label}
+    \item 2–4: the three components of the force applied to the reference node, as received from the peer
+    \item 5–7: the three components of the moment applied to the reference node, as received from the peer
+    \item 8–10: the three components of the force that are actually applied to the reference node, in the global reference frame
+    \item 11–13: the three components of the moment with respect to the reference node that are actually applied to the reference node, in the global reference frame
+    \item  14–16: the three components of the force resulting from the combination of all nodal forces, in the global reference frame
+    \item 17–19: the three components of the moment with respect to the reference node resulting from the combination of all nodal forces and moments, in the global reference frame
+    
+\end{itemize}
+
+
+\subsubsection{\texttt{.act} file}
+
+This type of file  contains the output related to beam elements. The internal forces and couples are computed from the interpolated strains along the beam by means of the constitutive law, at the two evaluation points. For each time step and for each element, the format of the columns is:
+
+\begin{itemize}
+    \item 1: the label of the beam
+    \item 2–4: the three components of the force at the first evaluation point
+    \item 5–7: the three components of the couple at the first evaluation point
+    \item 8–10: the three components of the force at the second evaluation point
+    \item 11–13: the three components of the couple at the second evaluation point
+\end{itemize}
+
+
+\subsubsection{\texttt{.jnt} file}
+
+The output concerning joint elements is generally made of a standard part, plus some extra information depending on the type of joint, which, when available, is described along with the joint description. Here the standard part is described:
+
+\begin{itemize}
+    \item 1: the label of the joint
+    \item 2–4: the three components of the reaction force in a local reference
+    \item 5–7: the three components of the reaction couple in a local frame
+    \item 8–10: the three components of the reaction force in the global frame
+    \item 11–13: the three components of the reaction couple, rotated into the global frame
+\end{itemize}
+
+for total joints:
+
+\begin{itemize}
+    \item 14–16: the three components of the relative displacement in the reference frame of the element
+    \item 17–19: the three components of the relative rotation vector in the reference frame of the element
+    \item 20–22: the three components of the relative velocity in the reference frame of the element
+    \item 23–25: the three components of the relative angular velocity in the reference frame of the element
+\end{itemize}
+

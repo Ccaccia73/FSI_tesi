@@ -1,0 +1,318 @@
+# $Header: /var/cvs/mbdyn/mbdyn/mbdyn-1.0/tests/forces/strext/socket/simplerotor/mapping/simplerotor2_mapping,v 1.7 2017/01/12 15:02:57 masarati Exp $
+#
+# MBDyn (C) is a multibody analysis code. 
+# http://www.mbdyn.org
+# 
+# Copyright (C) 1996-2017
+# 
+# Pierangelo Masarati	<masarati@aero.polimi.it>
+# Paolo Mantegazza	<mantegazza@aero.polimi.it>
+# 
+# Dipartimento di Ingegneria Aerospaziale - Politecnico di Milano
+# via La Masa, 34 - 20156 Milano, Italy
+# http://www.aero.polimi.it
+# 
+# Changing this copyright notice is forbidden.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation (version 2 of the License).
+# 
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# 
+# Author: Giuseppe Quaranta <quaranta@aero.polimi.it>
+
+
+begin: data;
+	problem: initial value;
+end: data;
+
+set: real DT = 5e-4;
+set: real INITIAL_TIME = 0.0;
+set: real FINAL_TIME = 10.0;
+
+
+begin: initial value;
+
+	initial time: INITIAL_TIME;
+	final time: FINAL_TIME;
+	time step: DT;
+#	set: const integer TIMESTEP = 1234;
+#	strategy: change, postponed, TIMESTEP; # changes the time step as specified by the drive caller labeled TIMESTEP, whose definition is postponed (this is simply a placeholder)
+
+	method: ms, .6;
+	nonlinear solver: newton raphson, modified, 5;
+	linear solver: umfpack, colamd, mt, 1;
+#	linear solver: naive, colamd;
+#    linear solver: umfpack;
+
+	tolerance: 1e-6;
+	max iterations: 1000;
+
+	derivatives coefficient: 1e-9;
+	derivatives tolerance: 1e-6;
+	derivatives max iterations: 100;
+
+	output: iterations;
+	output: residual;
+end: initial value;
+
+# number of beam3 elements
+set: integer N = 10;
+
+begin: control data;
+	structural nodes: 
+		+1    # clamped node
+		+2*N  # other nodes
+	;
+	rigid bodies:
+		+2*N  # mass of other nodes
+	;
+	joints:
+		+1    # clamp
+		+2*N  # other total joints on nodes to force 2D
+	;
+	beams:
+		+N    # the whole beam
+	;
+	forces:
+		+1    # loads the beam
+		+1    # load on last node
+	;
+#	file drivers:
+#	    +1
+#	;
+end: control data;
+
+# root reference
+set: const integer ROOT = 1;
+set: const real Xroot = 0.0;
+set: const real Yroot = 0.0;
+set: const real Zroot = 0.0;
+reference: ROOT, Xroot, Yroot, Zroot, eye, null, null;
+
+
+# material density [kg/m^3]
+set: real rho = 100.;
+# beam width (z direction)
+set: real w = 4.e-3;
+# beam height (y direction)
+set: real h = 6.e-4;
+# beam lenght (x direction)
+set: real L = 0.04;
+# lenght of half beam3 element
+set: real dL = L/(2*N);
+
+# mass of single chunck
+set: real m = rho*w*h*dL; 
+
+# elastic properties
+set: real E = 2.5e5;
+set: real nu = 0.35;
+set: real G = E/(2*(1+nu));
+set: real A = w*h;
+set: real Jz = 1./12.*w*h^3;
+set: real Jy = 1./12.*h*w^3;
+set: real Jp = Jy + Jz;
+set: real damp = .01;
+
+set: integer curr_node;
+
+begin: nodes;
+	structural: ROOT, static,
+		reference, ROOT, null,		# position
+		reference, ROOT, eye,		# orientation
+		reference, ROOT, null,		# initial velocity
+		reference, ROOT, null;		# angular velocity
+	
+	set: curr_node = 2;
+	include: "beam.nod";
+	set: curr_node = 4;
+	include: "beam.nod";
+	set: curr_node = 6;
+	include: "beam.nod";
+	set: curr_node = 8;
+	include: "beam.nod";
+	set: curr_node = 10;
+	include: "beam.nod";
+	set: curr_node = 12;
+	include: "beam.nod";
+	set: curr_node = 14;
+	include: "beam.nod";
+	set: curr_node = 16;
+	include: "beam.nod";
+	set: curr_node = 18;
+	include: "beam.nod";
+	set: curr_node = 20;
+	include: "beam.nod";
+end: nodes;
+
+#begin: drivers;
+#	set: const integer INPUT = 200;
+#	file: INPUT, stream,
+#		  stream drive name, "TS_DRV", # irrelevant but needed
+#		  create, yes,
+#		  path, "/tmp/mbdyn.ts.sock", # or use port
+#		  1;      # one channel: the time step
+#	  drive caller: TIMESTEP, file, INPUT, 1; # replace placeholder with file driver
+#end: drivers;
+
+
+set: const integer BEAM_NNODES = 2*N+1;
+set: real da = .005;
+set: integer CURR_BEAM = 1;
+
+
+begin: elements;
+	joint: 500+ROOT, clamp, ROOT, node, node;
+
+	set: curr_node = 2;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 4;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 6;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 8;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 10;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 12;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 14;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 16;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 18;
+	include: "beam.elm";
+	include: "joint.elm";
+	set: curr_node = 20;
+	include: "beam.elm";
+	include: "joint.elm";
+	    
+    force: CURR_BEAM, external structural mapping,
+		socket,
+		create, yes,
+		    path, "/tmp/mbdyn.node.sock",
+		    no signal,
+		    coupling,
+			    # loose,
+			    tight,
+		#reference node, 1,
+		#orientation, euler 123,
+		#use reference node forces, yes,
+		points number, 3 * BEAM_NNODES,
+			CURR_BEAM, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  1, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  2, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  3, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  4,
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  5,
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  6, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  7, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  8, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  9, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM + 10,
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  11, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  12, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  13, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  14,
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  15,
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  16, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  17, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  18, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM +  19, 
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+			CURR_BEAM + 20,
+				offset, null,
+				offset, 0, da, 0.,
+				offset, 0., 0., da,
+		# echo, "flap_points.dat", surface, "flap.dat", output, "flap_H.dat", order, 2, basenode, 12, weight, 2, stop;
+		mapped points number, 204,
+		sparse mapping file, "flap_H.dat";
+
+# constant absolute force in node 11
+	force: 2, absolute, 
+		2*N + 1,
+		position,  null,
+		0., 1., 0.,
+		# slope, initial time, final time / forever, initial value
+		ramp, .0, 0., 1., 0.;
+end: elements;
+
+
+# vim:ft=mbd
