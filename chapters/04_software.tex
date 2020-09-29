@@ -179,310 +179,164 @@ We focus now on the main entities of a MBDyn simulation, namely nodes and elemen
 \subsection{Nodes}
 \label{sec:mbd-node}
 
-%
-%6.1 Structural Node
-%Structural nodes can have 6 degrees of freedom (position and orientation), and thus describe the kinematics of rigid-body motion in space, or 3 degrees of freedom (position) and thus describe the kinematics
-%of point mass motion in space.
-%The former has been originally implemented in MBDyn; the latter has been added in MBDyn 1.5.0,
-%mainly to support the implementation of membrane elements.
-%The 6 dof structural node can be static, dynamic, modal or dummy.
-%The 3 dof structural node can be static or dynamic.
-%Elements that only require displacement can be connected to either type of nodes; when connected
-%to a 6 degree of freedom node, they only make use of position/velocity and only contribute to force
-%equilibrium equations.
-%Elements that require both displacement and orientation can only be connected to 6 degree of freedom
-%nodes
+Nodes are the basic blocks of a model: they instantiate kinematic degrees of freedom and the corresponding equilibrium equations. There can be different type of nodes in MBDyn, we focus here on \texttt{structural nodes}.
+
+Structural nodes can have 3 degrees of freedom, thus describe the kinematics of point mass motion in space  (position) or 6 DoFs (position and orientation), and thus describe the kinematics of rigid-body motion in space.
+
+Each node has a unique label and can be specified in different ways:
+
+\begin{itemize}
+	\item \texttt{static}: this keyword instantiates only equilibrium equations (force for 3 DoF nodes or force and moment for 6 DoF nodes)
+	\item \texttt{dynamic}: this also instantiates momentum (3 and 6 DoFs) and momenta moment (6 DoFs)
+\end{itemize}
+
+Also \texttt{modal} and \texttt{dummy} nodes exist, but are beyond the scope of this work.
+
+Nodes are the starting point to define the elements of a simulation.
+
 
 \subsection{Elements}
 \label{sec:mbd-elem}
 
-\subsubsection{Beam elements}
+Elements constitute the components of the multibody model. Each has a unique numerical label and is connected to one or more nodes. They write contributions to nodes equations and represent \textit{connectivity} and \textit{constitutive properties}.
+
+%Elements that require both displacement and orientation can only be connected to 6 DoFS nodes.
+
+There exist many types of elements in MBDyn, we focus here on the ones used in the FSI simulation: beams, bodies, joints and forces.
+
+
+
+\subsection{Beam elements}
 \label{sec:mbd-beam}
 
-%8.3 Beam Elements
-%The family of finite volume beam elements implemented in MBDyn allows to model slender deformable
-%structural components with a high level of flexibility.
-%The beam is defined by a reference line and by a manifold of orientations attached to the line. It is
-%assumed that the direction 1 of the orientations lies along the reference line, but it is not strictly required
-%to be tangent to it even in the reference configuration.
-%The beam element is defined by its nodes; currently, 2 and 3 node beam elements are implemented.
-%Each node of the beam is related to a structural node by an offset and an optional relative orientation,
-%to provide topological flexibility.
-%The beam element is modeled by means of an original Finite Volume approach [13], which computes
-%the internal forces as functions of the straining of the reference line and orientation at selected points
-%along the line itself, called evaluation points, which lie somewhere between two pairs of beam nodes.
-%At each evaluation point, a 6D constitutive law must be defined, which defines the relationship
-%between the strains, the curvatures of the beam and their time derivatives and the internal forces and
-%moments at the evaluation points.
-%The strains and curvatures and their time derivatives are obtained from the nodal positions and
-%orientations by differentiating the interpolation functions.
-%The 6D constitutive laws are defined as
-%
-%
-%
-%Fx
-%Fy
-%Fz
-%Mx
-%My
-%Mz
-%
-%
-%
-%= f
-%
-%
-%
-%
-%
-%εx
-%γy
-%γz
-%κx
-%κy
-%κz
-%
-%
-%
-%,
-%
-%
-%
-%ε˙x
-%γ˙y
-%γ˙ z
-%κ˙ x
-%κ˙ y
-%κ˙ z
-%
-%
-%
-%
-%
-%where, if the convention of using x as beam axis is followed:
-%• Fx is the axial force component;
-%• Fy and Fz are the shear force components;
-%• Mx is the torsional moment component;
-%
-%
-%
-%My and Mz are the bending moment components;
-%• εx is the axial strain component;
-%• γy and γz are the shear strain components;
-%• κx is the torsional curvature component;
-%• κy and κz are the bending curvature component;
-%• f is an arbitrary function that defines the constitutive law.
-%8.3.1 Beam Section Constitutive Law
-%Typically, linear elastic or viscoelastic constitutive laws are used, although one may want to implement
-%specific nonlinear elastic or elastic-plastic constitutive laws.
-%Beam Section Characterization
-%MBDyn allows the broadest generality in defining what a linear elastic constitutive law contains, since
-%the entire 6 × 6 constitutive matrix can be input. This means that internal forces and moments can be
-%arbitrarily related to generalized strains and curvatures. However, to make sense, a constitutive matrix
-%at the section level, must satisfy some constraints, e.g. it is expected to be symmetric, although this is
-%not strictly enforced by the code.
-%However, most of the info about the extra-diagonal terms of the stiffness matrix are not usually
-%available. One easy way to work this around is to resort to any so-called composite beam section
-%characterization analysis available in the literature.
-%For details, the reader is referred to [14] for a review of the topic, to [15] for an early work on the
-%subject, and to [16] for a more recent review of the original formulation. The software that implements
-%this type of analysis is called ANBA++. It is not free software, so far. Prospective users can contact
-%the authors, through MBDyn developers
-%
-%
-%8.3.2 Three-node beam element
-%The three-node beam element is described in detail in [13]. Each of the three points the beam element
-%connects is referred to a structural node but can have an arbitrary offset to allow high generality in
-%locating the structural reference line of the beam. Figure 8.4 illustrates the geometry of the three-node
-%beam element.
-%The finite volume formulation presented in [13] is used. As a consequence, the internal forces and
-%moments are evaluated at two points that are at about midpoint between nodes 1 and 2, and nodes 2
-%and 3 (at ξ = −1/
-%√
-%3 ∼= −0.57735 and ξ = 1/
-%√
-%3 ∼= 0.57735 of a non-dimensional abscissa ξ running from
-%ξ = −1 at node 1 to ξ = 1 at node 3).
-%So the constitutive properties must be supplied in these points, as well as the orientation matrices RI
-%and RII , that express the orientation of the reference system the constitutive properties are expressed
-%in with respect to the global frame (the axial force is conventionally defined in direction 1). Any of
-%the supported 6D constitutive laws can be supplied to define the constitutive properties of each beam
-%section.
-%The traditional input format is
-%<elem_type> ::= beam3
-%<normal_arglist> ::=
-%<node_1_label> , (Vec3) <relative_offset_1> ,
-%<node_2_label> , (Vec3) <relative_offset_2> ,
-%<node_3_label> , (Vec3) <relative_offset_3> ,
-%(OrientationMatrix) <orientation_matrix_section_I> ,
-%(ConstitutiveLaw<6D>) <constitutive_law_section_I> ,
-%{ same | (OrientationMatrix) <orientation_matrix_section_II> } ,
-%{ same | (ConstitutiveLaw<6D>) <constitutive_law_section_II> }
-%[ , <custom_output> ]
-%The relative_offset_<i>, with i=1,2,3, are the vectors oi
-%, with i=1,2,3, of Figure 8.4.
-%The orientation matrices orientation_matrix_section_<j>, with j=I,II, are the section orientation
-%matrices Rj , with j=I,II, of Figure 8.4.
+As briefly introduced in Section \ref{sec:beam}, when simulations involve slender bodies, it is particularly interesting to use a 1D finite element model together with a form of mapping between the interface (wet surface) and the model to exchange kinematics and dynamics information. This can be performed in MBDyn using \texttt{beam} elements (described in this section) and the \texttt{external structural mapping} element (described in Section \ref{sec:mbd-forces}).
+
+MBDyn models slender deformable components by means of finite volume \texttt{beam} elements with a high level of flexibility.
+
+The beam element is defined by its nodes and a reference line; although 2 and 3 nodes beam elements are implemented, only \texttt{beam3} are considered here (Figure \ref{fig:mbdyn-beam-model}). Each node of the beam is related to a \texttt{structural node} (node 1 to 3 in Figure \ref{fig:mbdyn-beam-model}) by an offset ($o_1$ to $o_3$) and a relative orientation.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/beam_model}
+	\caption{MBDyn beam model, taken from the input manual}
+	\label{fig:mbdyn-beam-model}
+\end{figure}
 
 
-%
-%
-%
-%2.10 Constitutive Law
-%
-%
-%
-\subsubsection{Bodies}
+The Finite Volume approach described \cite{ghiringhelli2000multibody} is used to model the beam element. It computes the internal forces as functions of the reference line strain and as functions of the  orientation at the \textit{evaluation points} (i.e. integration points, point I and II in Figure \ref{fig:mbdyn-beam-model}) that are between nodes 1 and 2, and between nodes 2 and 3 (at $\xi =-1/\sqrt{3}$ and $\xi = 1/\sqrt{3}$ of a non-dimensional abscissa $-1\leq \xi \leq 1$ ranging from node 1 to node 3).
+
+
+A 6D constitutive law is defined at each evaluation point: it relates the strains and the curvatures of the beam (and their time derivatives) to the internal forces and moments at the evaluation points in the form:
+
+\begin{equation}
+	\begin{Bmatrix}
+		F_x \\ F_y \\ F_z \\ M_x \\ M_y \\ M_z
+	\end{Bmatrix} = f
+	\begin{pmatrix}
+		\begin{Bmatrix}
+			\epsilon_x \\ \gamma_y \\ \gamma_z \\ \kappa_x \\ \kappa_y \\ \kappa_z
+		\end{Bmatrix} , 
+		\begin{Bmatrix}
+			\dot{\epsilon_x} \\ \dot{\gamma_y} \\ \dot{\gamma_z} \\ \dot{\kappa_x} \\ \dot{\kappa_y} \\ \dot{\kappa_z}
+		\end{Bmatrix}
+	\end{pmatrix}
+\end{equation}
+
+
+Using the convention of \textit{x-axis} as beam axis we have:
+
+\begin{itemize}
+	\item $F_x$: axial force component,
+	\item $F_y$ and $F_z$: shear force components,
+	\item $M_x$: torsional moment component,
+	\item $M_y$ and $M_z$: bending moment components,
+	\item $\epsilon_x$: axial strain component,
+	\item $\gamma_y$ and $\gamma_z$: shear strain components,
+	\item $\kappa_x$: torsional curvature component,
+	\item $\kappa_y$ and $\kappa_z$: bending curvature components,
+	\item $f$: constitutive law.
+\end{itemize}
+
+
+\subsubsection{Beam section Constitutive Law}
+
+In dynamic simulations, linear elastic or viscoelastic laws are generally used, even though nonlinear laws can be used.  Focusing on linear laws, MBDyn allows the user to define every constitutive laws, going from an isotropic beam section to a fully anisotropic one: in fact the entire $6 \times 6$ constitutive matrix can be provided. It is up to the user to define a valid law as the matrix must satisfy some constraints, e.g. it must be symmetric.
+
+In the context of FSI simulations, this feature allows the user to define a section constitutive law that is independent from the shape of the beam itself. Thus the aerodynamic aspects and the structural aspects are handled by two distinct elements of the model: i.e. the interface mesh defines the aerodynamic forces and the beam constitutive law defines the structural properties.   
+
+Some studies about the definition of general beam section constitutive properties (\textit{composite beam section characterization}) are available in the literature: an early work can be found in \cite{giavotto1983anisotropic}, a review in \cite{hodges1990review} or an application to wind turbine blades in \cite{kim2013development}.
+
+
+\subsection{Bodies}
 \label{sec:mbd-body}
-%
-%
-%8.4 Body
-%The body element describes a lumped rigid body when connected to a regular, 6 degree of freedom
-%structural node, or a point mass when connected to a rotationless, 3 degree of freedom structural node.
-%
-%
-%MODAL. see chap 8 del tutorial
-%
-%The modal body represents a very versatile manner to introduce the modeling of the
-%essential dynamics of very complex deformable components, with some restrictions,
-%into the multibody modeling environment. In essence, the dynamics of a deformable
-%component is described as a linear combination of a reduced set of shapes and the
-%related generalized mass, damping and stiffness matrices, plus some terms that describe
-%selected nonlinearities in the inertia forces. This linear change in configuration with
-%respect to the reference condition is superimposed to the finite motion of a regular
-%multibody node, that accounts for the rigid body motion of the deformable component.
-%Modal bodies are classified as joints in MBDyn, although they bring together features of bodies (inertia forces) and of joints (connections between multibody nodes).
-%The interface between a modal element and the multibody environment is defined
-%by means of regular multibody nodes that are “clamped” to the corresponding FEM
-%nodes; as a consequence, the modal element can naturally connect to any multibody
-%entity that can be connected to regular multibody structural nodes. The interface nodes
-%must be separately defined in the control data and in the nodes sections. Since
-%they are rigidly attached to the modal element, static multibody structural nodes
-%can be used, unless some inertia is to be added in the multibody domain; in that case, a
-%dynamic multibody structural node must be used.
-%This tutorial uses the two hand-made FEM data files illustrated in Appendix A of
-%the input manual to perform some basic analysis with trivial static and dynamic modal
-%models. More sophisticated modal models can be manually prepared, or generated
-%by means of NASTRAN following the procedure detailed in Appendix A of the input
-%manual, or even generated from any FEM analysis software by manipulating the output
-%as illustrated in the same reference.
+
+The \texttt{body} element describes a lumped rigid body when connected to a regular, 6 DoF structural node, or a point mass when connected to a rotationless, 3 DoF structural node. It can be used in connection with a structural element to give inertial properties: for example, in a \texttt{beam} element (see Section \ref{sec:mbd-beam}), 2 bodies are added to the evaluation points of the beam to account for lumped inertia of each portion in which the beam is divided. 
+
 
 \subsection{Joints}
 \label{sec:mbd-joint}
 
-E i giunti?
+\texttt{structural} nodes can be constrained by means of \texttt{joint} elements. Many different joints are available. In the FSI model the following types of joints are used:
 
-\subsubsection{Forces}
+\begin{itemize}
+	\item \texttt{clamp}: grounds all 6 DoFs of a node in an arbitrary position and orientation
+	\item \texttt{total joint}: allows to arbitrarily constrain specific components of the relative position and orientation of two nodes\cite{masarati2013formulation}
+\end{itemize}
+
+
+\subsection{Forces}
 \label{sec:mbd-forces}
-%
-%8.8 Force
-%The force element is a general means to introduce a right-hand side to the equations, i.e. an explicit
-%contribution to the equations. There is a basic distinction between abstract and structural forces: abstract forces apply to arbitrary equations, while structural forces (and couples) are specific to structural
-%nodes and have a spatial characterization. Essentially, structural forces have three components that may
-%187
-%depend on arbitrary parameters (usually the simulated time), and a location in space. Structural couples
-%have three parameter-dependent components. The syntax of the force element is:
 
-%
-%8.8.9 External forces
-%External forces are elements that allow to communicate with an external software that computes forces
-%based on information on the kinematics of the model.
-%Different communication schemes are supported. By default, communication occurs via files. Currently supported communication schemes are
-%
-%
-%8.8.10 External Structural
-%This element allows to communicate with an external software that computes forces applied to a pool
-%of nodes and may depend on the kinematics of those nodes. Communication occurs by means of the
-%communicators illustrated earlier.
-%
-%8.8.11 External structural mapping
-%This element allows to communicate with an external software that computes forces applied to a pool
-%of nodes and may depend on the kinematics of those nodes through a linear mapping. Communication
-%occurs by means of the communicators illustrated earlier.
-%
-%A set of num_points points is generated first, by computing the kinematics of the points originating from
-%the rigid-body motion of the structural nodes node_label according to the specified offset. Multiple
-%offset blocks can appear for each node_label.
-%The echo keyword causes the positions of those points to be written in a file named echo_file_name.
-%If the keyword stop is present, the simulation ends here. This is useful to generate the bulk data that is
-%needed to compute the linear mapping matrix. The optional keyword precision allows to set precision
-%digits in the logged data; the other optional keywords refer to values that are written verbatim to the
-%file. In detail, surface_file_name is the name of the file that contains the coordinates of the peer’s
-%points, output_file_name is the name of the file that will contain the mapping matrix, order is an
-%integer (1 ≤ order ≤ 3), basenode is the number of nodes for each region (basenode > 0), weight is a
-%weighting coefficient (weight ≥ −2 or inf)
-%When the reference node keyword is present, the kinematics of the points is formulated in the reference frame of node ref_node_label. The forces are expected in the same reference frame. In this case,
-%if use reference node forces is set to yes, the force and moment related to node ref_node_label
-%
-%
-%returned by the external solver are used; if rotate reference node forces is set to yes, they are first
-%rotated in the global reference frame.
-%When the mapped points number keyword is present, a mapping matrix is read from the file named
-%mapping_file_name (same as output_file_name when the echo keyword is used). If the keyword from
-%file is used, the number of mapped_points is computed from the number of rows of the matrix in file
-%mapping_file_name. The matrix must be (3 × mapped_points) × (3 × num_points). If the mapped
-%points number keyword is not present, the element behaves as if the mapping were the identity matrix,
-%namely the position and the velocity of the points rigidly offset from MBDyn’s nodes are directly passed
-%to the peer solver. See the modal variant for a description of the mapping file format.
-%The labels of the original points, indicated as point_label, and the labels of the mapped points,
-%either contained in the mapped_labels_file_name, or directly listed as mapped_label, must be provided
-%when labels is set to yes.
-%Mapping. The mapping consists in a constant matrix that allows to compute the position and the
-%velocity of the mapped points (subscript ‘peer’) as functions of a set of points rigidly offset from MBDyn’s
-%nodes (subscript ‘mbdyn’),
-%
-%xpeer = Hxmbdyn (8.66a)
-%x˙ peer = Hx˙ mbdyn (8.66b)
-%The same matrix is used to map back the forces onto MBDyn’s nodes based on the preservation of the
-%work done in the two domains,
-%δx
-%T
-%mbdynfmbdyn = δx
-%T
-%peerfpeer = δx
-%T
-%mbdynHT fpeer (8.67)
-%which implies
-%fmbdyn = HT fpeer (8.68)
-%To compute matrix H one needs to:
+The \texttt{force} element is a general means to introduce a right-hand side to the equations. Structural forces are specific to structural
+nodes and  have three components that may depend on arbitrary parameters and a location in space.
 
-%
-% gather the coordinates of the set of points used by the peer process (subscript ‘peer’ in the formulas
-%above) in a file, formatted as
-%<num_points>
-%<x_1> <y_1> <z_1>
-%...
-%<x_n> <y_n> <z_n>
-%If reference node is defined, the points need to be expressed in a reference frame coincident with
-%that of node ref_node_label.
-%2. execute MBDyn’s input file after uncommenting the echo line in the definition of the external structural mapping force element, terminated by the stop keyword, to generate the echo_file_name
-%file with MBDyn’s points coordinates (subscript ‘mbdyn’ in the formulas above).
-%3. start octave
-%4. make sure the folder contrib/MLS/ is in octave’s path
-%addpath(’/path/to/contrib/MLS’)
-%5. execute the create_mls_interface function
-%
-%create_mls_interface(’echo_file_name’);
-%This generates the mapping matrix H, using the files echo_file_name and surface_file_name
-%(the latter is written in echo_file_name by the surface keyword). The matrix is stored in the
-%file output_file_name. The sparse storage is recommended, since for usual problems the matrix
-%is significantly sparse
-%
-%From this point on, when MBDyn is executed it loads the mapping matrix from file output_file_name
-%using sparse storage, automatically ignoring coefficients whose absolute value is below threshold (defaults to 0).
-%The parameters of the mapping, as documented in create_mls_interface, are
+MBDyn allows to communicate with an external software that computes forces based on information on the kinematics of the model. This feature is at the basis of the development of the \textit{adapter}. The following elements can be used.
 
 
+\subsubsection{External Structural}
 
+The \texttt{External Structural} element allows to communicate with an external software that computes forces applied to a pool of \texttt{nodes} and may depend on the kinematics of those nodes. In this case forces are applied directly to the nodes. In a FSI model, this would require that each interface mesh node has a correspondent MBDyn structural node. 
 
-%[14] Dewey H. Hodges. Review of composite rotor blade modeling. AIAA Journal, 28(3):561–565, March
-%1990.
-%
-%[15] Vittorio Giavotto, Marco Borri, Paolo Mantegazza, Gian Luca Ghiringhelli, V. Caramaschi, G. C.
-%Maffioli, and F. Mussi. Anisotropic beam theory and applications. Computers & Structures, 16(1–
-%4):403–413, 1983.
-%[16] Pierangelo Masarati. On the semi-analytical solution of beams subjected to distributed loads. In
-%XVI Congresso Nazionale AIDAA, pages 72.1–10, Palermo, 24–28 Settembre 2001.
+\subsubsection{External structural mapping}
+
+This element is similar to the previous one, but the nodes where forces are applied and the kinematics is computed depend on structural nodes through a linear mapping. This element has been used in building the adapter. In order to use the \texttt{external structural mapping} elements, the following steps have to be performed:
+
+\begin{enumerate}
+	\item a set of points is defined for each \texttt{structural node} according to a specified offset. Those points are used to compute the kinematics of the interface points, originating from the rigid-body motion of the structural nodes
+	\item before the simulation, a linear mapping matrix $H$ is generated starting from the position of the above points and the interface mesh points (this is performed by means of an \texttt{Octave} script which is part of MBDyn). The matrix is stored in sparse form
+	\item the mapping matrix is used during simulation to map forces and kinematics between the interface nodes and the structural nodes
+\end{enumerate}
+
+The constant matrix mapping allows to compute the position and the velocity of the \textit{interface} points as function of the points rigidly offset from structural nodes:
+
+\begin{subequations}
+	\begin{eqnarray}
+		x_{interf} &=& H x_{mbdyn} \\
+		\dot{x}_{interf} &=& H \dot{x}_{mbdyn} 
+	\end{eqnarray}
+\end{subequations}
+
+The same matrix is used to map back the forces onto structural nodes based on the preservation of the work done in the two domains:
+
+\begin{equation}
+	\delta x_{mbdyn}^T \cdot f_{mbdyn} =  \delta x_{interf}^T \cdot f_{interf} = \delta x_{mbdyn}^T \cdot H^T \cdot f_{interf} 
+\end{equation}
+
+which implies
+
+\begin{equation}
+	f_{mbdyn} = H^T f_{interf}
+\end{equation}
+
+When performing an FSI simulation with strong coupling (see Section \ref{sec:strong-coupling}), MBDyn may need to compute multiple iterations of the same time step in order to reach global convergence. This is performed by using the keyword \texttt{tight} in the coupling of the \texttt{external structural mapping}. The computation and the communication pattern is the following:
+
+\begin{enumerate}
+	\item MBDyn sends the predicted kinematics for time step $k$
+	\item MBDyn receives a set of forces sent by the external peer; those forces are computed based on the kinematics at iteration $j$
+	\item MBDyn continues iterating until convergence using the last set of forces until, while reading the forces, it is informed that the external peer converged. this implies that MBDyn solves the kinematics for time step $k$ at iteration $j$ using the forces evaluated by the external solver for iteration $j-1$ 
+\end{enumerate}
+
+The communication with the external software, in our case the adapter itself, is performed by means of a local unix socket.
 
 
 \subsection{Simulation output}
