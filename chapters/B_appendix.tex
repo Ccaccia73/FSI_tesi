@@ -1,4 +1,29 @@
 \chapter{MBDyn adapter configuration file}
 \label{app:mbd-config-file}
 
-In t
+\lstset{language=json}
+\begin{lstlisting}[caption=MBDyn adapter configuration file example, label=adapter-config]
+{
+	"readDataName": "Displacements0",
+	"writeDataName" : "Forces0",
+	"participantName" : "Solid",
+	"meshName": "Solid-Mesh",
+	"mesh": "./mesh/root0f.dat",
+	"root-coords": [0.0, 0.0, 0.0],
+	"mbdyn-input": "./map_10n_3x_21j.mbd",
+	"mbdyn-output": "./out_mbd",
+	"vtk-output": "./output/MBDyn-OF_",
+	"precice-config": "../precice-config.xml",
+	"displacement-delta": false,
+	"write-interval": 10,
+	"iterstart": 500,
+	"coeff0": 0.05,
+	"period": 2000,
+	"ramp-type": "linear",
+	"resultant-file": "./output/resultant.txt",
+	"node-socket": "/tmp/mbdyn.node.sock",
+	"pre-iteration": 5,
+	"read-coords": true,
+	"every-iteration": false
+}
+\end{lstlisting}
