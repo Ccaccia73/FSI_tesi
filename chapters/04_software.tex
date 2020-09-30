@@ -260,7 +260,22 @@ Using the convention of \textit{x-axis} as beam axis we have:
 
 \subsubsection{Beam section Constitutive Law}
 
-In dynamic simulations, linear elastic or viscoelastic laws are generally used, even though nonlinear laws can be used.  Focusing on linear laws, MBDyn allows the user to define every constitutive laws, going from an isotropic beam section to a fully anisotropic one: in fact the entire $6 \times 6$ constitutive matrix can be provided. It is up to the user to define a valid law as the matrix must satisfy some constraints, e.g. it must be symmetric.
+In dynamic simulations, linear elastic or viscoelastic laws are generally used, even though nonlinear laws can be used.  Focusing on linear laws, MBDyn allows the user to define every constitutive laws, going from an isotropic beam section to a fully anisotropic one: in fact the entire $6 \times 6$ constitutive matrix can be provided. It is up to the user to define a valid law as the matrix must satisfy some constraints, e.g. it must be symmetric. The simplest case, represented in Equation \ref{eq:iso-const}, is a diagonal matrix \hl{in which} 
+
+\begin{equation}
+    f = \begin{bmatrix} EA & 0 & & \ldots &  & 0 \\
+                          & \chi GA &  & & & &  \\
+                          & & \chi GA & & & \\
+                          & & & GJ_p & & \vdots \\
+                          & &  sym. & & EJ_y & 0 \\
+                          & & & & & EJ_z
+    \end{bmatrix} \cdot 
+    \begin{Bmatrix}
+		\epsilon_x \\ \gamma_y \\ \gamma_z \\ \kappa_x \\ \kappa_y \\ \kappa_z
+	\end{Bmatrix}
+    \label{eq:iso-const}
+\end{equation}
+
 
 In the context of FSI simulations, this feature allows the user to define a section constitutive law that is independent from the shape of the beam itself. Thus the aerodynamic aspects and the structural aspects are handled by two distinct elements of the model: i.e. the interface mesh defines the aerodynamic forces and the beam constitutive law defines the structural properties.   
 
