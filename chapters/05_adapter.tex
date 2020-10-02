@@ -168,13 +168,91 @@ If the time step has converged and at a user defined interval, the simulation da
 \section{Input parameters}
 \label{sec:mbdyn-adapter-input}
 
+Some input data are needed in order to perform a simulation. Such data are stored in a \texttt{json} file\footnote{see for example \href{https://www.json.org/json-en.html}{json.org} for some information about the syntax}. The file is given as input in the form:
+\begin{lstlisting}[language=bash]
+mbdyn-beam-adapter -f config.json
+\end{lstlisting}
+
+An example of input file is given in Appendix \ref{app:mbd-config-file}. The type of data can be related to different aspects of the simulation:
+
+\begin{enumerate}
+    \item preCICE
+    \begin{itemize}
+        \item \texttt{precice-config}: the interface must be initialized with the \textit{preCICE configuration file} (see Section \ref{sec:pc-config} and Appendix \ref{app:pc-config-file})
+        \item \texttt{readDataName}: label of the data to be read from the interface (typically forces)
+        \item \texttt{writeDataName}: label of the data to be written (typically displacements)
+        \item \texttt{participantName}: label the participant in the FSI simulation
+        \item \texttt{meshName}: label of the interface mesh in the FSI simulation
+    \end{itemize}
+    \item MBDyn
+    \begin{itemize}
+        \item \texttt{mesh}: location of the file containing the points mapped in MBDyn
+        \item \texttt{mbdyn-input}: input file name to be passed to MBDyn
+        \item \texttt{node-socket}: name of the socket to exchange data between the adapter and MBDyn (the name has been made configurable to allow different simulations to run in parallel using different sockets: the user must take care to use the same name in the MBDyn input file)
+        \item \texttt{mbdyn-output}: location and prefix of all MBDyn related output files (see Section \ref{sec:mbd-output} and Appendix \ref{sec:mbdyn-output-file}).
+    \end{itemize}
+    \item Simulation
+    \begin{itemize}
+        \item \texttt{displacement-delta}: Boolean value that tells the adapter whether to pass the relative displacement between two consecutive iterations or the displacement from the initial configuration. This is mainly due to compatibility with different fluid adapters (e.g. the current version of the \textit{SU2 adapter} requires delta displacements)  
+        \item \texttt{iterstart}: the following four parameters are used to give progression to the forces applied to the structure (Figure \ref{fig:sim-coeff} gives an example of the behavior). The purpose is to ease the beginning of the simulation, letting the flow settle and avoiding initial spikes in the application of the forces that could result in a diverging simulation.
+        The current parameter tells \texttt{MBDynConnector} how many iterations to perform with a reduced starting coefficient (200 in the example)
+        \item \texttt{coeff0}: this value is the initial coefficient ($0.1$ in the example)
+        \item \texttt{period}: this value is the number of iterations to reach 1 (600 in the example)
+        \item \texttt{ramp-type}: label defining the type of ramp. A linear law or a $1/2 \cdot (1-\cos)$ law can be used
+    \end{itemize}
+    \item Output (see Section \ref{sec:mbdyn-adapter-output} for some more details)
+    \begin{itemize}
+        \item \texttt{write-interval}: value that defines how often the \texttt{MBDynConnector} writes output data
+        \item \texttt{resultant-file}: location of the file containing the resultant and moment of the fluid forces applied to the structure. 
+        \item \texttt{root-coords}: vector containing the coordinates of the point about which the resultant moment has to be computed
+        \item \texttt{vtk-output}: location and prefix of the output file. 
+    \end{itemize}
+    \item Some parameters are used for debug purposes and might be removed in future releases
+    \begin{itemize}
+        \item \texttt{pre-iteration}: number of simulation iterations performed by MBDyn before coupling with the fluid solver. This can ease the initial coupling in case the definition of the structural model isn't in equilibrium
+        \item \texttt{read-coords}: Boolean value used to read the mapped points coordinates back in the adapter from MBDyn instead of reading the mesh file. 
+        \item \texttt{every-iteration}: Boolean value used to force the adapter to write output data at each coupling iteration 
+    \end{itemize}
+\end{enumerate}
 
 
-input: json config file
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/coeff.png}
+	\caption{Coefficient applied to nodal forces at beginning of simulation}
+	\label{fig:sim-coeff}
+\end{figure}
 
-- simulation parameters
 
 \section{Output results}
 \label{sec:mbdyn-adapter-output}
 
+Besides the output strictly related to preCICE, concerning information about convergence and number of iterations, or the output strictly related to the MBDyn solution (see Appendix \ref{sec:mbdyn-output-file}), the adapter gives two types of output.
+
+The infomration concerning the interface mesh points is saved in \texttt{vtu} file format, which is a binary XML VTK  file format used to store data on unstructured grids of points. A sequential number corresponding to the current iteration is appended to the name of the file so that any visualization software (e.g. \textit{ParaView}\footnote{\href{https://www.paraview.org/}{paraview.org}}) can load the whole dataset as a time series. Each file contains the following vector data:
+
+\begin{itemize}
+    \item displacement
+    \item displacement delta
+    \item velocity
+    \item nodal force
+\end{itemize}
+
+for each node. An example of visualization is given in Figure \ref{fig:vtk-out}. For debug purposes also the area and the normal of each cell can be saved. 
+
 output: VTK and resultants
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/vtk_disp.png}
+	\caption{Output data in VTU format}
+	\label{fig:vtk-out}
+\end{figure}
+
+The second output file contains the resultant and the moment applied to the structure by the fluid forces.
+
+Each line of the file has the form:
+\begin{verbatim*}
+t Fx Fy Fz Mx My Mz c
+\end{verbatim*}
+
+where $t$ is the current time step, $F_x, F_y, F_z$ are the components of the resultant, $M_x, M_y, M_z$ are the components of the moment (the point is defined in the input file) and finally $c$ is the coefficient applied to the nodal forces (see Figure \ref{fig:sim-coeff}).
