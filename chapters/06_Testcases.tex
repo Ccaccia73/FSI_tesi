@@ -1,4 +1,78 @@
 \chapter{Validation Test-cases}
 \label{cha:tests}
 
+
 \section{}
+
+In order to validate the developed coupling adapter, several testcases were simulated, which ought to
+qualitatively and quantitatively confirm the physically correct implementation. Moreover, the capabilities
+of the adapter for larger-scale two- as well as three-dimensional simulations are shown in the following.
+All simulations in this chapter were carried out on the MAC Cluster "CoolMAC" using the "Sandybridge"
+and "Bulldozer" partitions1. The coupled structural solver for all simulations was the module SOLIDZ
+(CSM simulations), which is part of the multiphysics simulation software suite Alya that is developed
+at the Barcelona Supercomputing Center ([44]). Meshes for the testcases were generated with the free
+software Gmsh ([19]).
+Each section in this chapter starts with a short definition of the respective testcase, including its geometry,
+discretization, expectation of the physical behavior and a motivation for running the simulation.
+Subsequently, I state the physical and numerical settings used for the run. In the end, the obtained
+results are shown and discussed briefly.
+Beginning with Section 6.1, a very simple two-dimensional testcase is described, which is altered to yield a
+three-dimensional scenario in Section 6.2. A quantitative comparison of simulation results is possible via
+running the well-known FSI3 benchmark testcase ([39]) in Section 6.3. The chapter is closed by Section
+6.4, simulating a slender cylinder. This example has a practical background and represents a real-world
+application.
+As for all simulations material and physical parameters as well as solver configurations need to be defined,
+I forestall them here in order to avoid repeating myself in each section of this chapter. Also, this allows
+to compare simulations settings with each other more easily. Material and physical parameters are stated
+in Table 6.1. Fluids are modeled as ideal gases, solids as linearly elastic and isotropic.
+Several solver configuration options remain the same for all simulations: Forces and the displacements
+relative to the last time step are chosen as coupling quantities. In case an implicit coupling algorithm is
+used, these are monitored by preCICE for convergence of the fixed-point system. In addition, an implicit
+coupling algorithm extrapolates the coupling quantities with a second-order scheme at the beginning of
+each time step. If IQN-ILS or V-IQN (recall Section 4.1.1) are chosen for coupling, preCICE takes into
+account up to 30 iterations of up to 10 previous time steps in order to solve the interface least-squares
+problem.
+Concerning SU2, time discretization is handled by the implicit Euler method and spatial discretization is
+dealt with by a second-order scheme in combination with a Roe approximate Riemann solver ([34]). The
+linear system, which finally yields the solution vector of the flow field, is solved by the FGMRES procedure
+([35]). All other solver configurations are given in Table 6.2 or directly stated in the respective sections.
+Note that some FSI simulations are initialized from a fluid-only start solution, which is calculated for a
+time period specified with tstart. Also, some simulations make use of the dual time stepping technique of
+%SU2. The corresponding dual time convergence limit dual relates to reducing the density residual of the
+fluid domain.
+Fluid and solid calculations are started on different nodes of the cluster for all simulations.
+
+
+
+\section{Dummy fluid solver}
+
+
+\section{2D Flap}
+
+
+\section{Square cylinder Benchmark}
+
+
+\cite{ramm1998fluid} art originale.
+\cite{walhorn2002space}
+\cite{matthies2003partitioned}
+\cite{dettmer2006computational}
+\cite{olivier2009fluid}
+\cite{wood2010partitioned}
+\cite{kassiotis2011nonlinear}
+\cite{habchi2013partitioned}
+\cite{froehle2014high}
+
+
+\section{FSI2 Benchmark}
+
+
+
+\section{FSI3 Benchmark}
+
+
+\section{Senstitivity analysis of FSI3 Benchmark}
+
+
+
+
