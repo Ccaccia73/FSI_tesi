@@ -1,10 +1,10 @@
-\chapter{Validation Test-cases}
+\chapter{Validation Test Cases}
 \label{cha:tests}
 
 
-\section{}
+\section{Introduction}
 
-In order to validate the developed coupling adapter, several testcases were simulated, which ought to
+In order to validate the developed coupling adapter, several test cases were simulated, which ought to
 qualitatively and quantitatively confirm the physically correct implementation. Moreover, the capabilities
 of the adapter for larger-scale two- as well as three-dimensional simulations are shown in the following.
 All simulations in this chapter were carried out on the MAC Cluster "CoolMAC" using the "Sandybridge"
@@ -46,8 +46,97 @@ Fluid and solid calculations are started on different nodes of the cluster for a
 
 \section{Dummy fluid solver}
 
+The first task implemented to validate the adapter consisted in developing a simple \textit{dummy fluid solver}: i.e. a software component connected to the coupling library preCICE with the simple task to apply forces to user-defined nodes on the structure and read back the displacements.
 
-\section{2D Flap}
+This approach allowed to validate first to validate the MBDyn model with the \texttt{external structural mapping} component (see Section \ref{sec:mbd-forces}) and the correct data exchange between preCICE and the adapter. 
+
+The \textit{dummy solver} has been written in Python and it is part of the software package in this work.
+
+A MBDyn model composed of 5 \texttt{beam3} elements (see Section \ref{sec:mbd-beam}) has been written to perform this test, as depicted in Figure \ref{fig:cnt-beams}. 
+
+\begin{figure}[htbp!]
+	    \centering
+        \begin{tikzpicture}
+            \point{a}{0}{0};
+            \point{b}{1.5}{0};
+            \point{c}{3}{0};
+            \point{d}{4.5}{0};
+            \point{e}{6}{0};
+            \point{f}{7.5}{0};
+            
+            \beam{4}{a}{b};
+            \beam{4}{b}{c};
+            \beam{4}{c}{d};
+            \beam{4}{d}{e};
+            \beam{4}{e}{f};
+            
+            \notation{2}{b}{};
+            \notation{2}{c}{};
+            \notation{2}{d}{};
+            \notation{2}{e}{};
+            \notation{2}{f}{};
+            
+            \notation{4}{a}{b}[ $1$ ];
+            \notation{4}{b}{c}[ $2$ ];
+            \notation{4}{c}{d}[ $3$ ];
+            \notation{4}{d}{e}[ $4$ ];
+            \notation{4}{e}{f}[ $5$ ];
+            
+            \support{3}{a}[-90]
+            % \load{1}{b}[90][1][.1];
+            \dscaling{3}{0.5};
+            \daxis{1}{-1.5 ,0 ,0}[right][above][left];
+        \end{tikzpicture}
+    	\caption{cantilever made of 5 beam elements}
+		\label{fig:cnt-beams}
+\end{figure}
+
+The inertia of the structure is provided by 2 bodies attached to the nodes of each beam.
+
+
+
+
+\begin{figure}[htbp!]
+	%\centering
+	    \begin{subfigure}{.8\textwidth}
+	    \centering
+        \begin{tikzpicture}
+            \point{a}{0}{0};
+            \point{b}{6}{0};
+            \beam{4}{a}{b};
+            \support{3}{a}[-90]
+            \load{1}{b}[90][1][.1];
+        \end{tikzpicture}
+    	\caption{cantilever with tip load}
+		\label{fig:cnt-tip}
+	    \end{subfigure}
+	    %\newline
+	    \par\bigskip
+	    \begin{subfigure}{.8\textwidth}
+		\centering
+		\begin{tikzpicture}
+            \point{a}{0}{0};
+            \point{b}{6}{0};
+            \beam{4}{a}{b};
+            \support{3}{a}[-90]
+            \lineload{1}{a}{b}[1][1];%[force interval];
+        \end{tikzpicture}
+    	\caption{cantilever with distributed load}
+		\label{fig:cnt-distrib}
+	    \end{subfigure}
+	\caption{model and data exchange test-cases}
+\end{figure}
+
+
+
+
+
+
+
+
+\section{Vertical flap: incompressible regime}
+
+\section{Vertical Flap: compressible regime}
 
 
 \section{Square cylinder Benchmark}
@@ -64,14 +153,14 @@ Fluid and solid calculations are started on different nodes of the cluster for a
 \cite{froehle2014high}
 
 
-\section{FSI2 Benchmark}
+\section{Turek-Hron FSI2 Benchmark}
 
 
 
-\section{FSI3 Benchmark}
+\section{Turek-Hron FSI1 and FSI3 Benchmark}
 
 
-\section{Senstitivity analysis of FSI3 Benchmark}
+\section{Sensitivity analysis of FSI3 Benchmark}
 
 
 
