@@ -52,7 +52,7 @@ This approach allowed to validate first to validate the MBDyn model with the \te
 
 The \textit{dummy solver} has been written in Python and it is part of the software package in this work.
 
-A MBDyn model composed of 5 \texttt{beam3} elements (see Section \ref{sec:mbd-beam}) has been written to perform this test, as depicted in Figure \ref{fig:cnt-beams}. 
+A MBDyn model composed of 5 \texttt{beam3} elements (see Section \ref{sec:mbd-beam}) has been written to perform this test, as depicted in Figure \ref{fig:cnt-beams}. The beam section is constant and rectangular and the physical properties are constant throughout the beam length. 
 
 \begin{figure}[htbp!]
 	    \centering
@@ -91,10 +91,63 @@ A MBDyn model composed of 5 \texttt{beam3} elements (see Section \ref{sec:mbd-be
 		\label{fig:cnt-beams}
 \end{figure}
 
-The inertia of the structure is provided by 2 bodies attached to the nodes of each beam.
+The inertia of the structure is provided by 2 \texttt{body} elements (see Section \ref{sec:mbd-body} attached to the second and third nodes of each beam (see Figure \ref{fig:mbdyn-beam-model}). The center of gravity of each body is offset by $-l/4$ in x-direction (where $l$ is the length of the single beam element). Each body has the following inertial properties (see Figure \ref{fig:cnt-mass}: 
+
+\begin{equation}
+    m = \rho A \frac{l}{4} \quad I = \frac{m}{12} \begin{bmatrix} h^2+w^2 & 0 & 0 \\ 0 & \frac{l^2}{16} + w^2 & 0 \\ 0 & 0 & \frac{l^2}{16} + h^2 \end{bmatrix}
+    \label{eq:body-inertia}
+\end{equation}
 
 
+\begin{figure}[htbp!]
+	    \centering
+\begin{tikzpicture}[every edge quotes/.append style={auto, text=blue}]
+  \pgfmathsetmacro{\cubex}{4}
+  \pgfmathsetmacro{\cubey}{2}
+  \pgfmathsetmacro{\cubez}{3}
+  \draw [draw=blue, every edge/.append style={draw=blue, densely dashed, opacity=.5}, fill=yellow!10]
+    (0,0,0) coordinate (o) -- ++(-\cubex,0,0) coordinate (a) -- ++(0,-\cubey,0) coordinate (b) edge coordinate [pos=1] (g) ++(0,0,-\cubez)  -- ++(\cubex,0,0) coordinate (c) -- cycle
+    (o) -- ++(0,0,-\cubez) coordinate (d) -- ++(0,-\cubey,0) coordinate (e) edge (g) -- (c) -- cycle
+    (o) -- (a) -- ++(0,0,-\cubez) coordinate (f) edge (g) -- (d) -- cycle;
+  \path [every edge/.append style={draw=black, |-|}]
+    (b) +(0,-5pt) coordinate (b1) edge ["$l/2$"] (b1 -| c)
+    (b) +(-5pt,0) coordinate (b2) edge ["h"] (b2 |- a)
+    (c) +(3.5pt,-3.5pt) coordinate (c2) edge ["w"] ([xshift=3.5pt,yshift=-3.5pt]e)
+    ;
+    \daxis{1} {-8,-1,-1.5} [right][above][left];
+    \dpoint{q}{-2.5}{-1}{-1.5};
+    \dpoint{r}{0}{-1}{-1.5};
+    \dpoint{s}{-\cubex}{-1}{-1.5};
+    \dpoint{t}{\cubex}{-1}{-1.5};
+    \beam{4}{q}{r};
+    \dhinge{1}{q};
+    \dhinge{1}{r};
+    \dhinge{1}{s};
+    \dhinge{1}{t};
+    \dnotation{1}{q}{CoG};
+    \dnotation{1}{r}{$n_2$};
+    \dnotation{1}{s}{$n_1$};
+    \dnotation{1}{t}{$n_3$};
+    \ddimensioning{xy}{q}{r}{1.5}[ $l/4$ ];
+    \ddimensioning{xy}{s}{t}{-2.5}[ $l$ ];
+    
+\end{tikzpicture}
+    	\caption{\texttt{body} element attached to node 2 of the \texttt{beam} element}
+		\label{fig:cnt-mass}
+\end{figure}
 
+
+The interface mesh is represented in Figure \ref{fig:mbdyn-mesh}.
+
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/example-mesh}
+	\caption{interface points mesh}
+	\label{fig:mbdyn-mesh}
+\end{figure}
+
+The model has been loaded by a concentrated load on the tip (Figure \ref{fig:cnt-tip} and with an equivalent distributed load on the upper surface (Figure \ref{fig:cnt-distrib}).
 
 \begin{figure}[htbp!]
 	%\centering
@@ -127,16 +180,13 @@ The inertia of the structure is provided by 2 bodies attached to the nodes of ea
 	\caption{model and data exchange test-cases}
 \end{figure}
 
+The results have been compared the expected values in terms of tip displacement at steady state and in terms of frequency of the tip movement when the system has been loaded with a step load.
 
-
-
-
-
-
+When both the MBDyn model and the data exchanged through the preCICE interface have been validated, the model has been coupled to a CFD solver.
 
 \section{Vertical flap: incompressible regime}
 
-\section{Vertical Flap: compressible regime}
+\section{Vertical flap: compressible regime}
 
 
 \section{Square cylinder Benchmark}
