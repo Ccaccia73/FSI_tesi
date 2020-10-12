@@ -4,8 +4,17 @@
 
 \section{Introduction}
 
-In order to validate the developed coupling adapter, several test cases were simulated, which ought to
-qualitatively and quantitatively confirm the physically correct implementation. Moreover, the capabilities
+In order to validate the coupling adapter developed in this work, a set of test cases have been simulated, which are supposed to qualitatively and quantitatively confirm the physically correctness of the implementation.
+
+The validation has been carried out in different steps: the first task (section \ref{sec:dummy}) consisted in validating the MBDyn model that has been used throughout the simulations and verifying that the implementation of the coupling works as expected.
+
+The second step aimed at comparing the results obtained performing an FSI simulation with MBDyn with another structural solver, both in compressible and in incompressible regime (Sections \ref{sec:cx-mbd} and \ref{sec:su2-mbd}).
+
+Then, some results obtained from FSI simulations coupling MBDyn with OpenFOAM, have been compared with some benchmarks present in literature. At first, the problem described in \cite{ramm1998fluid} has been considered. It is characterized by a mass ratio (see Section \ref{subsec:mass-ratio}) of $1.18\cdot 10^{-3}$  
+
+Th
+
+ Moreover, the capabilities
 of the adapter for larger-scale two- as well as three-dimensional simulations are shown in the following.
 All simulations in this chapter were carried out on the MAC Cluster "CoolMAC" using the "Sandybridge"
 and "Bulldozer" partitions1. The coupled structural solver for all simulations was the module SOLIDZ
@@ -45,14 +54,17 @@ Fluid and solid calculations are started on different nodes of the cluster for a
 
 
 \section{Dummy fluid solver}
+\label{sec:dummy}
 
-The first task implemented to validate the adapter consisted in developing a simple \textit{dummy fluid solver}: i.e. a software component connected to the coupling library preCICE with the simple task to apply forces to user-defined nodes on the structure and read back the displacements.
+The first task implemented to validate the adapter consisted in developing a simple \textit{dummy fluid solver}: i.e. a software component connected to the coupling library preCICE with the simple task to apply forces to user-defined nodes on the structure and read back the displacements of the interface nodes.
 
-This approach allowed to validate first to validate the MBDyn model with the \texttt{external structural mapping} component (see Section \ref{sec:mbd-forces}) and the correct data exchange between preCICE and the adapter. 
+This approach allowed first to validate the MBDyn model with the \texttt{external structural mapping} component (see Section \ref{sec:mbd-forces}) and the correct data exchange between preCICE and the adapter. 
 
 The \textit{dummy solver} has been written in Python and it is part of the software package in this work.
 
-A MBDyn model composed of 5 \texttt{beam3} elements (see Section \ref{sec:mbd-beam}) has been written to perform this test, as depicted in Figure \ref{fig:cnt-beams}. The beam section is constant and rectangular and the physical properties are constant throughout the beam length. 
+A MBDyn cantilever beam model composed of 5 \texttt{beam3} elements (see Section \ref{sec:mbd-beam}) has been written to perform this test, as depicted in Figure \ref{fig:cnt-beams}. This requires a total of 11 \texttt{node} elements to define the structure.
+
+The beam section is uniform and rectangular ($w \times h$) and the physical properties (eg. $\rho, E, \nu$) are constant throughout the beam length. 
 
 \begin{figure}[htbp!]
 	    \centering
@@ -91,10 +103,10 @@ A MBDyn model composed of 5 \texttt{beam3} elements (see Section \ref{sec:mbd-be
 		\label{fig:cnt-beams}
 \end{figure}
 
-The inertia of the structure is provided by 2 \texttt{body} elements (see Section \ref{sec:mbd-body} attached to the second and third nodes of each beam (see Figure \ref{fig:mbdyn-beam-model}). The center of gravity of each body is offset by $-l/4$ in x-direction (where $l$ is the length of the single beam element). Each body has the following inertial properties (see Figure \ref{fig:cnt-mass}: 
+The inertia of the structure is provided by 2 \texttt{body} elements (see Section \ref{sec:mbd-body} attached to the second and third nodes of each beam (see Figure \ref{fig:mbdyn-beam-model}). The center of gravity of each body is offset by $-l/4$ in x-direction (where $l$ is the length of the single beam element). Each body has the following inertial properties (see Figure \ref{fig:cnt-mass}): 
 
 \begin{equation}
-    m = \rho A \frac{l}{4} \quad I = \frac{m}{12} \begin{bmatrix} h^2+w^2 & 0 & 0 \\ 0 & \frac{l^2}{16} + w^2 & 0 \\ 0 & 0 & \frac{l^2}{16} + h^2 \end{bmatrix}
+    m = \rho wh \frac{l}{4} \quad I = \frac{m}{12} \begin{bmatrix} h^2+w^2 & 0 & 0 \\ 0 & \frac{l^2}{16} + w^2 & 0 \\ 0 & 0 & \frac{l^2}{16} + h^2 \end{bmatrix}
     \label{eq:body-inertia}
 \end{equation}
 
@@ -137,7 +149,8 @@ The inertia of the structure is provided by 2 \texttt{body} elements (see Sectio
 \end{figure}
 
 
-The interface mesh is represented in Figure \ref{fig:mbdyn-mesh}.
+The first node of the structure is clamped (to implement the cantilever constraint), while all other joints are constrained to move in the $x-y$ plane and rotate only arpound the $x-axis$ so that the structure can move only in the $x-y$ plane.
+The interface mesh is represented in Figure \ref{fig:mbdyn-mesh}. Only the connectivity elements belonging to the $x-z$ and $y-z$ plane are represented, but it does not affect the behavior if the structure.
 
 
 \begin{figure}[htbp!]
@@ -147,7 +160,7 @@ The interface mesh is represented in Figure \ref{fig:mbdyn-mesh}.
 	\label{fig:mbdyn-mesh}
 \end{figure}
 
-The model has been loaded by a concentrated load on the tip (Figure \ref{fig:cnt-tip} and with an equivalent distributed load on the upper surface (Figure \ref{fig:cnt-distrib}).
+The model has been loaded by a concentrated load on two tip nodes (Figure \ref{fig:cnt-tip}) and with an equivalent distributed load on the nodes belonging to the upper surface (Figure \ref{fig:cnt-distrib}).
 
 \begin{figure}[htbp!]
 	%\centering
@@ -180,18 +193,96 @@ The model has been loaded by a concentrated load on the tip (Figure \ref{fig:cnt
 	\caption{model and data exchange test-cases}
 \end{figure}
 
-The results have been compared the expected values in terms of tip displacement at steady state and in terms of frequency of the tip movement when the system has been loaded with a step load.
+The results have been compared the expected theoretical values in terms of tip displacement at steady state and in terms of frequency of the tip movement when the system has been loaded with a step load.
 
 When both the MBDyn model and the data exchanged through the preCICE interface have been validated, the model has been coupled to a CFD solver.
 
+
+
+
+
 \section{Vertical flap: incompressible regime}
+\label{sec:cx-mbd}
+
+The first validation step consisted in comparing the results obtained with MBDyn with the ones obtained by another structural solver with the same fluid model.
+
+For this purpose a simple case of a vertical flap immersed in a flow in incompressible regime.
+
+\subsection{Fluid domain}
+
+The fluid domain is 
+
+\subsection{Coupling parameters}
+
+
+\subsection{Structural Solver: CalculiX}
+ 
+ 
+\subsection{Implementation with MBDyn}
+
+
+\subsection{Results}
+
+
+
+
+
+
 
 \section{Vertical flap: compressible regime}
+\label{sec:su2-mbd}
+
+Test coupling capabilities with a different fluid solver, SU2 and 
+
+
+\subsection{Fluid domain}
+
+
+\subsection{Coupling parameters}
+
+
+\subsection{MBDyn model}
+
+\subsection{results}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 \section{Square cylinder Benchmark}
 
+\subsection{Problem Description}
 
+\cite{ramm1998fluid} art originale.
+
+
+\subsubsection{Fluid domain}
+
+
+\subsubsection{Solid domain}
+
+
+\subsubsection{Coupling parameters}
+
+
+\subsubsection{Results}
+
+\cite{ramm1998fluid} art originale.
 \cite{ramm1998fluid} art originale.
 \cite{walhorn2002space}
 \cite{matthies2003partitioned}
@@ -203,15 +294,92 @@ When both the MBDyn model and the data exchanged through the preCICE interface h
 \cite{froehle2014high}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \section{Turek-Hron FSI2 Benchmark}
+
+\cite{turek2006proposal}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 \section{Turek-Hron FSI1 and FSI3 Benchmark}
 
-
-\section{Sensitivity analysis of FSI3 Benchmark}
-
+\cite{turek2006proposal}
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Sensitivity analysis of FSI1-FSI3 Benchmarks}
+
+
+\subsection{FSI1 sensitivity Analysis ($Re=20$)}
+
+
+\subsection{FSI3 sensitivity Analysis ($Re=200$)}
+
+
+\subsection{Sensitivity Analysis at ($Re=1000$)}
+
+\subsection{Conclusions}
