@@ -10,47 +10,19 @@ The validation has been carried out in different steps: the first task (section 
 
 The second step aimed at comparing the results obtained performing an FSI simulation with MBDyn with another structural solver, both in compressible and in incompressible regime (Sections \ref{sec:cx-mbd} and \ref{sec:su2-mbd}).
 
-Then, some results obtained from FSI simulations coupling MBDyn with OpenFOAM, have been compared with some benchmarks present in literature. At first, the problem described in \cite{ramm1998fluid} has been considered. It is characterized by a mass ratio (see Section \ref{subsec:mass-ratio}) of $1.18\cdot 10^{-3}$  
+Then, some results obtained from FSI simulations coupling MBDyn with OpenFOAM, have been compared with some benchmarks present in literature. At first, the problem described in \cite{ramm1998fluid} has been considered (see Section \ref{sec:sq-cyl-bench}): it is composed of a square cylinder with a trailing flap. It is characterized by a mass ratio (see Section \ref{subsec:mass-ratio}) of $1.18\cdot 10^{-3}$, this turned out to be a fundamental parameter fo the convergence of simulations, and has been extensively analyzed in the subsequent sections.
 
-Th
+One set of well-known benchmarks in FSI literature are the three Turek-Hron FSI test cases described in \cite{turek2006proposal}. Those cases are characterized by the same domain (a round cylinder with a trailing flap) and the same fluid properties. Changes impact only fluid velocity and structural properties (in particular $\rho,E$).
 
- Moreover, the capabilities
-of the adapter for larger-scale two- as well as three-dimensional simulations are shown in the following.
-All simulations in this chapter were carried out on the MAC Cluster "CoolMAC" using the "Sandybridge"
-and "Bulldozer" partitions1. The coupled structural solver for all simulations was the module SOLIDZ
-(CSM simulations), which is part of the multiphysics simulation software suite Alya that is developed
-at the Barcelona Supercomputing Center ([44]). Meshes for the testcases were generated with the free
-software Gmsh ([19]).
-Each section in this chapter starts with a short definition of the respective testcase, including its geometry,
-discretization, expectation of the physical behavior and a motivation for running the simulation.
-Subsequently, I state the physical and numerical settings used for the run. In the end, the obtained
-results are shown and discussed briefly.
-Beginning with Section 6.1, a very simple two-dimensional testcase is described, which is altered to yield a
-three-dimensional scenario in Section 6.2. A quantitative comparison of simulation results is possible via
-running the well-known FSI3 benchmark testcase ([39]) in Section 6.3. The chapter is closed by Section
-6.4, simulating a slender cylinder. This example has a practical background and represents a real-world
-application.
-As for all simulations material and physical parameters as well as solver configurations need to be defined,
-I forestall them here in order to avoid repeating myself in each section of this chapter. Also, this allows
-to compare simulations settings with each other more easily. Material and physical parameters are stated
-in Table 6.1. Fluids are modeled as ideal gases, solids as linearly elastic and isotropic.
-Several solver configuration options remain the same for all simulations: Forces and the displacements
-relative to the last time step are chosen as coupling quantities. In case an implicit coupling algorithm is
-used, these are monitored by preCICE for convergence of the fixed-point system. In addition, an implicit
-coupling algorithm extrapolates the coupling quantities with a second-order scheme at the beginning of
-each time step. If IQN-ILS or V-IQN (recall Section 4.1.1) are chosen for coupling, preCICE takes into
-account up to 30 iterations of up to 10 previous time steps in order to solve the interface least-squares
-problem.
-Concerning SU2, time discretization is handled by the implicit Euler method and spatial discretization is
-dealt with by a second-order scheme in combination with a Roe approximate Riemann solver ([34]). The
-linear system, which finally yields the solution vector of the flow field, is solved by the FGMRES procedure
-([35]). All other solver configurations are given in Table 6.2 or directly stated in the respective sections.
-Note that some FSI simulations are initialized from a fluid-only start solution, which is calculated for a
-time period specified with tstart. Also, some simulations make use of the dual time stepping technique of
-%SU2. The corresponding dual time convergence limit dual relates to reducing the density residual of the
-fluid domain.
-Fluid and solid calculations are started on different nodes of the cluster for all simulations.
+At first, the so-called FSI2 benchmark (characterized by a mass number of $0.1$) has been considered (Section \ref{sec:FSI2}). This benchmark, together with the previous one, shows the validity of the adapter and its potential use in FSI simulations.
 
+Finally, the FSI3 benchmark has been extensively analyzed (Section \ref{sec:FSI1-FSI3}). It has a mass number of $1$ and, up to now, it hasn't been possible to find a suitable set of coupling parameters that can make this case converge when coupled with MBDyn.
+
+It appears that the added mass effect (see Section \ref{sec:added-mass}), plays a dominant role in the convergence of a FSI problems with MBDyn. For this reason, a sensitivity analysis has been performed on the FSI3 problem setup (Section \ref{sec:FSI3-sensitivity}). In particular, flow velocity, fluid density and solid stiffness have been varied in order to gain some insight about the range of parameters, and adimensional numbers that must be considered to understand how critical a simulation can be.     
+
+Each section starts with a short description of the test case, including the most relevant parameter: e.g. the fluid domain geometry and discretization, structural and coupling parameters. Finally some results are presented, together with the coupling performances.
+
+The meshes for all test cases have generated with the free software \textit{Salome}\footnote{\href{https://www.salome-platform.org/}{salome-platform.org/}}. Files for MBDyn interface points have been generated by a Python script running within the \textit{Salome} environment. The script is part of the software made for this work. 
 
 
 \section{Dummy fluid solver}
@@ -94,8 +66,12 @@ The beam section is uniform and rectangular ($w \times h$) and the physical prop
             \notation{4}{d}{e}[ $4$ ];
             \notation{4}{e}{f}[ $5$ ];
             
-            \support{3}{a}[-90]
+            \support{3}{a}[-90];
             % \load{1}{b}[90][1][.1];
+            
+            \dimensioning{1}{a}{f}{-1.8}[$L$];
+            \dimensioning{1}{a}{b}{-1}[$l$];
+            
             \dscaling{3}{0.5};
             \daxis{1}{-1.5 ,0 ,0}[right][above][left];
         \end{tikzpicture}
@@ -149,7 +125,7 @@ The inertia of the structure is provided by 2 \texttt{body} elements (see Sectio
 \end{figure}
 
 
-The first node of the structure is clamped (to implement the cantilever constraint), while all other joints are constrained to move in the $x-y$ plane and rotate only arpound the $x-axis$ so that the structure can move only in the $x-y$ plane.
+The first node of the structure is clamped (to implement the cantilever constraint), while all other joints are constrained to move in the $x-y$ plane and rotate only around the $x-axis$ so that the structure can move only in the $x-y$ plane.
 The interface mesh is represented in Figure \ref{fig:mbdyn-mesh}. Only the connectivity elements belonging to the $x-z$ and $y-z$ plane are represented, but it does not affect the behavior if the structure.
 
 
@@ -204,27 +180,190 @@ When both the MBDyn model and the data exchanged through the preCICE interface h
 \section{Vertical flap: incompressible regime}
 \label{sec:cx-mbd}
 
-The first validation step consisted in comparing the results obtained with MBDyn with the ones obtained by another structural solver with the same fluid model.
+The first validation step consisted in comparing the results obtained with MBDyn with the ones given by another structural solver with the same fluid model. 
 
-For this purpose a simple case of a vertical flap immersed in a flow in incompressible regime.
+For this purpose a simple case of a vertical flap immersed in a flow in incompressible regime, has been considered, borrowing an example given in the preCICE website.
 
 \subsection{Fluid domain}
 
-The fluid domain is 
+The fluid domain is represented in Figure \ref{fig:ex1-domain}. The inlet is on the left with uniform flow velocity, the outlet is on the right, while all other boundaries are \textit{no-slip} walls.
 
-\subsection{Coupling parameters}
+
+\begin{figure}[htbp!]
+	\centering
+	\begin{tikzpicture}
+		\point{a}{-4}{0};
+		\point{b}{-0.1}{0};
+		\point{c}{0.1}{0};
+		\point{d}{8}{0};
+		\point{e}{-0.1}{1};
+		\point{f}{0.1}{1};
+		\point{g}{-4}{3};
+		\point{h}{8}{3};
+		
+		\point{i}{-3.5}{0.5};
+		
+		\beam{2}{a}{b};
+		\beam{2}{c}{d};
+		\beam{2}{a}{g};
+		\beam{2}{d}{h};
+		\beam{2}{g}{h};
+		\beam{4}{b}{e};
+		\beam{4}{e}{f};
+		\beam{4}{f}{c};
+		
+		\dimensioning{1}{g}{h}{3.5}[$20m$];
+		\dimensioning{1}{a}{b}{-0.6}[$4m$];
+		\dimensioning{2}{d}{h}{8.5}[$4m$];
+		
+		\dimensioning{1}{e}{f}{1.25}[$0.1m$];
+		\dimensioning{2}{c}{f}{0.8}[$1m$];
+		
+		\lineload{1}{a}{g};
+		
+		\load{1}{i}[180][1][-1];
+		\load{1}{i}[-90][1][-1];
+		\notation{1}{-2.5,0.25}{x};
+		\notation{1}{-3.75,1.5}{z};
+		%\dscaling{3}{0.4};
+		%\daxis{1}{1.5 ,0 ,0}[right]][above];
+	\end{tikzpicture}
+	\caption{vertical flap: fluid domain}
+	\label{fig:ex1-domain}
+\end{figure}
+
+
+The fluid domain is discretized in an structured hexaedral mesh as depicted in Figure \ref{fig:ex1-mesh}. The main fluid and mesh values are given in Table \ref{table:ex1-fluid} and \ref{table:ex1-mesh}. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/ex1-mesh1}
+	\caption{vertical flap: fluid mesh}
+	\label{fig:ex1-mesh}
+\end{figure}
+
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{ l| c | c l } 
+			parameter & & value &    \\ 
+			\hline
+			fluid density  & $\rho$ & 1 & \si{kg.m^{-3}}   \\
+			kinematic viscosity & $\nu$ & $10^{-3}$ & \si{m^2.s^{-1}} \\
+%			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
+%			Reynolds number & Re & $\approx 1000$ & \\
+			flow velocity & $\vec{v}$ & 10 & \si{m.s^{-1}}			
+		\end{tabular}
+	\end{center}
+	\caption{Vertical flap: fluid properties}
+	\label{table:ex1-fluid}
+\end{table}
+
+
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{ l| c | c } 
+			parameter & & value   \\ 
+			\hline
+			number of mesh points  & $n_{dof}$ & 17344     \\
+			number of cells & $n_c$ & 8400  \\
+			number of interface cells  & $n_{int}$ & 42  \\			
+		\end{tabular}
+	\end{center}
+	\caption{Vertical flap: mesh properties}
+	\label{table:ex1-mesh}
+\end{table}
+
+
+
+\subsection{Simulation and Coupling parameters}
+
+The coupling between the fluid solver and the structural solver is the same for the MBDyn and the CalculiX simulation
+
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{ l| c | c l } 
+			parameter & & value   \\ 
+			\hline
+			simulation time  & $t$ & 5 & \si{s}     \\
+			step size & $\Delta t$ & $10^{-2}$ & \si{s}  \\
+			\hline
+			coupling scheme & & serial implicit & \\
+			coupling algorithm & & IQN-ILS & \\
+			displacement rel. convergence limit & & $10^{-4}$ & \\
+			force rel. convergence limit & & $10^{-3}$ & \\
+			
+			interface mesh mapping & & RBF & \\
+			
+		\end{tabular}
+	\end{center}
+	\caption{Vertical flap: coupling parameters}
+	\label{table:ex1-coupling}
+\end{table}
+
+
+
 
 
 \subsection{Structural Solver: CalculiX}
- 
+
+The structural model built in CalculiX is composed of 40 \textbf{C3D8}\footnote{general purpose linear brick element} as represented in Figure \ref{fig:cx-mesh}. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.6\textwidth]{images/cx1}
+	\caption{vertical flap: CalculiX mesh}
+	\label{fig:cx-mesh}
+\end{figure}
+
+The properties of the solid are reported in Table \ref{table:ex1-solid}.
+
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{ l| c | c l } 
+			parameter & & value &    \\ 
+			\hline
+			solid density  & $\rho$ & 3000 & \si{kg.m^{-3}}   \\
+			Elastic modulus  & E & $4\cdot 10^6$ & \si{Pa}   \\
+			Poisson coefficient & $\nu$ & $0.3$ &  \\
+			%			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
+			%			Reynolds number & Re & $\approx 1000$ & \\
+		\end{tabular}
+	\end{center}
+	\caption{Vertical flap: solid properties}
+	\label{table:ex1-solid}
+\end{table}
+
  
 \subsection{Implementation with MBDyn}
 
 
+The MBDyn model uses the same solid properties of Table \ref{table:ex1-solid} and is composed of 10 \texttt{beam3} elements. Apart from the different orientation, the setup is the same as the one briefly described in Section \ref{sec:dummy}. The only relevant parameter that can be explicitly set up in MBDyn in comparison to CalculiX, consists in the structural damping of the beam elements (see Section \ref{sec:mbd-beam}), which is set to be proportional to stiffness matrix of the element with a coefficient of $10^{-3}$.
+
+The interface mesh is divided into 20 faces for the front and back surfaces of the flap. The upper surface is divided into 2, so that the interface is identical to the one obtained in CalculiX. 
+
+
+
 \subsection{Results}
 
+The 
 
 
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{ l| c | c } 
+			parameter & & value   \\ 
+			\hline
+			mass number  & $M$ & $3.3\cdot 10^{-4}$     \\
+			reduced velocity & $U_R$ & $9.13\cdot 10^{-5}$  \\
+			Cauchy number  & $C_Y$ & $2.5\cdot 10^{-5}$  \\			
+		\end{tabular}
+	\end{center}
+	\caption{Vertical flap: adimensional numbers}
+	\label{table:ex1-adim}
+\end{table}
 
 
 
@@ -265,6 +404,7 @@ Test coupling capabilities with a different fluid solver, SU2 and
 
 
 \section{Square cylinder Benchmark}
+\label{sec:sq-cyl-bench}
 
 \subsection{Problem Description}
 
@@ -315,7 +455,7 @@ Test coupling capabilities with a different fluid solver, SU2 and
 
 
 \section{Turek-Hron FSI2 Benchmark}
-
+\label{sec:FSI2}
 \cite{turek2006proposal}
 
 
@@ -342,6 +482,8 @@ Test coupling capabilities with a different fluid solver, SU2 and
 
 
 \section{Turek-Hron FSI1 and FSI3 Benchmark}
+\label{sec:FSI1-FSI3}
+
 
 \cite{turek2006proposal}
 
@@ -372,14 +514,14 @@ Test coupling capabilities with a different fluid solver, SU2 and
 
 
 \section{Sensitivity analysis of FSI1-FSI3 Benchmarks}
+\label{sec:FSI3-sensitivity}
+
+\subsection{FSI1 sensitivity Analysis (Re=20)}
 
 
-\subsection{FSI1 sensitivity Analysis ($Re=20$)}
+\subsection{FSI3 sensitivity Analysis (Re=200)}
 
 
-\subsection{FSI3 sensitivity Analysis ($Re=200$)}
-
-
-\subsection{Sensitivity Analysis at ($Re=1000$)}
+\subsection{Sensitivity Analysis at (Re=1000)}
 
 \subsection{Conclusions}
