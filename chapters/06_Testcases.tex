@@ -340,7 +340,7 @@ The properties of the solid are reported in Table \ref{table:ex1-solid}.
 \subsection{Implementation with MBDyn}
 
 
-The MBDyn model uses the same solid properties of Table \ref{table:ex1-solid} and is composed of 10 \texttt{beam3} elements. Apart from the different orientation, the setup is the same as the one briefly described in Section \ref{sec:dummy}. The only relevant parameter that can be explicitly set up in MBDyn in comparison to CalculiX, consists in the structural damping of the beam elements (see Section \ref{sec:mbd-beam}), which is set to be proportional to stiffness matrix of the element with a coefficient of $10^{-3}$.
+The MBDyn model uses the same solid properties of Table \ref{table:ex1-solid} and is composed of 10 \texttt{beam3} elements. Apart from the different orientation, the setup is the same as the one briefly described in Section \ref{sec:dummy}. The only relevant parameter that can be explicitly set up in MBDyn in comparison to CalculiX, consists in the structural damping of the beam elements (see Section \ref{sec:mbd-beam}), which is set to be proportional to stiffness matrix of the element with a coefficient of $2\cdot10^{-3}$.
 
 The interface mesh is divided into 20 faces for the front and back surfaces of the flap. The upper surface is divided into 2, so that the interface is identical to the one obtained in CalculiX. 
 
@@ -348,12 +348,12 @@ The interface mesh is divided into 20 faces for the front and back surfaces of t
 
 \subsection{Results}
 
-The 
+The problem considered is characterized by the adimensional parameters given in Table \ref{table:ex1-adim} and its solution is represented in Figure \ref{fig:vf_sol}.
 
 
 \begin{table}[!h]
 	\begin{center}
-		\begin{tabular}{ l| c | c } 
+		\begin{tabular}{ l c | r } 
 			parameter & & value   \\ 
 			\hline
 			mass number  & $M$ & $3.3\cdot 10^{-4}$     \\
@@ -365,13 +365,74 @@ The
 	\label{table:ex1-adim}
 \end{table}
 
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/vert_flap/vert_flap1.png}
+	\caption{vertical flap: velocity field}
+	\label{fig:vf_sol}
+\end{figure}
+
+
+The solutions between CalculiX and MBDyn are first compared in terms of resultants applied to the structure during the simulation (Figures \ref{fig:vf_force} and \ref{fig:vf_moment}), then the tip displacement in $x$ direction is considered in Figure \ref{fig:vf_displacement}. The forces and moments applied to the structure in the two cases are very close. The only initial difference is due to a short ramp in the application of the forces to MBDyn. The tip displacement follows the same path. It appears that the MBDyn solution produces a slightly greater oscillation with a longer period. The attenuation is comparable. The damping parameter plays a significan role in the behavior of the structure. Different trials showed that the value of $0.002$ could be good to give results close to the ones given by CalculiX.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/vert_flap/forces_rho1.png}
+	\caption{vertical flap: resultant forces}
+	\label{fig:vf_force}
+\end{figure}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/vert_flap/moments_rho1.png}
+	\caption{vertical flap: moment applied at root}
+	\label{fig:vf_moment}
+\end{figure}
+
+
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/vert_flap/disp_rho1.png}
+	\caption{vertical flap: tip displacement x direction}
+	\label{fig:vf_displacement}
+\end{figure}
+
+
+As to convergence and number of iterations between the two solvers, Figure \ref{fig:vf_cx_iter} and \ref{fig:vf_mbd_iter} show that, in general, MBdyn and CalculiX require 2 iterations to converge. This can be explained by the small mass number of this case. At some iterations MBDyn requires more iterations: this is due to the fact, for some reasons due to the coupling not completely understood at the moment, a force unbalance arises in the y-direction (out of the plane of the model) which produces a moment around x-axis. This moment is absorbed by the rotation constraints at the nodes and it does not affect the behavior of the resultant in x and z directions. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/vert_flap/CX_iterations_rho1.png}
+	\caption{vertical flap: CalculiX convergence and iterations}
+	\label{fig:vf_cx_iter}
+\end{figure}
+
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/vert_flap/MBD_iterations_rho1.png}
+	\caption{vertical flap: MBDyn convergence and iterations}
+	\label{fig:vf_mbd_iter}
+\end{figure}
+
+
+Finally, MBDyn allows to analyze the internal forces of each beam, as represented in Figure \ref{fig:vf_mbd_internal}.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/vert_flap/OF-MBDyn_rho1_act.png}
+	\caption{vertical flap: MBDyn convergence and iterations}
+	\label{fig:vf_mbd_internal}
+\end{figure}
+
 
 
 
 \section{Vertical flap: compressible regime}
 \label{sec:su2-mbd}
 
-Test coupling capabilities with a different fluid solver, SU2 and 
+A model similar to the one described in the previous section has been used to test the coupling capabilities of the adapter with a different fluid solver: SU2\footnote{\href{https://su2code.github.io/}{su2code.github.io}}. The coupling adapter between SU2 and preCICE allows to build FSI simulations in compressible regime, to use a bidimensional mesh and requires that the structural adapter exchanges \textit{displacement deltas}. For those reasons a similar model has been built. 
 
 
 \subsection{Fluid domain}
@@ -484,12 +545,23 @@ Test coupling capabilities with a different fluid solver, SU2 and
 \section{Turek-Hron FSI1 and FSI3 Benchmark}
 \label{sec:FSI1-FSI3}
 
-
-\cite{turek2006proposal}
-
+The other benchmark proposed in \cite{turek2006proposal}
 
 
 
+\begin{table}[!h]
+	\begin{center}
+		\begin{tabular}{ l c | r } 
+			parameter & & value   \\ 
+			\hline
+			mass number  & $M$ & $1$     \\
+			reduced velocity & $U_R$ & $9.13\cdot 10^{-5}$  \\
+			Cauchy number  & $C_Y$ & $2.5\cdot 10^{-5}$  \\			
+		\end{tabular}
+	\end{center}
+	\caption{FSI3: adimensional numbers}
+	\label{fsi3:ex1-adim}
+\end{table}
 
 
 
