@@ -501,7 +501,7 @@ The fluid domain is discretized in an unstructured triangular mesh as depicted i
 		\begin{tabular}{ l c l | c } 
 			parameter & & & value  \\ 
 			\hline
-			fluid properties  & $\rho$ &  & standard air   \\
+			fluid properties  &  &  & standard air   \\
 			outlet pressure & $p$& \si{Pa} & $101300$  \\
 			inlet temperature & $T$ & \si{K} & 288  \\
 %			Reynolds number & Re & $\approx 1000$ & \\
@@ -541,7 +541,7 @@ The MBDyn model uses solid properties defined in Table \ref{table:comp-solid} an
 			parameter & & value &    \\ 
 			\hline
 			solid density  & $\rho$ & \si{kg.m^{-3}} & 1000    \\
-			Elastic modulus  & E & \si{Pa} & $4\cdot 5.6 \cdot 10^9$    \\
+			Elastic modulus  & E & \si{Pa} & $ 5.6 \cdot 10^9$    \\
 			Poisson coefficient & $\nu$ & & $0.4$  \\
 			structural damping & & & $1 \cdot 10^{-3}$ \\
 			%			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
@@ -554,7 +554,7 @@ The MBDyn model uses solid properties defined in Table \ref{table:comp-solid} an
 
 \subsection{Coupling parameters}
 
-The coupling between the fluid solver and the structural solver is the same for the MBDyn and the CalculiX simulation. The main data are given in Table \ref{table:comp-coupling}:
+The main data concerning the coupling between MBDyn and SU2 are given in Table \ref{table:comp-coupling}:
 
 \begin{table}[!h]
 	\begin{center}
@@ -579,8 +579,7 @@ The coupling between the fluid solver and the structural solver is the same for 
 
 \subsection{results}
 
-The problem considered is characterized by the adimensional parameters given in Table \ref{table:comp-adim} and its solution is represented in Figure \ref{fig:comp_sol}.
-
+The problem considered is characterized by the adimensional parameters given in Table \ref{table:comp-adim}: in particular the mass number remains in the order of $\mathcal{O} 10^{-3}$. A sketch of the flow solution is represented in Figure \ref{fig:comp_sol}.
 
 \begin{table}[!h]
 	\begin{center}
@@ -609,8 +608,10 @@ The problem considered is characterized by the adimensional parameters given in 
 	\caption{vertical flap (compressible): streamlines}
 	\end{subfigure}
 	\caption{vertical flap (compressible): flow solution}
-	\label{fig:vf_comp_sol}
+	\label{fig:comp_sol}
 \end{figure}
+
+
 
 
 The solutions between CalculiX and MBDyn are first compared in terms of resultants applied to the structure during the simulation (Figures \ref{fig:vf_force} and \ref{fig:vf_moment}), then the tip displacement in $x$ direction is considered in Figure \ref{fig:vf_displacement}. The forces and moments applied to the structure in the two cases are very close. 
@@ -639,17 +640,17 @@ As to convergence and number of iterations between the two solvers, Figure \ref{
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.95\textwidth, trim=0 1500 0 50, clip]{images/comp_flap/MBD_iterations_comp.png}
+	\includegraphics[width=0.95\textwidth, trim=0 80 0 100, clip]{images/comp_flap/MBD_iterations_comp.png}
 	\caption{vertical flap (compressible): convergence and iterations}
 	\label{fig:comp_mbd_iter}
 \end{figure}
 
 
-Finally, MBDyn allows to analyze the internal forces of each beam, as represented in Figure \ref{fig:vf_mbd_internal}.
+Finally, MBDyn allows to analyze the internal forces of each beam, as represented in Figure \ref{fig:comp_mbd_internal}.
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.82\textwidth]{images/comp_flap/vert-flap_SU2-MBDyn_act.png}
+	\includegraphics[width=0.92\textwidth, trim=0 230 0 230, clip]{images/comp_flap/vert-flap_SU2-MBDyn_act.png}
 	\caption{vertical flap (compressible): MBDyn internal forces}
 	\label{fig:comp_mbd_internal}
 \end{figure}
