@@ -192,12 +192,14 @@ The fluid domain is represented in Figure \ref{fig:ex1-domain}. The inlet is on 
 \begin{figure}[htbp!]
 	\centering
 	\begin{tikzpicture}
+	    \pgfmathsetmacro{\xa}{-0.1}
+	    \pgfmathsetmacro{\xb}{0.1}
 		\point{a}{-4}{0};
-		\point{b}{-0.1}{0};
-		\point{c}{0.1}{0};
+		\point{b}{\xa}{0};
+		\point{c}{\xb}{0};
 		\point{d}{8}{0};
-		\point{e}{-0.1}{1};
-		\point{f}{0.1}{1};
+		\point{e}{\xa}{1};
+		\point{f}{\xb}{1};
 		\point{g}{-4}{3};
 		\point{h}{8}{3};
 		
@@ -243,7 +245,7 @@ The fluid domain is discretized in an structured hexaedral mesh as depicted in F
 \end{figure}
 
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c l | c } 
 			parameter & & & value  \\ 
@@ -262,7 +264,7 @@ The fluid domain is discretized in an structured hexaedral mesh as depicted in F
 
 
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c | c } 
 			parameter & & value   \\ 
@@ -283,7 +285,7 @@ The fluid domain is discretized in an structured hexaedral mesh as depicted in F
 The coupling between the fluid solver and the structural solver is the same for the MBDyn and the CalculiX simulation. The main data are given in Table \ref{table:ex1-coupling}:
 
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c  l| c } 
 			parameter & & & value   \\ 
@@ -320,7 +322,7 @@ The structural model built in CalculiX is composed of 40 \textbf{C3D8}\footnote{
 
 The properties of the solid are reported in Table \ref{table:ex1-solid}.
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c  l | c } 
 			parameter & & value &    \\ 
@@ -351,7 +353,7 @@ The interface mesh is divided into 20 faces for the front and back surfaces of t
 The problem considered is characterized by the adimensional parameters given in Table \ref{table:ex1-adim} and its solution is represented in Figure \ref{fig:vf_sol}.
 
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c | r } 
 			parameter & & value   \\ 
@@ -374,7 +376,7 @@ The problem considered is characterized by the adimensional parameters given in 
 
 
 The solutions between CalculiX and MBDyn are first compared in terms of resultants applied to the structure during the simulation (Figures \ref{fig:vf_force} and \ref{fig:vf_moment}), then the tip displacement in $x$ direction is considered in Figure \ref{fig:vf_displacement}. The forces and moments applied to the structure in the two cases are very close. 
-The tip displacements shows that both structures exhibit the same damping and the oscillating frequency is very close: CalculiX shows a slightly higher frequency and a more visible second order frequency. The MBDyn structure looks a little more flexible: after 50 seconds of simulation tends to $58mm$ of tip displacement in $x$ direction, while the same structure in CalculiX tends to $53mm$ of displacement. 
+The tip displacement shows that both structures exhibit the same damping and the oscillating frequency is very close: CalculiX shows a slightly higher frequency and a more visible second order frequency. The MBDyn structure looks a little more flexible: after 50 seconds of simulation tends to $58mm$ of tip displacement in $x$ direction, while the same structure in CalculiX tends to $53mm$ of displacement. 
 
 \begin{figure}[htbp!]
 	\centering
@@ -404,17 +406,20 @@ As to convergence and number of iterations between the two solvers, Figure \ref{
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.9\textwidth]{images/vert_flap/CX_iterations_rho1.png}
-	\caption{vertical flap: CalculiX convergence and iterations}
-	\label{fig:vf_cx_iter}
-\end{figure}
-
-
-\begin{figure}[htbp!]
+	\begin{subfigure}{0.8\textwidth}
 	\centering
-	\includegraphics[width=0.82\textwidth]{images/vert_flap/MBD_iterations_rho1.png}
-	\caption{vertical flap: MBDyn convergence and iterations}
+	\includegraphics[width=\textwidth, trim=0 0 0 20, clip]{images/vert_flap/CX_iterations_rho1.png}
+	\caption{CalculiX}
+	\label{fig:vf_cx_iter}
+	\end{subfigure}
+	\begin{subfigure}{0.9\textwidth}
+	\centering
+	\includegraphics[width=\textwidth, trim=0 0 0 20, clip]{images/vert_flap/MBD_iterations_rho1.png}
+	\caption{MBDyn}
 	\label{fig:vf_mbd_iter}
+	\end{subfigure}
+	\caption{vertical flap: convergence and iterations}
+	\label{fig:vf_iter}
 \end{figure}
 
 
@@ -445,12 +450,14 @@ The fluid domain is represented in Figure \ref{fig:comp-domain}. The inlet is on
 \begin{figure}[htbp!]
 	\centering
 	\begin{tikzpicture}
+	    \pgfmathsetmacro{\xa}{-1.1}
+	    \pgfmathsetmacro{\xb}{-1}
 		\point{a}{-4}{0};
-		\point{b}{-0.1}{0};
-		\point{c}{0.1}{0};
+		\point{b}{\xa}{0};
+		\point{c}{\xb}{0};
 		\point{d}{8}{0};
-		\point{e}{-0.1}{1};
-		\point{f}{0.1}{1};
+		\point{e}{\xa}{1};
+		\point{f}{\xb}{1};
 		\point{g}{-4}{3};
 		\point{h}{8}{3};
 		
@@ -470,18 +477,18 @@ The fluid domain is represented in Figure \ref{fig:comp-domain}. The inlet is on
 		\dimensioning{2}{d}{h}{8.5}[$1.2m$];
 		
 		\dimensioning{1}{e}{f}{1.25}[$0.002m$];
-		\dimensioning{2}{c}{f}{0.8}[$0.4m$];
+		\dimensioning{2}{c}{f}{-0.2}[$0.4m$];
 		
 		\lineload{1}{a}{g};
 		
 		\load{1}{i}[180][1][-1];
 		\load{1}{i}[-90][1][-1];
 		\notation{1}{-2.5,0.25}{x};
-		\notation{1}{-3.75,1.5}{z};
+		\notation{1}{-3.75,1.5}{y};
 		%\dscaling{3}{0.4};
 		%\daxis{1}{1.5 ,0 ,0}[right]][above];
 	\end{tikzpicture}
-	\caption{vertical flap: fluid domain}
+	\caption{vertical flap (compressible): fluid domain}
 	\label{fig:comp-domain}
 \end{figure}
 
@@ -490,13 +497,13 @@ The fluid domain is discretized in an unstructured triangular mesh as depicted i
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.9\textwidth]{images/comp_flap/mesh.png}
+	\includegraphics[width=0.9\textwidth, trim=0 100 0 100,clip]{images/comp_flap/mesh.png}
 	\caption{vertical flap (compressible): fluid mesh}
 	\label{fig:comp-mesh}
 \end{figure}
 
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c l | c } 
 			parameter & & & value  \\ 
@@ -515,7 +522,7 @@ The fluid domain is discretized in an unstructured triangular mesh as depicted i
 
 
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c | c } 
 			parameter & & value   \\ 
@@ -535,10 +542,10 @@ The fluid domain is discretized in an unstructured triangular mesh as depicted i
 
 The MBDyn model uses solid properties defined in Table \ref{table:comp-solid} and is composed of 5 \texttt{beam3} elements. 
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c  l | c } 
-			parameter & & value &    \\ 
+			parameter & & & value   \\ 
 			\hline
 			solid density  & $\rho$ & \si{kg.m^{-3}} & 1000    \\
 			Elastic modulus  & E & \si{Pa} & $ 5.6 \cdot 10^9$    \\
@@ -556,7 +563,7 @@ The MBDyn model uses solid properties defined in Table \ref{table:comp-solid} an
 
 The main data concerning the coupling between MBDyn and SU2 are given in Table \ref{table:comp-coupling}:
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c  l| c } 
 			parameter & & & value   \\ 
@@ -579,9 +586,9 @@ The main data concerning the coupling between MBDyn and SU2 are given in Table \
 
 \subsection{results}
 
-The problem considered is characterized by the adimensional parameters given in Table \ref{table:comp-adim}: in particular the mass number remains in the order of $\mathcal{O} 10^{-3}$. A sketch of the flow solution is represented in Figure \ref{fig:comp_sol}.
+The problem considered is characterized by the adimensional parameters given in Table \ref{table:comp-adim}: in particular the mass number remains in the order of $\mathcal{O} \left(10^{-3}\right)$. A sketch of the flow solution is represented in Figure \ref{fig:comp_sol}.
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c | r } 
 			parameter & & value   \\ 
@@ -591,7 +598,7 @@ The problem considered is characterized by the adimensional parameters given in 
 			Cauchy number  & $C_Y$ & $  \approx 2.53 \cdot 10^{-7}$  \\			
 		\end{tabular}
 	\end{center}
-	\caption{Vertical flap: adimensional numbers}
+	\caption{Vertical flap (compressible): adimensional numbers}
 	\label{table:comp-adim}
 \end{table}
 
@@ -612,10 +619,11 @@ The problem considered is characterized by the adimensional parameters given in 
 \end{figure}
 
 
+The combination of parameters considered in this test case aimed at considering a very thin flexible element surrounded by a low-Mach flow, so that large displacements are involved. The structure reaches a steady deformed shape after around 1 second as shown in Figure  \ref{fig:comp_displacement}, concerning tip displacement. 
 
+The fluid flow has been initialized with a steady solution obtained considering a rigid structure, then the FSI problem has been simulated applying the the aerodynamic load to the flap progressively: a linear ramp starting at $1\%$ of the load with a duration of 0.2 seconds (see Section \ref{sec:mbdyn-adapter-input} for the adapter input parameters).
 
-The solutions between CalculiX and MBDyn are first compared in terms of resultants applied to the structure during the simulation (Figures \ref{fig:vf_force} and \ref{fig:vf_moment}), then the tip displacement in $x$ direction is considered in Figure \ref{fig:vf_displacement}. The forces and moments applied to the structure in the two cases are very close. 
-The tip displacements shows that both structures exhibit the same damping and the oscillating frequency is very close: CalculiX shows a slightly higher frequency and a more visible second order frequency. The MBDyn structure looks a little more flexible: after 50 seconds of simulation tends to $58mm$ of tip displacement in $x$ direction, while the same structure in CalculiX tends to $53mm$ of displacement. 
+Resultant forces $(R_x, R_y)$ and moment $(M_z)$ computed at the root of the flap are shown in Figure \ref{fig:comp_force}.
 
 \begin{figure}[htbp!]
 	\centering
@@ -634,8 +642,7 @@ The tip displacements shows that both structures exhibit the same damping and th
 \end{figure}
 
 
-As to convergence and number of iterations between the two solvers, Figure \ref{fig:vf_cx_iter} and \ref{fig:vf_mbd_iter} show that, in general, MBdyn and CalculiX require 2 iterations to converge. This can be explained by the small mass number of this case. At some iterations MBDyn requires more iterations: this is due to the fact, for some reasons due to the coupling not completely understood at the moment, a force unbalance arises in the y-direction (out of the plane of the model) which produces a moment around x-axis. This moment is absorbed by the rotation constraints at the nodes and it does not affect the behavior of the resultant in x and z directions. 
-
+Each time step of the problem converges quite rapidly, requiring 5 iterations in most cases. This outcome agrees with the fact that a low mass number and a high fluid velocity make the problem loosely coupled (see section \ref{sec:strong-coupling} for some details). Nevertheless an explicit simulation diverges immediately.  
 
 
 \begin{figure}[htbp!]
@@ -645,8 +652,7 @@ As to convergence and number of iterations between the two solvers, Figure \ref{
 	\label{fig:comp_mbd_iter}
 \end{figure}
 
-
-Finally, MBDyn allows to analyze the internal forces of each beam, as represented in Figure \ref{fig:comp_mbd_internal}.
+Axial, shear and bending moment in each of the MBDyn elements are plotted in Figure \ref{fig:comp_mbd_internal}.
 
 \begin{figure}[htbp!]
 	\centering
@@ -659,52 +665,11 @@ Finally, MBDyn allows to analyze the internal forces of each beam, as represente
 \newpage
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \section{Square cylinder Benchmark}
 \label{sec:sq-cyl-bench}
+
+
+
 
 \subsection{Problem Description}
 
@@ -788,7 +753,7 @@ The other benchmark proposed in \cite{turek2006proposal}
 
 
 
-\begin{table}[!h]
+\begin{table}[!htb]
 	\begin{center}
 		\begin{tabular}{ l c | r } 
 			parameter & & value   \\ 
