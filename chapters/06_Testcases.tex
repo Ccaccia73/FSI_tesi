@@ -908,13 +908,13 @@ An average higher number of iterations agrees with the fact that a higher mass n
 	\label{fig:sq_mbd_iter}
 \end{figure}
 
-As in the prevous examples, the axial, shear and bending moment in each of the MBDyn elements are plotted in Figure \ref{fig:comp_mbd_internal}: in this case a temporal slice of $0.5s$ has been considered.
+As in the previous examples, the axial, shear and bending moment in each of the MBDyn elements are plotted in Figure \ref{fig:sq_mbd_internal}: in this case a temporal slice of $0.5s$ has been considered.
 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.92\textwidth, trim=0 230 0 230, clip]{images/sq-cyl/sq-flap_OF-MBDyn_act.png}
 	\caption{square cylinder: MBDyn internal forces (detail)}
-	\label{fig:comp_mbd_internal}
+	\label{fig:sq_mbd_internal}
 \end{figure}
 
 
@@ -954,7 +954,185 @@ The comparison shows a very good agreement among the studies, showing that the i
 \label{sec:FSI2}
 
 
-Another \cite{turek2006proposal}
+Another well known benchmark concerning FSI simulations performed in incompressible flow regime is proposed by Turek and Hron \cite{turek2006proposal}. The fluid domain is similar to the one described in the previous chapter. The domain is again composed by a cylinder and a flap, but different flow velocities and structural properties are considered, so that 3 cases arise, commonly knonw as FSI1, FSI2 and FSI3.
+
+For reasons that will be apparent in the next section, FSI2 is considered first. 
+
+\subsection{Problem Description}
+
+The structural part is composed of a round cylinder with a trailing thin flap, as described in Figure \ref{fig:fsi2_domain}. The geometrical data are given in Table \ref{table:fsi2-geom}.
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c | r } 
+			parameter & & value   \\ 
+			\hline
+			H  & [\si{m}] & $0.41$     \\
+			L &  [\si{m}] & $2.5$  \\
+			l  & [\si{m}] & $0.35$  \\
+			h  & [\si{m}] & $0.02$  \\
+			C  & [\si{m}] & $\left(0.2,0.2 \right)$  \\
+			r  & [\si{m}] & $0.05$  \\
+		\end{tabular}
+	\end{center}
+	\caption{FSI2: geometry}
+	\label{table:fsi2-geom}
+\end{table}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.92\textwidth, trim=0 0 50 0, clip]{images/FSI2/FSI2.png}
+	\caption{FSI2: domain}
+	\label{fig:fsi2_domain}
+\end{figure}
+
+\subsection{Fluid domain}
+
+The fluid domain is represented in Figure \ref{fig:fsi2_domain} and has been simulated in OpenFOAM. The inlet is on the left with \textit{parabolic} flow velocity, the outlet is on the right, while all other boundaries are \textit{no-slip} walls.
+
+The fluid domain is discretized in an structured hexaedral mesh as depicted in Figure \ref{fig:fsi2_mesh}. The main fluid and mesh values are given in Table \ref{table:sq-fluid} and \ref{table:sq-mesh}. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/FSI2/FSI2-mesh.png}
+	\caption{FSI2: fluid mesh}
+	\label{fig:fsi2_mesh}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c l | c } 
+			parameter & & & value  \\ 
+			\hline
+			fluid density  & $\rho$ & \si{kg.m^{-3}} & $1.18$   \\
+			dynamic viscosity & $\mu$& \si{kg.m^{-1}.s^{-1}} & $1.82 \cdot 10^{-5}$  \\
+%			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
+			Reynolds number & Re &  & $332$ \\
+			flow velocity & $\vec{u}_{\infty}$ & \si{m.s^{-1}} & $0.513$ \\
+			flow type & & & laminar \\
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: fluid properties}
+	\label{table:sq-fluid}
+\end{table}
+
+
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c | c } 
+			parameter & & value   \\ 
+			\hline
+			number of mesh points  & $n_{dof}$ & 59096     \\
+			number of cells & $n_c$ & 29040  \\
+			number of interface cells  & $n_{int}$ & 202  \\			
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: mesh properties}
+	\label{table:sq-mesh}
+\end{table}
+
+
+\subsection{Solid domain}
+
+The properties of the solid are reported in Table \ref{table:sq-solid}.
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c  l | c } 
+			parameter & & value &    \\ 
+			\hline
+			solid density  & $\rho$ & \si{kg.m^{-3}} & 100    \\
+			Elastic modulus  & E & \si{Pa} & $2.5\cdot 10^5$    \\
+			Poisson coefficient & $\nu$ & & $0.35$  \\
+			%			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
+			%			Reynolds number & Re & $\approx 1000$ & \\
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: solid properties}
+	\label{table:sq-solid}
+\end{table}
+
+The MBDyn model is composed of 10 \texttt{beam3} elements. The setup resembles the one briefly described in Section \ref{sec:dummy}. The structural damping of the beam elements (see Section \ref{sec:mbd-beam}) has been set to be proportional to stiffness matrix of the element with a coefficient of $1\cdot10^{-2}$. This value appeared to be high enough to give a smooth structural solution without being excessively damping.
+
+The interface mesh is divided into 202 faces and is shown in Figure \ref{fig:sq_struct_mesh}. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth, trim=0 50 0 200, clip]{images/sq-cyl/sq_struct_mesh.png}
+	\caption{square cylinder: structural interface mesh}
+	\label{fig:sq_struct_mesh}
+\end{figure}
+
+
+\subsection{Coupling parameters}
+
+
+The main coupling data are given in Table \ref{table:sq-coupling}. The particularly short time step is required by fluid mesh movement: as it will be apparent in the results, the thin flexible flap moves quickly and with large displacement. The diffusion algorithm used by OpenFOAM to deform the fluid mesh produced inconsistent cell volumes when using higher time steps. 
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c  l| c } 
+			parameter & & & value   \\ 
+			\hline
+			simulation time  & $t$& \si{s} & 6      \\
+			step size & $\Delta t$ & \si{s} & $5 \cdot 10^{-4}$   \\
+			\hline
+			coupling scheme & & & serial implicit  $S\rightarrow F$  \\
+			coupling algorithm & & &  IQN-ILS  \\
+			displacement rel. convergence limit & & & $10^{-4}$ \\
+			force rel. convergence limit &&  & $10^{-3}$  \\
+      		interface mesh mapping & & & RBF  \\
+			
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: coupling parameters}
+	\label{table:sq-coupling}
+\end{table}
+
+Most parameters are similar to the ones used in other examples as they turned out to fit well with most of the experiments. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
