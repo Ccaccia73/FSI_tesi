@@ -584,7 +584,7 @@ The main data concerning the coupling between MBDyn and SU2 are given in Table \
 \end{table}
 
 
-\subsection{results}
+\subsection{Results}
 
 The problem considered is characterized by the adimensional parameters given in Table \ref{table:comp-adim}: in particular the mass number remains in the order of $\mathcal{O} \left(10^{-3}\right)$. A sketch of the flow solution is represented in Figure \ref{fig:comp_sol}.
 
@@ -642,7 +642,7 @@ Resultant forces $(R_x, R_y)$ and moment $(M_z)$ computed at the root of the fla
 \end{figure}
 
 
-Each time step of the problem converges quite rapidly, requiring 5 iterations in most cases. This outcome agrees with the fact that a low mass number and a high fluid velocity make the problem loosely coupled (see section \ref{sec:strong-coupling} for some details). Nevertheless an explicit simulation diverges immediately.  
+Each time step of the problem converges quite rapidly, requiring 5 iterations in most cases (see Figure \ref{fig:comp_mbd_iter}. This outcome agrees with the fact that a low mass number and a high fluid velocity make the problem loosely coupled (see section \ref{sec:strong-coupling} for some details). Nevertheless an explicit simulation diverges immediately.  
 
 
 \begin{figure}[htbp!]
@@ -668,65 +668,293 @@ Axial, shear and bending moment in each of the MBDyn elements are plotted in Fig
 \section{Square cylinder Benchmark}
 \label{sec:sq-cyl-bench}
 
+The first simple problems aimed at verifying that the complete FSI problem: i.e. the MBDyn model, the mapping with the interface mesh, the coupling adapter and the fluid model (fluid flow and mesh movement performed with different solvers) is working and gives correct results.
 
-
+After that it is important to verify the performance of the system considering well-known benchmarks, so that the results can be compared with a large number of algorithms and techniques.
 
 \subsection{Problem Description}
 
-\cite{ramm1998fluid} art originale.
+The first benchmark considered here has been described in \cite{ramm1998fluid}. The structural part is composed of a square cylinder with a trailing thin flap, as described in Figure \ref{fig:sq_domain}. The geometrical data are given in Table \ref{table:sq-geom}.
 
-
-\subsection{Fluid domain}
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c | r } 
+			parameter & & value   \\ 
+			\hline
+			H  & [\si{mm}] & $10$     \\
+			L & [\si{mm}] & $40$  \\
+			t  & [\si{mm}] & $0.6$  \\			
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: geometry}
+	\label{table:sq-geom}
+\end{table}
 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.82\textwidth, trim=0 0 0 0, clip]{images/sq-cyl/sq-cyl-domain.png}
-	\caption{square cylinder benchmark: fluid domain}
+	\caption{square cylinder benchmark: domain}
 	\label{fig:sq_domain}
 \end{figure}
 
+\subsection{Fluid domain}
+
+The fluid domain is represented in Figure \ref{fig:sq_domain} and has been simulated in OpenFOAM. The inlet is on the left with uniform flow velocity, the outlet is on the right, the external boundaries (top and bottom) are \textit{slip-walls} while all other boundaries (cylinder and flap) are \textit{no-slip} walls.
+
+
+The fluid domain is discretized in an structured hexaedral mesh as depicted in Figure \ref{fig:sq_mesh}. The main fluid and mesh values are given in Table \ref{table:sq-fluid} and \ref{table:sq-mesh}. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/sq-cyl/sq_mesh.png}
+	\caption{square cylinder: fluid mesh}
+	\label{fig:sq_mesh}
+\end{figure}
+
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c l | c } 
+			parameter & & & value  \\ 
+			\hline
+			fluid density  & $\rho$ & \si{kg.m^{-3}} & $1.18$   \\
+			dynamic viscosity & $\mu$& \si{kg.m^{-1}.s^{-1}} & $1.82 \cdot 10^{-5}$  \\
+%			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
+			Reynolds number & Re &  & $332$ \\
+			flow velocity & $\vec{u}_{\infty}$ & \si{m.s^{-1}} & $0.513$ \\
+			flow type & & & laminar \\
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: fluid properties}
+	\label{table:sq-fluid}
+\end{table}
+
+
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c | c } 
+			parameter & & value   \\ 
+			\hline
+			number of mesh points  & $n_{dof}$ & 59096     \\
+			number of cells & $n_c$ & 29040  \\
+			number of interface cells  & $n_{int}$ & 202  \\			
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: mesh properties}
+	\label{table:sq-mesh}
+\end{table}
+
+
 \subsection{Solid domain}
+
+The properties of the solid are reported in Table \ref{table:sq-solid}.
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c  l | c } 
+			parameter & & value &    \\ 
+			\hline
+			solid density  & $\rho$ & \si{kg.m^{-3}} & 100    \\
+			Elastic modulus  & E & \si{Pa} & $2.5\cdot 10^5$    \\
+			Poisson coefficient & $\nu$ & & $0.35$  \\
+			%			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
+			%			Reynolds number & Re & $\approx 1000$ & \\
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: solid properties}
+	\label{table:sq-solid}
+\end{table}
+
+The MBDyn model is composed of 10 \texttt{beam3} elements. The setup resembles the one briefly described in Section \ref{sec:dummy}. The structural damping of the beam elements (see Section \ref{sec:mbd-beam}) has been set to be proportional to stiffness matrix of the element with a coefficient of $1\cdot10^{-2}$. This value appeared to be high enough to give a smooth structural solution without being excessively damping.
+
+The interface mesh is divided into 202 faces and is shown in Figure \ref{fig:sq_struct_mesh}. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.9\textwidth, trim=0 50 0 200, clip]{images/sq-cyl/sq_struct_mesh.png}
+	\caption{square cylinder: structural interface mesh}
+	\label{fig:sq_struct_mesh}
+\end{figure}
 
 
 \subsection{Coupling parameters}
 
 
-\subsubsection{Results}
+The main coupling data are given in Table \ref{table:sq-coupling}. The particularly short time step is required by fluid mesh movement: as it will be apparent in the results, the thin flexible flap moves quickly and with large displacement. The diffusion algorithm used by OpenFOAM to deform the fluid mesh produced inconsistent cell volumes when using higher time steps. 
 
-\cite{ramm1998fluid} art originale.
-\cite{ramm1998fluid} art originale.
-\cite{walhorn2002space}
-\cite{matthies2003partitioned}
-\cite{dettmer2006computational}
-\cite{olivier2009fluid}
-\cite{wood2010partitioned}
-\cite{kassiotis2011nonlinear}
-\cite{habchi2013partitioned}
-\cite{froehle2014high}
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c  l| c } 
+			parameter & & & value   \\ 
+			\hline
+			simulation time  & $t$& \si{s} & 6      \\
+			step size & $\Delta t$ & \si{s} & $5 \cdot 10^{-4}$   \\
+			\hline
+			coupling scheme & & & serial implicit  $S\rightarrow F$  \\
+			coupling algorithm & & &  IQN-ILS  \\
+			displacement rel. convergence limit & & & $10^{-4}$ \\
+			force rel. convergence limit &&  & $10^{-3}$  \\
+      		interface mesh mapping & & & RBF  \\
+			
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: coupling parameters}
+	\label{table:sq-coupling}
+\end{table}
+
+Most parameters are similar to the ones used in other examples as they turned out to fit well with most of the experiments. 
+
+\subsection{Results}
+
+The problem considered is characterized by the adimensional parameters given in Table \ref{table:sq-adim} and its solution is represented in Figure \ref{fig:sq_sol}.
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c | r } 
+			parameter & & value   \\ 
+			\hline
+			mass number  & $M$ & $ 1.18\cdot 10^{-2}$     \\
+			reduced velocity & $U_R$ & $ \approx 1\cdot 10^{-4}$  \\
+			Cauchy number  & $C_Y$ & $  1.24 \cdot 10^{-6}$  \\			
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: adimensional numbers}
+	\label{table:sq-adim}
+\end{table}
+
+As in other simulations, fluid forces are applied with a ramp to ease convergence at the beginning of the simulation: during the first $100$ \si{ms} they are scaled to $10\%$ to reach $100\%$ after another $100$ \si{ms}.
+
+Alternating vortices begin developing quite rapidly and the structure begins oscillating. After around 2 seconds reaches a vortex lock-in regime (e.g. \cite{hong2001fluid}), as shown in Figure \ref{fig:sq_displacement} (in particular the tip displacement in \textit{y} direction).
+
+%@incollection{hong2001fluid,
+%  title={Fluid-Structure Interaction under the Vortex Lock-in Regime},
+%  author={Hong, Jun-Ho and Arai, Norio},
+%  booktitle={Computational Fluid Dynamics 2000},
+%  pages={601--606},
+%  year={2001},
+%  publisher={Springer}
+%}
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.98\textwidth, trim=20 20 20 50, clip]{images/sq-cyl/disp_sq.png}
+	\caption{square cylinder: tip displacement}
+	\label{fig:sq_displacement}
+\end{figure}
+
+Forces are measured on the whole structure on the fluid side, while are measured on the flap in the solid domain. Figure \ref{fig:sq_force} shows a detail of $0.5$ \si{s} of simulation. The difference in \textit{x}-direction represents the drag force on the cylinder. Differences in lift and moment are almost zero. 
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.98\textwidth, trim=20 100 20 100, clip]{images/sq-cyl/forces_sq.png}
+	\caption{Square cylinder: resultant forces (detail)}
+	\label{fig:sq_force}
+\end{figure}
 
 
+\begin{figure}[htb]
+\centering % <-- added
+\begin{subfigure}{0.5\textwidth}
+  \includegraphics[width=\linewidth]{images/sq-cyl/sq_v1.png}
+  \caption{t=3.37s velocity}
+  \label{fig:sq_v1}
+\end{subfigure}\hfil % <-- added
+\begin{subfigure}{0.5\textwidth}
+  \includegraphics[width=\linewidth]{images/sq-cyl/sq_p1.png}
+  \caption{t=3.37s pressure}
+  \label{fig:sq_p1}
+\end{subfigure}\hfil % <-- added
+
+\medskip
+
+\begin{subfigure}{0.5\textwidth}
+  \includegraphics[width=\linewidth]{images/sq-cyl/sq_v2.png}
+  \caption{t=3.47s velocity}
+  \label{fig:sq_v2}
+\end{subfigure}\hfil % <-- added
+\begin{subfigure}{0.5\textwidth}
+  \includegraphics[width=\linewidth]{images/sq-cyl/sq_p2.png}
+  \caption{t=3.47s pressure}
+  \label{fig:sq_p2}
+\end{subfigure}\hfil % <-- added
+
+\medskip
+
+\begin{subfigure}{0.5\textwidth}
+  \includegraphics[width=\linewidth]{images/sq-cyl/sq_v3.png}
+  \caption{t=3.53s velocity}
+  \label{fig:sq_v3}
+\end{subfigure}\hfil % <-- added
+\begin{subfigure}{0.5\textwidth}
+  \includegraphics[width=\linewidth]{images/sq-cyl/sq_p3.png}
+  \caption{t=3.53s pressure}
+  \label{fig:sq_p3}
+\end{subfigure}\hfil % <-- added
+
+\caption{square cylinder: fluid solution}
+\label{fig:sq_sol}
+\end{figure}
 
 
+Each time step converges with an average of 8 iterations, except for some situations where the coupling algorithm fails in making coupling forces converge. Those situations show a quite distorted fluid mesh that make the overall FSI problem harder to solve.
+
+An average higher number of iterations agrees with the fact that a higher mass number, here in the order of $\mathcal{O} \left(10^{-2} \right) $, makes the problem strongly coupled.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.95\textwidth, trim=0 80 0 100, clip]{images/sq-cyl/MBD_iterations_sq.png}
+	\caption{square cylinder: convergence and iterations}
+	\label{fig:sq_mbd_iter}
+\end{figure}
+
+As in the prevous examples, the axial, shear and bending moment in each of the MBDyn elements are plotted in Figure \ref{fig:comp_mbd_internal}: in this case a temporal slice of $0.5s$ has been considered.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.92\textwidth, trim=0 230 0 230, clip]{images/sq-cyl/sq-flap_OF-MBDyn_act.png}
+	\caption{square cylinder: MBDyn internal forces (detail)}
+	\label{fig:comp_mbd_internal}
+\end{figure}
 
 
+\subsection{Validation}
 
+This problem has been used as a benchmark in a great number of studies in literature. The comparison between the studies is generally made on the tip displacement, in term of amplitude and frequency of oscillation. In Table \ref{table:sq-res} some results are given and compared to the present study.
 
+The comparison shows a very good agreement among the studies, showing that the implementation of the adapter can give good results.
 
-
-
-
-
-
-
-
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l | c  c } 
+			Study & $f$ [\si{s^{-1}}] & $d_{y tip}$ [\si{mm}]   \\ 
+			\hline
+            Wall and Ramm \cite{ramm1998fluid} & $3.08$ & $13.1$ \\
+            Kassiotis et al. \cite{kassiotis2011nonlinear} & $2.98$ & $10.5$ \\
+            Wood et al. \cite{wood2010partitioned} & $2.94$ & $11.5$ \\
+            Olivier et al. \cite{olivier2009fluid} & $3.17$ & $9.5$ \\
+            Walhorn et al. \cite{walhorn2002space} & $3.14$ & $10.2$ \\
+            Matthies and Steindorf \cite{matthies2003partitioned} & $3.13$ & $11.8$ \\ 
+            Dettmer and Peric \cite{dettmer2006computational} & $3.03$ & $12.5$ \\
+            Habchi et al. \cite{habchi2013partitioned} & $3.25$ & $10.2$ \\
+            Froehle and Persson \cite{froehle2014high} & $3.18$ & $11.2$ \\
+            Sanchez et al.\footnote{Fluid Structure Interaction Problems using SU2. First SU2 Annual Developers Meeting. TU Delft, 6 September 2016}  & $3.15$ & $11.5$ \\
+            Present study    & $3.067$ & $11.2$ \\
+            
+		\end{tabular}
+	\end{center}
+	\caption{square cylinder: results}
+	\label{table:sq-res}
+\end{table}
 
 
 \newpage
 
-
 \section{Turek-Hron FSI2 Benchmark}
 \label{sec:FSI2}
-\cite{turek2006proposal}
+
+
+Another \cite{turek2006proposal}
 
 
 
