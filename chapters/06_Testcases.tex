@@ -899,7 +899,7 @@ Forces are measured on the whole structure on the fluid side, while are measured
 
 Each time step converges with an average of 8 iterations, except for some situations where the coupling algorithm fails in making coupling forces converge. Those situations show a quite distorted fluid mesh that make the overall FSI problem harder to solve.
 
-An average higher number of iterations agrees with the fact that a higher mass number, here in the order of $\mathcal{O} \left(10^{-2} \right) $, makes the problem strongly coupled.
+An higher average number of iterations agrees with the fact that a higher mass number, here in the order of $\mathcal{O} \left(10^{-2} \right) $, makes the problem strongly coupled.
 
 \begin{figure}[htbp!]
 	\centering
@@ -1055,7 +1055,7 @@ The properties of the solid are reported in Table \ref{table:FSI2-solid}.
 	\label{table:FSI2-solid}
 \end{table}
 
-The MBDyn model the sdame as the one used in \ref{sec:sq-cyl-bench} and is composed of 10 \texttt{beam3} elements, with a structural damping of $1\cdot10^{-2}$.
+The MBDyn model the same as the one used in \ref{sec:sq-cyl-bench} and is composed of 10 \texttt{beam3} elements, with a structural damping of $1\cdot10^{-2}$.
 
 The interface mesh is divided into 90 faces and is shown in Figure \ref{fig:FSI2_struct_mesh}. 
 
@@ -1113,7 +1113,7 @@ The problem considered is characterized by the adimensional parameters given in 
 
 In this case, the ramp applied to fluid forces are applied at the beginning of the simulation is longer in order to make the fluid and structure settle: during the first $500$ \si{ms} forces are scaled to $10\%$ and reach $100\%$ after another $500$ \si{ms}.
 
-Alternating vortices begin developing and the flap begins oscillating with an increasing amplitude. After around 4 seconds reaches a vortex lock-in regime, as shown in Figure \ref{fig:sq_displacement} (in particular the tip displacement in \textit{y} direction).
+Alternating vortices begin developing and the flap begins oscillating with an increasing amplitude. After around 4 seconds reaches a vortex lock-in regime, as shown in Figure \ref{fig:FSI2_displacement} (in particular the tip displacement in \textit{y} direction).
 
 
 
@@ -1127,18 +1127,17 @@ Alternating vortices begin developing and the flap begins oscillating with an in
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.98\textwidth, trim=20 20 20 50, clip]{images/sq-cyl/disp_sq.png}
+	\includegraphics[width=0.98\textwidth, trim=20 20 50 50, clip]{images/FSI2/disp_fsi2.png}
 	\caption{square cylinder: tip displacement}
-	\label{fig:sq_displacement}
+	\label{fig:FSI2_displacement}
 \end{figure}
 
-Forces are measured on the whole structure on the fluid side, while are measured on the flap in the solid domain. Figure \ref{fig:sq_force} shows a detail of $0.5$ \si{s} of simulation. The difference in \textit{x}-direction represents the drag force on the cylinder. Differences in lift and moment are almost zero. 
-
+Forces are measured on the whole structure on the fluid side, while are measured on the flap in the solid domain. Figure \ref{fig:FSI2_force} shows a detail of $2$ \si{s} of simulation. The difference in \textit{x}-direction represents the drag force on the cylinder.
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.98\textwidth, trim=20 100 20 100, clip]{images/sq-cyl/forces_sq.png}
+	\includegraphics[width=0.98\textwidth, trim=20 100 20 100, clip]{images/FSI2/forces_fsi2.png}
 	\caption{Square cylinder: resultant forces (detail)}
-	\label{fig:sq_force}
+	\label{fig:FSI2_force}
 \end{figure}
 
 
@@ -1186,24 +1185,22 @@ Forces are measured on the whole structure on the fluid side, while are measured
 \end{figure}
 
 
-Each time step converges with an average of 8 iterations, except for some situations where the coupling algorithm fails in making coupling forces converge. Those situations show a quite distorted fluid mesh that make the overall FSI problem harder to solve.
-
-An average higher number of iterations agrees with the fact that a higher mass number, here in the order of $\mathcal{O} \left(10^{-2} \right) $, makes the problem strongly coupled.
+Each time step converges with an average of 14.5 iterations, which again confirms the trend of more coupling iterations as the mass number increases.
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.95\textwidth, trim=0 80 0 100, clip]{images/sq-cyl/MBD_iterations_sq.png}
-	\caption{square cylinder: convergence and iterations}
-	\label{fig:sq_mbd_iter}
+	\includegraphics[width=0.95\textwidth, trim=0 80 0 100, clip]{images/FSI2/MBD_iterations_fsi2.png}
+	\caption{FSI2: convergence and iterations}
+	\label{fig:FSI2_mbd_iter}
 \end{figure}
 
-As in the previous examples, the axial, shear and bending moment in each of the MBDyn elements are plotted in Figure \ref{fig:sq_mbd_internal}: in this case a temporal slice of $0.5s$ has been considered.
+As in the previous examples, the axial, shear and bending moment in each of the MBDyn elements are plotted in Figure \ref{fig:sq_mbd_internal}: in this case a temporal slice of $25s$ has been considered. The values plotted here consider a beam with $2mm$ width: i.e. the thichness of the solid and fluid domains considered in this case.
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.92\textwidth, trim=0 230 0 230, clip]{images/sq-cyl/sq-flap_OF-MBDyn_act.png}
-	\caption{square cylinder: MBDyn internal forces (detail)}
-	\label{fig:sq_mbd_internal}
+	\includegraphics[width=0.92\textwidth, trim=0 230 0 230, clip]{images/FSI2/FSI2_OF-MBDyn_act.png}
+	\caption{FSI2: MBDyn internal forces (detail)}
+	\label{fig:FSI2_mbd_internal}
 \end{figure}
 
 
