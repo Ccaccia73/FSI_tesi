@@ -1194,7 +1194,7 @@ Each time step converges with an average of 14.5 iterations, which again confirm
 	\label{fig:FSI2_mbd_iter}
 \end{figure}
 
-As in the previous examples, the axial, shear and bending moment in each of the MBDyn elements are plotted in Figure \ref{fig:sq_mbd_internal}: in this case a temporal slice of $25s$ has been considered. The values plotted here consider a beam with $2mm$ width: i.e. the thichness of the solid and fluid domains considered in this case.
+As in the previous examples, the axial, shear and bending moment in each of the MBDyn elements are plotted in Figure \ref{fig:sq_mbd_internal}: in this case a temporal slice of $25s$ has been considered. The values plotted here consider a beam with $2mm$ width: i.e. the thickness of the solid and fluid domains considered in this case.
 
 \begin{figure}[htbp!]
 	\centering
@@ -1208,19 +1208,86 @@ As in the previous examples, the axial, shear and bending moment in each of the 
 
 This problem has been used as a benchmark in a great number of studies in literature. The comparison between the studies is generally made on the tip displacement, in term of amplitude and frequency of oscillation. In Table \ref{table:sq-res} some results are given and compared to the present study.
 
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l | c c | c c  |  } 
+			Study & $d_{x tip}$ [\si{mm}] & f [\si{Hz}] & $d_{y tip}$ [\si{mm}] & f [\si{Hz}] \\ 
+			\hline
+			\hline
+			Benchmark  \cite{turek2006proposal} & $-14.58\pm12.44$ & $3.8$ & $1.23\pm80.6$ & $2.0$     \\
+			Turek et al. (2010) \cite{turek2010numerical} & $-14.85\pm12.70$ & $3.86$ & $1.30\pm81.7$ & $1.93$ \\
+			Gjertsen \cite{gjertsen2017development} & $-14.83\pm13.11$ & & $1.24\pm81.6$ & \\
+			Degroote \cite{degroote2009interface}  & $-14.07\pm12.37$ & $3.7$ & $1.18\pm76.5$ & $1.9$ \\
+			Present study & $-14.95\pm9.8$ & $3.87$ & $2.78\pm85.4$ & $1.93$ \\ 
+		\end{tabular}
+	\end{center}
+	\caption{FSI2: comparison of results (displacements)}
+	\label{table:FSI2-results-d}
+\end{table}
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l | c c | c c  |  } 
+			Study & drag [\si{N.m^{-1}}] & f [\si{Hz}] & lift [\si{N.m^{-1}}] & f [\si{Hz}]    \\ 
+			\hline
+			\hline
+			Benchmark  \cite{turek2006proposal} & $208.83\pm73.75$ & $3.8$ & $0.88\pm234.2$ & $2.0$     \\
+			Turek et al. (2010) \cite{turek2010numerical} & $215.06\pm77.63$ & $3.86$ & $0.61\pm237.8$ & $1.93$\\   
+			Gjertsen \cite{gjertsen2017development} & $161.50\pm73.75$ & & $0.88\pm234.2$ & \\
+			Degroote \cite{degroote2009interface}  & $217.52\pm84.65$ & $3.7$ & $-0.74\pm267.6$ & $1.9$ \\
+			Present study & $239.13\pm31.9$ & $3.87$ & $2.4\pm217.2$ & $1.93$ \\
+		\end{tabular}
+	\end{center}
+	\caption{FSI2: comparison of results (forces)}
+	\label{table:FSI2-results-f}
+\end{table}
+
 The comparison shows a very good agreement among the studies, showing that the implementation of the adapter can give good results.
 
 
+FSI2: fully oscillating while CFD2 (≈ same Re number!) is steady Excellent check for interaction mechanisms \cite{turek2010numerical}
+
+y. FSI2 gives the largest deformation is therefore considered the most difficult of the three \cite{richter2015time}, giving deformations of 2.5 times greater than the flag height
+
+
+%@article{turek2010numerical,
+%  title={Numerical benchmarking of fluid-structure interaction between elastic object and laminar incompressible %flow},
+%  author={Turek, Stefan and Hron, Jaroslav and Razzaq, Mudassar},
+%  journal={Universit{\"a}tsbibliothek Dortmund},
+%  year={2010}
+%}
+
+%@incollection{richter2015time,
+%  title={On time discretizations of fluid-structure interactions},
+%  author={Richter, Thomas and Wick, Thomas},
+%  booktitle={Multiple Shooting and Time Domain Decomposition Methods},
+%  pages={377--400},
+%  year={2015},
+%  publisher={Springer}
+%}
+
+%@mastersthesis{gjertsen2017development,
+%  title={Development of a Verified and Validated Computational Framework for Fluid-Structure Interaction: Investigating Lifting Operators and Numerical Stability},
+%  author={Gjertsen, Sebastian},
+%  year={2017}
+%}
 
 
 
-
-
-
-
-
-
-
+A very important thing to notice about this benchmark [11] is that it is a proposal for a benchmark, as it is called “Proposal for numerical benchmarking of
+fluid-structure interaction between an elastic object and laminar incompressible flow”. So the point of the paper is give a specific problem setup which
+others can contribute result-data. A paper was published in 2010 by J. Hron,
+Turek, et al, [24] that compared results of different discretizations and solution approaches. The study [24] gives 7 different methods and results for two
+of the FSI test cases. They state in the numerical results that “However, also
+clear differences between the different approaches with regard to accuracy
+are visible. Particularly for the drag and lift values, which lead to differences
+of up to order 50%, and also for the displacement valueswhich are in the
+range of 10% errors.”. With this in mind it is important to know that the
+referential values used are only those reported from the original paper, which
+only looked at one implementation. While the paper which compares results,
+only 2 of the 7 contributions were schemes of monolithic nature, which are
+the closest one should refer to in this thessis.
 
 
 
