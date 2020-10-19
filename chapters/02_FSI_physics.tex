@@ -391,7 +391,7 @@ Finally, the \textit{elastogravity number} combines gravity (or body forces in g
 
 \subsection{Dimensional analysis of coupled problems}
 
-It is now possible to undertake the dimensional analysis of a fully coupled fluid and solid interaction problem. Some of the parameters are only defined in the fluid side or in the solid side (e.g. viscosity or stiffnes). Some parameters are common to both domains (e.g. lenght scale or gravity). The variables of interest are now the velocity in the fluid and the displacements in the solid. Each of them can be related to all the parameters without separation. For example, the fluid velocity relationship is of the kind:
+It is now possible to undertake the dimensional analysis of a fully coupled fluid and solid interaction problem. Some of the parameters are only defined in the fluid side or in the solid side (e.g. viscosity or stiffness). Some parameters are common to both domains (e.g. length scale or gravity). The variables of interest are now the velocity in the fluid and the displacements in the solid. Each of them can be related to all the parameters without separation. For example, the fluid velocity relationship is of the kind:
 
 \begin{eqnarray}
 	 g(\vec{v}; \vec{x},t; \rho, \mu, V_0; \rho_S. E; \vec{g}, L) = 0
@@ -401,7 +401,7 @@ It is now possible to undertake the dimensional analysis of a fully coupled flui
 
 Equation \ref{eq:vel-param} is composed of 11 dimensional parameters. Applying $\pi$ theorem, the total number of independent dimensionless parameter expected is 8. Starting from the ones derived in the previous sections:
 
-\begin{itemize}
+\begin{enumerate}
 	\item $\vec{x}^* = \frac{\vec{x}}{L}$: dimensionless coordinates
 	\item $\vec{v}^* = \frac{\vec{v}}{V_0}$: dimensionless fluid velocity
 	\item $t*_f = \frac{V_0 t}{L}$: dimensionless time
@@ -409,7 +409,7 @@ Equation \ref{eq:vel-param} is composed of 11 dimensional parameters. Applying $
 	\item $Fr = \frac{V_0}{\sqrt{gL}}$: Froude number
 	\item $\delta = \frac{U_0}{L}$: displacement number
 	\item $\frac{\rho_S g L}{E}$: elastogravity number
-\end{itemize}
+\end{enumerate}
 
 The 7 quantities above derive from the separated problem. The last one necessarily mixes things from the fluid and the solid side otherwise it would have been found in one uncoupled case. There is no unique choice for this parameter, the following are the most common ones.
 

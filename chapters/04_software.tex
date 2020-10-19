@@ -10,11 +10,11 @@ This chapter illustrates the main software tools used in this work. First, the c
 The main information concerning preCICE is taken from the official documentation: that is \cite{gatzhammer2014efficient} and  \cite{bungartz2016precice}. The preCICE website is also a source of documentation\footnote{\href{http://www.precice.org}{www.precice.org}}.
 
 The open-source\footnote{The code can be accessed via Github: \href{https://github.com/precice/precice}{github.com/precice/precice}} software library preCICE provides the components to connect traditional single-physics solvers and create a partitioned multi-physics simulation (e.g. fluid-structure interaction, conjugated heat transfer, solid-solid interaction, etc.).
-It aims at coupling existing solvers in a partitioned black-box manner (see Section \ref{sec:coupling}):  only minimal information abut the solver is available and connection involves just interface nodes. 
+It aims at coupling existing solvers in a partitioned black-box manner (see Section \ref{sec:coupling}):  only minimal information about the solver is available and connection involves just interface nodes. 
 In order to be flexible and easily implemented, the impact on the solvers should be as minimal as possible: for this reason, preCICE offers a high level ~\ac{API} (Section \ref{sec:pc-api}) different languages, such as C/C++, Fortran and Python.
 The ability to switch among different solvers is advantageous as it provides a lot of flexibility in developing and testing new coupled components.
 
-In a nutshell, preCICE simply affects the input and observes the output of the solvers (called \textit{participants}). The required data and control elements are accessed using an \textit{adapter}, i.e. a "glue code" that is attached to the corresponding solver and communicates the information with the library.
+In a nutshell, preCICE simply affects the input and observes the output of the solvers (called \textit{participants}). The required data and control elements are accessed using an \textit{adapter}, i.e. a  ``glue code'' that is attached to the corresponding solver and communicates the information with the library.
 
 preCICE performs all the actions required to perform a coupled simulation: implements the coupling strategy and convergence criteria (Section \ref{sec:pc-coupling}), the communication
 between the participants (Section \ref{sec:pc-comm}), the mapping of data between meshes (Section \ref{sec:pc-map}). preCICE is configured by means of an ~\ac{XML} file (Section \ref{sec:pc-config}).
@@ -63,11 +63,11 @@ Even if volume coupling is possible, preCICE is mainly designed to couple simula
 The user defines which data are shared by each \textit{participant} (i.e. solver) and the way data is shared in the configuration section named \texttt{mapping}. As described in Section \ref{sec:data-mapping}, two kinds of mapping are available:
 
 \begin{itemize}
-	\item \texttt{consistent}: the value of a node at the one grid is the same as the value of the corresponding node (or nodes) at the other grid. In general the number of fluid nodes is at least the same or, more often, exceeds the nodes of the structure, so a single structural node is associated to several fluid nodes. The mapping of displacements is consistent: in the simplest case, all fluid nodes experience the same displacement of a single solid node, otherwise an interpolation is performed (see Figure \ref{fig:consistent}).
-	\item \texttt{conservative}: in the same conditions as before, forces are mapped from multiple fluid nodes to a single solid node in an additive manner (see Figure \ref{fig:conservative}).
+	\item \texttt{consistent}: the value of a node at the one grid is the same as the value of the corresponding node (or nodes) at the other grid. In general the number of fluid nodes is at least the same or, more often, exceeds the nodes of the structure, so a single structural node is associated to several fluid nodes. The mapping of displacements is consistent: in the simplest case, all fluid nodes experience the same displacement of a single solid node, otherwise an interpolation is performed (see Section \ref{sec:data-mapping} for a detailed explanation and Figure \ref{fig:consistent} for an example).
+	\item \texttt{conservative}: in the same conditions as before, forces are mapped from multiple fluid nodes to a single solid node in an additive manner (see Section \ref{sec:data-mapping} and Figure \ref{fig:conservative} for an example).
 \end{itemize} 
 
-Along with the mapping strategy, a method must be defined (see Section \ref{sec:data-mapping}): \texttt{nearest-neighbor}, \texttt{nearest-projection}, \texttt{rbf}. For the latest method, preCICE implements a wide variety of basis functions, with Gaussian and thin plate splines being the most widely used.
+Along with the mapping strategy, a method must be defined: \texttt{nearest-neighbor}, \texttt{nearest-projection}, \texttt{rbf} (see Section \ref{sec:data-mapping}). For the latest method, preCICE implements a wide variety of basis functions, with Gaussian and thin plate splines being the most widely used.
 
  
 
@@ -118,11 +118,11 @@ Official adapters are currently available for several free solvers, e.g. Calculi
 
 MBDyn is free and open-source\footnote{the software is available through a public git repository \href{https://gitlab.polimi.it/Pub/mbdyn}{gitlab.polimi.it/Pub/mbdyn}} general purpose Multibody Dynamics analysis software developed at the \textit{Dipartimento di Scienze e Tecnologie Aerospaziali}  of the University Politecnico di Milano.
 
-Most of the information concerning MBDyn is taken from the official documentation given in the software website\footnote{MBDyn website: \href{https://www.mbdyn.org/}{mbdyn.org}} and form the input manual\footnote{a copy can be found at the following link [\href{https://www.mbdyn.org/userfiles/documents/mbdyn-input-1.7.3.pdf}{input manual}] or in the code repository}.
+Most of the information concerning MBDyn is taken from the official documentation given in the software website\footnote{MBDyn website: \href{https://www.mbdyn.org/}{mbdyn.org}} and from the input manual\footnote{a copy can be found at the following link [\href{https://www.mbdyn.org/userfiles/documents/mbdyn-input-1.7.3.pdf}{input manual}] or in the code repository}.
 
 MBDyn allows to build a simulate multibody system, which\footnote{see Wikipedia entry: \href{https://en.wikipedia.org/wiki/Multibody_system}{Multibody system}} is the study of the dynamic behavior of interconnected rigid or flexible bodies, each of which may undergo large translational and rotational displacements.
 
-MBDyn can simulate linear and non-linear dynamic or rigid and flexible bodies (including geometrically exact and composite-ready beam and shell finite elements, component mode synthesis elements, lumped elements) subjected to kinematic constraints, external forces and control subsystems\cite{masarati2014efficient}. 
+MBDyn can simulate linear and non-linear dynamic of rigid and flexible bodies (including geometrically exact and composite-ready beam and shell finite elements, component mode synthesis elements, lumped elements) subjected to kinematic constraints, external forces and control subsystems\cite{masarati2014efficient}. 
 MBDyn has been developed to serve as an analysis tool for rotorcraft research and cab simulate essential fixed-wing and rotorcraft aerodynamics.
 
 As explained more in detail later, MBDyn is open to be connected to other software components to perform multiphysics simulations. In particular, it is possible to pass externally computed forces  and to steer the multibody simulation from an external API: this feature has been particularly useful in building and \textit{adapter} to couple MBDyn with the library preCICE (see Chapter \ref{cha:adapter}).
@@ -260,7 +260,7 @@ Using the convention of \textit{x-axis} as beam axis we have:
 
 \subsubsection{Beam section Constitutive Law}
 
-In dynamic simulations, linear elastic or viscoelastic laws are generally used, even though nonlinear laws can be used.  Focusing on linear laws, MBDyn allows the user to define every constitutive laws, going from an isotropic beam section to a fully anisotropic one: in fact the entire $6 \times 6$ constitutive matrix can be provided. It is up to the user to define a valid law as the matrix must satisfy some constraints, e.g. it must be symmetric. The simplest case, represented in Equation \ref{eq:iso-const}, is a diagonal matrix \hl{in which} 
+In dynamic simulations, linear elastic or viscoelastic laws are generally used, even though nonlinear laws can be used.  Focusing on linear laws, MBDyn allows the user to define every constitutive laws, going from an isotropic beam section to a fully anisotropic one: in fact the entire $6 \times 6$ constitutive matrix can be provided. It is up to the user to define a valid law as the matrix must satisfy some constraints, e.g. it must be symmetric. The simplest case of linear elastic constitutive law is represented in Equation \ref{eq:iso-const}, in which a diagonal matrix relates internal forces to strain and curvature of the beam. 
 
 \begin{equation}
     f = \begin{bmatrix} EA & 0 & & \ldots &  & 0 \\
@@ -275,6 +275,12 @@ In dynamic simulations, linear elastic or viscoelastic laws are generally used, 
 	\end{Bmatrix}
     \label{eq:iso-const}
 \end{equation}
+
+The simplest case of linear viscoelastic law uses a proportional factor to be applied to the stiffness matrix of Equation \ref{eq:iso-const} such that: $viscosity=factor \cdot stiffness$.
+
+
+
+
 
 
 In the context of FSI simulations, this feature allows the user to define a section constitutive law that is independent from the shape of the beam itself. Thus the aerodynamic aspects and the structural aspects are handled by two distinct elements of the model: i.e. the interface mesh defines the aerodynamic forces and the beam constitutive law defines the structural properties.   

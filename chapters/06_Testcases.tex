@@ -10,7 +10,7 @@ The validation has been carried out in different steps: the first task (section 
 
 The second step aimed at comparing the results obtained performing an FSI simulation with MBDyn with another structural solver, both in compressible and in incompressible regime (Sections \ref{sec:cx-mbd} and \ref{sec:su2-mbd}).
 
-Then, some results obtained from FSI simulations coupling MBDyn with OpenFOAM, have been compared with some benchmarks present in literature. At first, the problem described in \cite{ramm1998fluid} has been considered (see Section \ref{sec:sq-cyl-bench}): it is composed of a square cylinder with a trailing flap. It is characterized by a mass ratio (see Section \ref{subsec:mass-ratio}) of $1.18\cdot 10^{-3}$, this turned out to be a fundamental parameter fo the convergence of simulations, and has been extensively analyzed in the subsequent sections.
+Then, some results obtained from FSI simulations coupling MBDyn with OpenFOAM, have been compared with some benchmarks present in literature. At first, the problem described in \cite{ramm1998fluid} has been considered (see Section \ref{sec:sq-cyl-bench}): it is composed of a square bluff body with a trailing flap. It is characterized by a mass ratio (see Section \ref{subsec:mass-ratio}) of $1.18\cdot 10^{-3}$, this turned out to be a fundamental parameter fo the convergence of simulations, and has been extensively analyzed in the subsequent sections.
 
 One set of well-known benchmarks in FSI literature are the three Turek-Hron FSI test cases described in \cite{turek2006proposal}. Those cases are characterized by the same domain (a round cylinder with a trailing flap) and the same fluid properties. Changes impact only fluid velocity and structural properties (in particular $\rho,E$).
 
@@ -359,7 +359,7 @@ The problem considered is characterized by the adimensional parameters given in 
 			parameter & & value   \\ 
 			\hline
 			mass number  & $M$ & $3.3\cdot 10^{-4}$     \\
-			reduced velocity & $U_R$ & $9.13\cdot 10^{-5}$  \\
+			reduced velocity & $U_R$ & $0.274$  \\
 			Cauchy number  & $C_Y$ & $2.5\cdot 10^{-5}$  \\			
 		\end{tabular}
 	\end{center}
@@ -594,7 +594,7 @@ The problem considered is characterized by the adimensional parameters given in 
 			parameter & & value   \\ 
 			\hline
 			mass number  & $M$ & $ \approx 1.2\cdot 10^{-3}$     \\
-			reduced velocity & $U_R$ & $ \approx 1.44\cdot 10^{-5}$  \\
+			reduced velocity & $U_R$ & $ \approx 1.44\cdot 10^{-2}$  \\
 			Cauchy number  & $C_Y$ & $  \approx 2.53 \cdot 10^{-7}$  \\			
 		\end{tabular}
 	\end{center}
@@ -665,16 +665,16 @@ Axial, shear and bending moment in each of the MBDyn elements are plotted in Fig
 \newpage
 
 
-\section{Square cylinder Benchmark}
+\section{Square bluff body Benchmark}
 \label{sec:sq-cyl-bench}
 
 The first simple problems aimed at verifying that the complete FSI problem: i.e. the MBDyn model, the mapping with the interface mesh, the coupling adapter and the fluid model (fluid flow and mesh movement performed with different solvers) is working and gives correct results.
 
 After that it is important to verify the performance of the system considering well-known benchmarks, so that the results can be compared with a large number of algorithms and techniques.
 
-\subsection{Problem Description}
+\subsection{Problem description}
 
-The first benchmark considered here has been described in \cite{ramm1998fluid}. The structural part is composed of a square cylinder with a trailing thin flap, as described in Figure \ref{fig:sq_domain}. The geometrical data are given in Table \ref{table:sq-geom}.
+The first benchmark considered here has been described in \cite{ramm1998fluid}. The structural part is composed of a square bluff body with a trailing thin flap, as described in Figure \ref{fig:sq_domain}. The geometrical data are given in Table \ref{table:sq-geom}.
 
 \begin{table}[!htb]
 	\begin{center}
@@ -686,14 +686,14 @@ The first benchmark considered here has been described in \cite{ramm1998fluid}. 
 			t  & [\si{mm}] & $0.6$  \\			
 		\end{tabular}
 	\end{center}
-	\caption{square cylinder: geometry}
+	\caption{square bluff body: geometry}
 	\label{table:sq-geom}
 \end{table}
 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.82\textwidth, trim=0 0 0 0, clip]{images/sq-cyl/sq-cyl-domain.png}
-	\caption{square cylinder benchmark: domain}
+	\caption{square bluff body benchmark: domain}
 	\label{fig:sq_domain}
 \end{figure}
 
@@ -707,7 +707,7 @@ The fluid domain is discretized in an structured hexaedral mesh as depicted in F
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/sq-cyl/sq_mesh.png}
-	\caption{square cylinder: fluid mesh}
+	\caption{square bluff body: fluid mesh}
 	\label{fig:sq_mesh}
 \end{figure}
 
@@ -725,7 +725,7 @@ The fluid domain is discretized in an structured hexaedral mesh as depicted in F
 			flow type & & & laminar \\
 		\end{tabular}
 	\end{center}
-	\caption{square cylinder: fluid properties}
+	\caption{square bluff body: fluid properties}
 	\label{table:sq-fluid}
 \end{table}
 
@@ -741,7 +741,7 @@ The fluid domain is discretized in an structured hexaedral mesh as depicted in F
 			number of interface cells  & $n_{int}$ & 202  \\			
 		\end{tabular}
 	\end{center}
-	\caption{square cylinder: mesh properties}
+	\caption{square bluff body: mesh properties}
 	\label{table:sq-mesh}
 \end{table}
 
@@ -762,7 +762,7 @@ The properties of the solid are reported in Table \ref{table:sq-solid}.
 			%			Reynolds number & Re & $\approx 1000$ & \\
 		\end{tabular}
 	\end{center}
-	\caption{square cylinder: solid properties}
+	\caption{square bluff body: solid properties}
 	\label{table:sq-solid}
 \end{table}
 
@@ -773,7 +773,7 @@ The interface mesh is divided into 202 faces and is shown in Figure \ref{fig:sq_
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.9\textwidth, trim=0 50 0 200, clip]{images/sq-cyl/sq_struct_mesh.png}
-	\caption{square cylinder: structural interface mesh}
+	\caption{square bluff body: structural interface mesh}
 	\label{fig:sq_struct_mesh}
 \end{figure}
 
@@ -799,7 +799,7 @@ The main coupling data are given in Table \ref{table:sq-coupling}. The particula
 			
 		\end{tabular}
 	\end{center}
-	\caption{square cylinder: coupling parameters}
+	\caption{square bluff body: coupling parameters}
 	\label{table:sq-coupling}
 \end{table}
 
@@ -815,11 +815,11 @@ The problem considered is characterized by the adimensional parameters given in 
 			parameter & & value   \\ 
 			\hline
 			mass number  & $M$ & $ 1.18\cdot 10^{-2}$     \\
-			reduced velocity & $U_R$ & $ \approx 1\cdot 10^{-4}$  \\
+			reduced velocity & $U_R$ & $ \approx 1\cdot 10^{-2}$  \\
 			Cauchy number  & $C_Y$ & $  1.24 \cdot 10^{-6}$  \\			
 		\end{tabular}
 	\end{center}
-	\caption{square cylinder: adimensional numbers}
+	\caption{square bluff body: adimensional numbers}
 	\label{table:sq-adim}
 \end{table}
 
@@ -832,7 +832,7 @@ Alternating vortices begin developing quite rapidly and the structure begins osc
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.98\textwidth, trim=20 20 20 50, clip]{images/sq-cyl/disp_sq.png}
-	\caption{square cylinder: tip displacement}
+	\caption{square bluff body: tip displacement}
 	\label{fig:sq_displacement}
 \end{figure}
 
@@ -841,7 +841,7 @@ Forces are measured on the whole structure on the fluid side, while are measured
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.98\textwidth, trim=20 100 20 100, clip]{images/sq-cyl/forces_sq.png}
-	\caption{Square cylinder: resultant forces (detail)}
+	\caption{square bluff body: resultant forces (detail)}
 	\label{fig:sq_force}
 \end{figure}
 
@@ -885,7 +885,7 @@ Forces are measured on the whole structure on the fluid side, while are measured
   \label{fig:sq_p3}
 \end{subfigure}\hfil % <-- added
 
-\caption{square cylinder: fluid solution}
+\caption{square bluff body: fluid solution}
 \label{fig:sq_sol}
 \end{figure}
 
@@ -897,7 +897,7 @@ An higher average number of iterations agrees with the fact that a higher mass n
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.95\textwidth, trim=0 80 0 100, clip]{images/sq-cyl/MBD_iterations_sq.png}
-	\caption{square cylinder: convergence and iterations}
+	\caption{square bluff body: convergence and iterations}
 	\label{fig:sq_mbd_iter}
 \end{figure}
 
@@ -906,18 +906,17 @@ As in the previous examples, the axial, shear and bending moment in each of the 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.92\textwidth, trim=0 230 0 230, clip]{images/sq-cyl/sq-flap_OF-MBDyn_act.png}
-	\caption{square cylinder: MBDyn internal forces (detail)}
+	\caption{square bluff body: MBDyn internal forces (detail)}
 	\label{fig:sq_mbd_internal}
 \end{figure}
 
+\newpage
 
 \subsection{Validation}
 
 This problem has been used as a benchmark in a great number of studies in literature. The comparison between the studies is generally made on the tip displacement, in term of amplitude and frequency of oscillation. In Table \ref{table:sq-res} some results are given and compared to the present study.
 
-The comparison shows a very good agreement among the studies, showing that the implementation of the adapter can give good results.
-
-\begin{table}[!htb]
+\begin{table}[!ht]
 	\begin{center}
 		\begin{tabular}{ l | c  c } 
 			Study & $f$ [\si{s^{-1}}] & $d_{y tip}$ [\si{mm}]   \\ 
@@ -931,15 +930,18 @@ The comparison shows a very good agreement among the studies, showing that the i
             Dettmer and Peric \cite{dettmer2006computational} & $3.03$ & $12.5$ \\
             Habchi et al. \cite{habchi2013partitioned} & $3.25$ & $10.2$ \\
             Froehle and Persson \cite{froehle2014high} & $3.18$ & $11.2$ \\
-            Sanchez et al.\footnote{Fluid Structure Interaction Problems using SU2. First SU2 Annual Developers Meeting. TU Delft, 6 September 2016}  & $3.15$ & $11.5$ \\
+            Sanchez et al.\tablefootnote{Fluid Structure Interaction Problems using SU2. First SU2 Annual Developers Meeting. TU Delft, 6 September 2016}  & $3.15$ & $11.5$ \\
+            \hline
             Present study    & $3.067$ & $11.2$ \\
             
 		\end{tabular}
 	\end{center}
-	\caption{square cylinder: results}
+	\caption{square bluff body: results}
 	\label{table:sq-res}
 \end{table}
 
+The comparison shows a very good agreement among the studies: considering all the previous simulations, the average tip displacement is $11.2$ \si{mm} with a standard deviation of $1.06$ \si{mm} and the average frequency of oscillation is $3.1$ \si{Hz} with a standard deviation of $0.09$ \si{Hz}. 
+This study, with a tip displacement of $11.2$ \si{mm} at a frequency of $3.067$ \si{Hz}, shows that the implementation of the adapter can give good results.
 
 \newpage
 
@@ -947,7 +949,10 @@ The comparison shows a very good agreement among the studies, showing that the i
 \label{sec:FSI2}
 
 
-Another well known benchmark concerning FSI simulations performed in incompressible flow regime is proposed by Turek and Hron \cite{turek2006proposal}. The fluid domain is similar to the one described in the previous chapter. The domain is again composed by a cylinder and a flap, but different flow velocities and structural properties are considered, so that 3 cases arise, commonly knonw as FSI1, FSI2 and FSI3.
+Another well known benchmark concerning FSI simulations performed in incompressible flow regime is proposed by Turek and Hron \cite{turek2006proposal}.
+A very important thing to notice about this study is that it is a proposal for a benchmark, as it is called  ``Proposal for numerical benchmarking of fluid-structure interaction between an elastic object and laminar incompressible flow''. So the paper gives a specific problem setup which others can contribute.
+
+The fluid domain is similar to the one described in the previous chapter. The domain is again composed by a cylinder and a flap, but different flow velocities and structural properties are considered, so that 3 cases arise, commonly knonw as FSI1, FSI2 and FSI3.
 
 For reasons that will be apparent in the next section, FSI2 is considered first. 
 
@@ -1001,9 +1006,9 @@ The fluid domain is discretized in an structured hexaedral mesh as depicted in F
 			fluid density  & $\rho$ & \si{kg.m^{-3}} & $1000$   \\
 			kinematic viscosity & $\nu$& \si{m^{2}.s^{-1}} & $1 \cdot 10^{-3}$  \\
 %			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
-			Reynolds number & Re &  & $200$ \\
-			max flow velocity & $\vec{u}_{max}$ & \si{m.s^{-1}} & $3$ \\
-			mean flow velocity & $\vec{u}$ & \si{m.s^{-1}} & $2$ \\
+			Reynolds number & Re &  & $100$ \\
+			max flow velocity & $\vec{u}_{max}$ & \si{m.s^{-1}} & $1.5$ \\
+			mean flow velocity & $\vec{u}$ & \si{m.s^{-1}} & $1$ \\
 			flow type & & & laminar \\
 		\end{tabular}
 	\end{center}
@@ -1037,7 +1042,7 @@ The properties of the solid are reported in Table \ref{table:FSI2-solid}.
 		\begin{tabular}{ l c  l | c } 
 			parameter & & value &    \\ 
 			\hline
-			solid density  & $\rho$ & \si{kg.m^{-3}} & 10000    \\
+			solid density  & $\rho$ & \si{kg.m^{-3}} & $10000$    \\
 			Elastic modulus  & E & \si{Pa} & $1.4\cdot 10^6$    \\
 			Poisson coefficient & $\nu$ & & $0.4$  \\
 			%			Reynolds length & $l_{Re}$ & $0.1$ & \si{m} \\
@@ -1048,7 +1053,7 @@ The properties of the solid are reported in Table \ref{table:FSI2-solid}.
 	\label{table:FSI2-solid}
 \end{table}
 
-The MBDyn model the same as the one used in \ref{sec:sq-cyl-bench} and is composed of 10 \texttt{beam3} elements, with a structural damping of $1\cdot10^{-2}$.
+The MBDyn model is the same as the one used in \ref{sec:sq-cyl-bench} and is composed of 10 \texttt{beam3} elements, with a structural damping of $1\cdot10^{-2}$.
 
 The interface mesh is divided into 90 faces and is shown in Figure \ref{fig:FSI2_struct_mesh}. 
 
@@ -1096,32 +1101,23 @@ The problem considered is characterized by the adimensional parameters given in 
 			parameter & & value   \\ 
 			\hline
 			mass number  & $M$ & $0.1$     \\
-			reduced velocity & $U_R$ & $ 1.69\cdot 10^{-5}$  \\
-			Cauchy number  & $C_Y$ & $  2.86 \cdot 10^{-3}$  \\			
+			reduced velocity & $U_R$ & $ 8.45\cdot 10^{-2}$  \\
+			Cauchy number  & $C_Y$ & $  7.14 \cdot 10^{-4}$  \\			
 		\end{tabular}
 	\end{center}
 	\caption{FSI2: adimensional numbers}
 	\label{table:FSI2-adim}
 \end{table}
 
-In this case, the ramp applied to fluid forces are applied at the beginning of the simulation is longer in order to make the fluid and structure settle: during the first $500$ \si{ms} forces are scaled to $10\%$ and reach $100\%$ after another $500$ \si{ms}.
+In this case, the ramp applied to fluid forces at the beginning of the simulation is longer in order to make the fluid and structure settle: during the first $500$ \si{ms} forces are scaled to $10\%$ and reach $100\%$ after another $500$ \si{ms}.
 
 Alternating vortices begin developing and the flap begins oscillating with an increasing amplitude. After around 4 seconds reaches a vortex lock-in regime, as shown in Figure \ref{fig:FSI2_displacement} (in particular the tip displacement in \textit{y} direction).
-
-
-
-
-
-
-
-
-
 
 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.98\textwidth, trim=20 20 50 50, clip]{images/FSI2/disp_fsi2.png}
-	\caption{square cylinder: tip displacement}
+	\caption{FSI2: tip displacement}
 	\label{fig:FSI2_displacement}
 \end{figure}
 
@@ -1129,7 +1125,7 @@ Forces are measured on the whole structure on the fluid side, while are measured
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.98\textwidth, trim=20 100 20 100, clip]{images/FSI2/forces_fsi2.png}
-	\caption{Square cylinder: resultant forces (detail)}
+	\caption{FSI2: resultant forces (detail)}
 	\label{fig:FSI2_force}
 \end{figure}
 
@@ -1178,7 +1174,7 @@ Forces are measured on the whole structure on the fluid side, while are measured
 \end{figure}
 
 
-Each time step converges with an average of 14.5 iterations, which again confirms the trend of more coupling iterations as the mass number increases.
+\hl{Each time step converges with an average of 14.5 iterations, which again confirms the trend of more coupling iterations as the mass number increases.}
 
 \begin{figure}[htbp!]
 	\centering
@@ -1199,7 +1195,13 @@ As in the previous examples, the axial, shear and bending moment in each of the 
 
 \subsection{Validation}
 
-This problem has been used as a benchmark in a great number of studies in literature. The comparison between the studies is generally made on the tip displacement, in term of amplitude and frequency of oscillation. In Table \ref{table:sq-res} some results are given and compared to the present study.
+Turek and Hron benchmarks have been used as a benchmark in many studies considering strongly coupled FSI simulations. 
+
+FSI2 is fully oscillating while the same problem, considering the structure rigid (named CFD2 in \cite{turek2006proposal}) is steady: for this reason it is considered an excellent check for interaction mechanisms \cite{turek2010numerical}.
+
+Besides, FSI2 gives the largest deformation and in some cases it is considered the most difficult of the three benchmarks \cite{richter2015time}, as it gives deformations 2.5 times greater than the flap height.
+
+The comparison of the results can be done in terms of tip displacement and in terms of lift and drag force applied to the whole structure. The results given in the original paper and in a review made by the same authors, together with other studies found in literature are compared to the present study in Table \ref{table:FSI2-results-d} for the data concerning tip displacement, and in Table \ref{table:FSI2-results-f} for the forces applied to the structure.
 
 
 \begin{table}[!htb]
@@ -1236,75 +1238,74 @@ This problem has been used as a benchmark in a great number of studies in litera
 	\label{table:FSI2-results-f}
 \end{table}
 
-The comparison shows a very good agreement among the studies, showing that the implementation of the adapter can give good results.
 
+The study \cite{turek2010numerical} gives 7 different methods and results for FSI1 and FSI3 test cases. In the numerical results it is stated that ``clear differences between the different approaches with regard to accuracy are visible. Particularly for the drag and lift values, which lead to differences of up to order $50\%$, and also for the displacement values which are in the range of $10\%$ errors''.
 
-FSI2: fully oscillating while CFD2 (approx same Re number!) is steady Excellent check for interaction mechanisms \cite{turek2010numerical}
+For the FSI2 test case only the results from the initial Hron and Turek paper \cite{turek2006proposal} and a few others are available.
 
-y. FSI2 gives the largest deformation is therefore considered the most difficult of the three \cite{richter2015time}, giving deformations of 2.5 times greater than the flag height
-
-
-
-
-
-
-
-A very important thing to notice about this benchmark [11] is that it is a proposal for a benchmark, as it is called “Proposal for numerical benchmarking of
-fluid-structure interaction between an elastic object and laminar incompressible flow”. So the point of the paper is give a specific problem setup which
-others can contribute result-data. A paper was published in 2010 by J. Hron,
-Turek, et al, [24] that compared results of different discretizations and solution approaches. The study [24] gives 7 different methods and results for two
-of the FSI test cases. They state in the numerical results that “However, also
-clear differences between the different approaches with regard to accuracy
-are visible. Particularly for the drag and lift values, which lead to differences
-of up to order 50%, and also for the displacement valueswhich are in the
-range of 10% errors.”. With this in mind it is important to know that the
-referential values used are only those reported from the original paper, which
-only looked at one implementation. While the paper which compares results,
-only 2 of the 7 contributions were schemes of monolithic nature, which are
-the closest one should refer to in this thessis.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\hl{ As previously stated, the results for the FSI3 case differ by in
+some cases $50\%$ for Drag and Lift. With this in mind, in the FSI2 case I
+am off by less then 10% for displacement in x and y direction and for Lift.
+While Drag is off by about 50%. It is reasonable to assume that since there
+were such differences in the results for different implementations for the FSI3
+results, we would expect similar behavior in the FSI2 results.}
 
 
 \newpage
 
 
-\section{Turek-Hron FSI1 and FSI3 Benchmark}
+\section{Turek-Hron FSI3 Benchmark}
 \label{sec:FSI1-FSI3}
 
-The other benchmark proposed in \cite{turek2006proposal}
+Omitting for a while the test case named FSI1 as it is not oscillating, the other benchmark proposed in \cite{turek2006proposal}, named FSI3, is very similar to FSI2 with the only different properties shown in Table \ref{table:FSI3-diff}. The corresponding adimensional numbers are given in Table \ref{table:FSI3-adim}. 
 
 
 
 \begin{table}[!htb]
 	\begin{center}
-		\begin{tabular}{ l c | r } 
-			parameter & & value   \\ 
+		\begin{tabular}{ l c l | c | c } 
+			parameter & & & FSI2 & FSI3   \\ 
 			\hline
-			mass number  & $M$ & $1$     \\
-			reduced velocity & $U_R$ & $9.13\cdot 10^{-5}$  \\
-			Cauchy number  & $C_Y$ & $2.5\cdot 10^{-5}$  \\			
+			solid density  &  $\rho$ & \si{kg.m^{-3}} & $10000$ & $1000$     \\
+			Elastic modulus  & E & \si{Pa} & $1.4\cdot 10^6$ & $5.6\cdot 10^6$   \\
+			max flow velocity & $\vec{u}_{max}$ & \si{m.s^{-1}} & $1.5$ & $3$ \\
+			mean flow velocity & $\vec{u}$ & \si{m.s^{-1}} & $1$ & $2$  \\
 		\end{tabular}
 	\end{center}
-	\caption{FSI3: adimensional numbers}
-	\label{fsi3:ex1-adim}
+	\caption{FSI2-FSI3: different parameters}
+	\label{table:FSI3-diff}
+\end{table}
+
+The 
+
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c | c | c} 
+			parameter & & FSI2 & FSI3   \\ 
+			\hline
+			mass number  & $M$ & $0.1$ & $1$     \\
+			reduced velocity & $U_R$ &  $8.45 \cdot 10^{-2}$  & $2.67\cdot 10^{-2}$  \\
+			Cauchy number  & $C_Y$ & \cellcolor{yellow!25}  $7.14\cdot 10^{-4}$  & \cellcolor{yellow!25} $7.14\cdot 10^{-4}$  \\
+			Reynolds number & $Re$ & $100$ & $200$ \\	
+		\end{tabular}
+	\end{center}
+	\caption{FSI2-FSI3: adimensional numbers}
+	\label{table:FSI3-adim}
 \end{table}
 
 
+The simulation of FSI3 using MBDyn and OpenFOAM connected with preCICE proved to be an unfeasible task, at least at the time of writing. This same test case is known to work, giving correct results, coupling OpenFOAM and CalculiX as described in the preCICE website\footnote{\href{https://github.com/precice/precice/wiki/Tutorial-for-FSI-with-OpenFOAM-and-CalculiX}{Tutorial-for-FSI-with-OpenFOAM-and-CalculiX}}.
+Nevertheless, substituting CalculiX with MBDyn, all other parameters being equal, makes the simulation diverge.
 
+Different approaches have been experimented, acting on each part of the problem. For example:
 
+\begin{itemize}
+	\item in the fluid domain:
+	\begin{enumerate}
+		\item popp
+	\end{enumerate}
+\end{itemize}
 
 
 

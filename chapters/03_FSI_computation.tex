@@ -133,7 +133,7 @@ When the fluid solver completes the time step, data are passed to the structural
 
 Note that Equation \ref{eq:stag1} uses values computed at $t^n$, while Equation \ref{eq:stag2} uses values computed at $t^{(n+1)}$. The order of execution might be inverted.
 
-In order reduce execution time, the solvers might run in parallel, using data from the same time step (\textit{parallel-explicit coupling}:
+In order to reduce execution time, the solvers might run in parallel, using data from the same time step (\textit{parallel-explicit coupling}):
 
 \begin{subequations}
 \begin{eqnarray}
@@ -204,7 +204,7 @@ The two explicit schemes are shown schematically in Figures \ref{fig:serial-expl
 	\caption{Explicit coupling schemes}
 \end{figure}
 
-In general, an explicit coupling is not enough to regain the exact (as in the monolithic approach) solution of the problem as the matching coupling conditions between the solvers is not enforced within each time step: no balance between fluid and structural domain with respect to forces and displacements at the interface can be guaranteed (\cite{hou2012numerical}, \cite{degroote2009performance}). Nevertheless, explicit coupling yields good results if the interaction between fluid and solid is weak as in aeroelastic simulations, where in general the simulations show small displacements of the structure within a single time step and the flow field isn't much influenced by the structural displacements (\cite{farhat2006provably}).
+In general, an explicit coupling is not enough to regain the exact (as in the monolithic approach) solution of the problem as the matching coupling conditions between the solvers is not enforced within each time step: no balance between fluid and structural domain with respect to forces and displacements at the interface can be guaranteed (\cite{hou2012numerical}, \cite{degroote2009performance}). Nevertheless, explicit coupling yields good results if the interaction between fluid and solid is weak as in aeroelastic simulations, where in general the simulations show small displacements of the structure within a single time step and the flow field isn't much influenced by the structural displacements \cite{farhat2006provably}.
 
 \subsection{Implicit coupling schemes}
 \label{subsec:implicit}
@@ -415,7 +415,7 @@ A suitable dynamic relaxation parameter, is a better choice, like the \textit{Ai
 Aitken under-relaxation can be a good choice for strong interaction with a fluid solvers that does not fully converge in every iteration or for compressible fluid solvers.
 
 
-\subsection{Quasi Newton Least Squares schemes}
+\subsection{Quasi-Newton Least Squares schemes}
 
 Under-relaxation is a good choice for easy stable problems, but is outperformed by more sophisticated quasi-Newton coupling schemes. Equation \ref{eq:fp3} could be solved iteratively with a Newton method \cite{uekermann2016partitioned}:
 
@@ -547,7 +547,7 @@ Node-to-node matching of fluid and structure meshes at the interface is not requ
 
 The match between the interfaces must hold at each time step: this implies that both solid and fluid domains need to deform. Deformation is easily expressed in the solid domain as the structural mesh is usually represented in Lagrangian perspective (see Section \ref{subsec:lagrange}). ALE perspective (Section \ref{subsec:ALE}) for the fluid domain becomes necessary in this case.
 
-Mesh deformation can turn out to be a complicated task as in general the fluid mesh is deformed during motion (see Figure \ref{fig:ale-mesh}). Mesh smoothing techniques need to be applied in order to keep a good mesh quality in terms of distorted elements which can lead to accuracy loss in simulations. (the following video shows high distorted fluid elements during FSI motion: \href{https://youtu.be/zJ7PR90Y2TI}{video}). 
+Mesh deformation can turn out to be a complicated task as in general the fluid mesh is deformed during motion (see Figure \ref{fig:ale-mesh}). Mesh smoothing techniques need to be applied in order to keep a good mesh quality in terms of distorted elements which can lead to accuracy loss in simulations. (the following video shows highly distorted fluid elements during FSI motion: \href{https://youtu.be/zJ7PR90Y2TI}{video}). 
 
 Mesh smoothing is generally applied to keep the fluid mesh as uniform and undistorted as possible during movement.
 There is a wide variety of mesh updating procedures \cite{van2007comparison}.
@@ -678,23 +678,23 @@ When a solid moves or vibrates in a fluid domain, the interaction changes the wa
 
 Besides the physical aspects of the interaction, some numerical issues arise when trying to simulate this kind of problems.
 
-The numerical issue named \textit{~\ac{AME}} is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
+The numerical issue named ~\ac{AME} is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
 
 Weakly coupled algorithms give good results in aeroelasticity studies, but they are known to become unstable under certain conditions, in particular when fluid and structure densities are comparable ($M \approx 1$, see Section \ref{subsec:mass-ratio}) and when the structure is particularly slender \cite{causin2005added}.
 Under the same conditions, strongly coupled algorithms exhibit convergence problems.
 
 For this reason, the mass ratio $M$ is a suitable indicator to determine the kind of interaction between solid and fluid: when $M \ll 1$ (i.e. when the solid is much denser than the fluid), the interaction is weak, while when densities are comparable the interaction is strong and imposes some limits on the partitioned solution techniques.
 
-The problem has been analyzed in literature by means of "toy FSI models" (in \cite{causin2005added}, \cite{degroote2008stability} or \cite{mehl2016parallel}). Even though the number of parameters affecting stability is big and not completely understood in complex scenarios, all of the studies point out the mass-ratio $M$ as the most relevant parameter.
+The problem has been analyzed in literature by means of "toy FSI models" (in \cite{causin2005added}, \cite{degroote2008stability} or \cite{mehl2016parallel}). Even though the number of parameters affecting stability is large and not completely understood in complex scenarios, all of the studies point out the mass-ratio $M$ as the most relevant parameter.
 
-A simplistic explanation of the phenomenon stems from the idea that at the interface, fluid and structure have no gaps (Section \ref{sec:interface}). For this reason, if the structure moves, also the fluid particles around it have to move: the acceleration of the surrounding fluid results in more inertial forces and the structure appears more inert. 
+A simplistic explanation of the phenomenon stems from the idea that at the interface, fluid and structure have no gaps (Section \ref{sec:interface}). For this reason, if the structure moves, also the fluid particles around it have to move: the acceleration of the surrounding fluid results in greater inertial forces and the structure appears more inert. 
 
 Added mass effect appears both in incompressible and in compressible fluid models, but with slightly different effects and implications.
 
 
 \subsection{AME in compressible regime}  
 
-In compressible regime, using a weakly coupled algorithm which doesn't enforce mass and energy balance at the interface (see Section \ref{subsec:explicit}) imposes a limit to the mass ratio above which the simulation becomes unstable and the algorithm fails to find a solution \cite{bodnar2014fluid}.
+In compressible regime, using a weakly coupled algorithm which does not enforce mass and energy balance at the interface (see Section \ref{subsec:explicit}) imposes a limit to the mass ratio above which the simulation becomes unstable and the algorithm fails to find a solution \cite{bodnar2014fluid}.
 
 A strongly coupled algorithm (Section \ref{subsec:implicit}) does not become unstable, but converges slowly: many subiterations are needed at each time step in order to reach the required convergence criteria (Section \ref{sec:convergence}).
 
@@ -706,11 +706,11 @@ the convergence of a strongly coupled algorithm improves proportionally to the t
 
 \subsection{AME in incompressible regime}
 
-AME is a much greater issue in incompressible regime than in compressible flows. A simple physical explanation of this fact could be as follows: a deformation of the structure results in a perturbation of the fluid domain close to the structure, which then propagates through the rest of the fluid domain. In compressible models, the speed at which a perturbation propagates (speed of sound) has a finite value. For this reason the the effect of a perturbation is spatially limited during a time step. In contrast, in an incompressible model, the speed at which the aforementioned perturbation propagates through the domain is infinitely large. A change in the geometry affects the whole domain without delay and impacts the whole domain at each time step \cite{causin2005added}.
+AME is a much greater issue in incompressible regime than in compressible flows. A simple physical explanation of this fact could be as follows: a deformation of the structure results in a perturbation of the fluid domain close to the structure, which then propagates through the rest of the fluid domain. In compressible models, the speed at which a perturbation propagates (speed of sound) has a finite value. For this reason the effect of a perturbation is spatially limited during a time step. In contrast, in an incompressible model, the speed at which the aforementioned perturbation propagates through the domain is infinitely large. A change in the geometry affects the whole domain without delay and impacts the whole domain at each time step \cite{causin2005added}.
 
 It has been observed that loose coupling of fluid and structural part in the context of incompressible flow and slender structures frequently yields unstable computations \cite{forster2006artificial}. However, strict stability limits exist also for strongly coupled algorithms. Those limits have a different relation to the time step with respect to compressible models.
 
-Simulations show that reducing of the time step may result in an increased instability. The AME is inherent in the coupling itself: in sequentially staggered schemes the fluid forces depend upon predicted structural
+Simulations show that reducing the time step may result in increased instability. The AME is inherent in the coupling itself: in sequentially staggered schemes the fluid forces depend upon predicted structural
 interface displacements rather than the correct ones and thus contain a portion of incorrect coupling forces. This contribution yields the instability \cite{degroote2008stability}.
 
 Provided that the stability limit is not exceeded, implicit methods behave differently n incompressible regime: the number or subiterations required to reach convergence during a single time step increases when the time step decreases. Besides, achieving the monolithic solution limit is not guaranteed (\cite{forster2006artificial}, \cite{van2009added}).
