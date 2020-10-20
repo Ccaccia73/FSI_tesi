@@ -1215,7 +1215,7 @@ The comparison of the results can be done in terms of tip displacement and in te
 			Gjertsen \cite{gjertsen2017development} & $-14.83\pm13.11$ & & $1.24\pm81.6$ & \\
 			Degroote \cite{degroote2009interface}  & $-14.07\pm12.37$ & $3.7$ & $1.18\pm76.5$ & $1.9$ \\
 			\hline
-			Present study & $-14.95\pm9.85$ & $3.87$ & $2.78\pm85.39$ & $1.93$ \\ 
+			Present study & $-14.95\pm9.85$ & $3.87$ & $2.78\pm83.39$ & $1.93$ \\ 
 		\end{tabular}
 	\end{center}
 	\caption{FSI2: comparison of results (displacements)}
@@ -1245,22 +1245,11 @@ The study \cite{turek2010numerical} gives 7 different methods and results for FS
 
 For the FSI2 test case only the results from the initial Hron and Turek paper \cite{turek2006proposal} and a few others are available.
 
-Comparing the results, with previous studies (Table \ref{table:FSI2-results-d}), mean displacement in x direction is very close to all other results (mainly due to mean pressure applied to the tip face), while mean oscillation is lower of about $3mm$. The displacement in y direction is about $4mm$ higher. It looks like the MBDyn structure is a bit more flexible (as also seen in Section \ref{sec:cx-mbd} for the vertical flap). This also reflects the fact that average drag and lift are higher.
+Comparing the results, with previous studies (Table \ref{table:FSI2-results-d}), mean displacement in x direction is very close to all other results (mainly due to mean pressure applied to the tip face), while mean oscillation is lower of about $3mm$. The displacement in y direction is about $2mm$ higher. It looks like the MBDyn structure is a bit more flexible (as also seen in Section \ref{sec:cx-mbd} for the vertical flap). This also reflects the fact that average drag and lift are higher.
 
 The greatest difference can be seen in the oscillation of drag, which is much smaller than other studies. The data collected during the simulation allow to separate the contribution of the cylinder from the one of the flap (see first graph of Figure \ref{fig:FSI2_force}). The cylinder has an average drag of $140$ \si{N.m^{-1}} with a standard deviation of $\approx7$ \si{N.m^{-1}}. Considering that the average $C_D$ of a cylinder at $Re=100$ is around $1.35$ \cite{qin2017direct}, and an average fluid velocity around the cylinder of about $1.4$ \si{m.s^{-1}}, the contribution is as expected. The contribution of the flap seems to be much lower than expected.
 
 As previously stated, the results for the FSI3 case differ by in some cases $50\%$ for Drag and Lift. With this in mind, in the FSI2 case it is reasonable to assume that since there were such differences in the results for different implementations for the FSI3 results, we would expect similar behavior in the FSI2 results.
-
-
-%@article{qin2017direct,
-%  title={Direct numerical simulations of gas--solid--liquid interactions in dilute fluids},
-%  author={Qin, Zhipeng and Suckale, Jenny},
-%  journal={International Journal of Multiphase Flow},
-%  volume={96},
-%  pages={34--47},
-%  year={2017},
-%  publisher={Elsevier}
-%}
 
 
 \newpage
@@ -1313,10 +1302,34 @@ Different approaches have been experimented, acting on each part of the problem.
 \begin{itemize}
 	\item in the fluid domain:
 	\begin{enumerate}
-		\item popp
+		\item using more strict convergence criteria for the fluid solver
+		\item using a linear or parabolic profile of the inlet velocity (tests on FSI2 showed very little difference)
+		\item using a ramp also in the fluid velocity
+		\item defining a finer ($2\times$ or $3\times$) fluid mesh
+		\item considering a different thickness of the fluid and solid domain (which showed that having thicker domain produces a negative impact on the convergence)
+	\end{enumerate}
+	\item in the solid domain:
+	\begin{enumerate}
+		\item considering more or fewer MBDyn nodes (from 5 to 20 nodes)
+		\item changing solver (\texttt{naive}, \texttt{umfpack}, \texttt{klu}, $\ldots$)
+		\item using different damping coefficients
+	\end{enumerate}
+	\item in the adapter:
+	\begin{enumerate}
+		\item using different ramp profiles and times
+	\end{enumerate}
+	\item in the coupling parameters:
+	\begin{enumerate}
+		\item changing coupling strategies (serial, parallel)
+		\item using more strict convergence criteria
+		\item turning the \textit{extrapolation} parameter on  or off (\textit{on} gets a better initial guess for the next time step)
+		\item changing acceleration algorithm and parameters
 	\end{enumerate}
 \end{itemize}
 
+None of the simulations carried on allowed to simulate the system correctly. In general every simulation diverged at some point of the ramp phase.
+
+For this reason 
 
 
 
