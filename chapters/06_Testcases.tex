@@ -1097,7 +1097,7 @@ The problem considered is characterized by the adimensional parameters given in 
 
 \begin{table}[!htb]
 	\begin{center}
-		\begin{tabular}{ l c | r } 
+		\begin{tabular}{ l c | c } 
 			parameter & & value   \\ 
 			\hline
 			mass number  & $M$ & $0.1$     \\
@@ -1174,7 +1174,7 @@ Forces are measured on the whole structure on the fluid side, while are measured
 \end{figure}
 
 
-\hl{Each time step converges with an average of 14.5 iterations, which again confirms the trend of more coupling iterations as the mass number increases.}
+Each time step converges with an average of 14.5 iterations, which again confirms the trend of more coupling iterations as the mass number increases.
 
 \begin{figure}[htbp!]
 	\centering
@@ -1214,7 +1214,8 @@ The comparison of the results can be done in terms of tip displacement and in te
 			Turek et al. (2010) \cite{turek2010numerical} & $-14.85\pm12.70$ & $3.86$ & $1.30\pm81.7$ & $1.93$ \\
 			Gjertsen \cite{gjertsen2017development} & $-14.83\pm13.11$ & & $1.24\pm81.6$ & \\
 			Degroote \cite{degroote2009interface}  & $-14.07\pm12.37$ & $3.7$ & $1.18\pm76.5$ & $1.9$ \\
-			Present study & $-14.95\pm9.8$ & $3.87$ & $2.78\pm85.4$ & $1.93$ \\ 
+			\hline
+			Present study & $-14.95\pm9.85$ & $3.87$ & $2.78\pm85.39$ & $1.93$ \\ 
 		\end{tabular}
 	\end{center}
 	\caption{FSI2: comparison of results (displacements)}
@@ -1231,7 +1232,8 @@ The comparison of the results can be done in terms of tip displacement and in te
 			Turek et al. (2010) \cite{turek2010numerical} & $215.06\pm77.63$ & $3.86$ & $0.61\pm237.8$ & $1.93$\\   
 			Gjertsen \cite{gjertsen2017development} & $161.50\pm73.75$ & & $0.88\pm234.2$ & \\
 			Degroote \cite{degroote2009interface}  & $217.52\pm84.65$ & $3.7$ & $-0.74\pm267.6$ & $1.9$ \\
-			Present study & $239.13\pm31.9$ & $3.87$ & $2.4\pm217.2$ & $1.93$ \\
+			\hline
+			Present study & $239.13\pm31.93$ & $3.87$ & $3.43\pm308.57$ & $1.93$ \\
 		\end{tabular}
 	\end{center}
 	\caption{FSI2: comparison of results (forces)}
@@ -1243,12 +1245,22 @@ The study \cite{turek2010numerical} gives 7 different methods and results for FS
 
 For the FSI2 test case only the results from the initial Hron and Turek paper \cite{turek2006proposal} and a few others are available.
 
-\hl{ As previously stated, the results for the FSI3 case differ by in
-some cases $50\%$ for Drag and Lift. With this in mind, in the FSI2 case I
-am off by less then 10% for displacement in x and y direction and for Lift.
-While Drag is off by about 50%. It is reasonable to assume that since there
-were such differences in the results for different implementations for the FSI3
-results, we would expect similar behavior in the FSI2 results.}
+Comparing the results, with previous studies (Table \ref{table:FSI2-results-d}), mean displacement in x direction is very close to all other results (mainly due to mean pressure applied to the tip face), while mean oscillation is lower of about $3mm$. The displacement in y direction is about $4mm$ higher. It looks like the MBDyn structure is a bit more flexible (as also seen in Section \ref{sec:cx-mbd} for the vertical flap). This also reflects the fact that average drag and lift are higher.
+
+The greatest difference can be seen in the oscillation of drag, which is much smaller than other studies. The data collected during the simulation allow to separate the contribution of the cylinder from the one of the flap (see first graph of Figure \ref{fig:FSI2_force}). The cylinder has an average drag of $140$ \si{N.m^{-1}} with a standard deviation of $\approx7$ \si{N.m^{-1}}. Considering that the average $C_D$ of a cylinder at $Re=100$ is around $1.35$ \cite{qin2017direct}, and an average fluid velocity around the cylinder of about $1.4$ \si{m.s^{-1}}, the contribution is as expected. The contribution of the flap seems to be much lower than expected.
+
+As previously stated, the results for the FSI3 case differ by in some cases $50\%$ for Drag and Lift. With this in mind, in the FSI2 case it is reasonable to assume that since there were such differences in the results for different implementations for the FSI3 results, we would expect similar behavior in the FSI2 results.
+
+
+%@article{qin2017direct,
+%  title={Direct numerical simulations of gas--solid--liquid interactions in dilute fluids},
+%  author={Qin, Zhipeng and Suckale, Jenny},
+%  journal={International Journal of Multiphase Flow},
+%  volume={96},
+%  pages={34--47},
+%  year={2017},
+%  publisher={Elsevier}
+%}
 
 
 \newpage
@@ -1275,8 +1287,6 @@ Omitting for a while the test case named FSI1 as it is not oscillating, the othe
 	\caption{FSI2-FSI3: different parameters}
 	\label{table:FSI3-diff}
 \end{table}
-
-The 
 
 
 \begin{table}[!htb]
