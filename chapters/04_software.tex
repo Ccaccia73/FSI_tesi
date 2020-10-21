@@ -1,115 +1,7 @@
 \chapter{Software Packages used in this work}
 \label{cha:software}
 
-This chapter illustrates the main software tools used in this work. First, the coupling library \textit{preCICE} is introduced in Section \ref{sec:precice}. Then, the multibody dynamics solver \textit{MBDyn} being connected to preCICE is shortly presented in Section \ref{sec:mbdyn}.
-
-
-\section{preCICE}
-\label{sec:precice}
-
-The main information concerning preCICE is taken from the official documentation: that is \cite{gatzhammer2014efficient} and  \cite{bungartz2016precice}. The preCICE website is also a source of documentation\footnote{\href{http://www.precice.org}{www.precice.org}}.
-
-The open-source\footnote{The code can be accessed via Github: \href{https://github.com/precice/precice}{github.com/precice/precice}} software library preCICE provides the components to connect traditional single-physics solvers and create a partitioned multi-physics simulation (e.g. fluid-structure interaction, conjugated heat transfer, solid-solid interaction, etc.).
-It aims at coupling existing solvers in a partitioned black-box manner (see Section \ref{sec:coupling}):  only minimal information about the solver is available and connection involves just interface nodes. 
-In order to be flexible and easily implemented, the impact on the solvers should be as minimal as possible: for this reason, preCICE offers a high level ~\ac{API} (Section \ref{sec:pc-api}) different languages, such as C/C++, Fortran and Python.
-The ability to switch among different solvers is advantageous as it provides a lot of flexibility in developing and testing new coupled components.
-
-In a nutshell, preCICE simply affects the input and observes the output of the solvers (called \textit{participants}). The required data and control elements are accessed using an \textit{adapter}, i.e. a  ``glue code'' that is attached to the corresponding solver and communicates the information with the library.
-
-preCICE performs all the actions required to perform a coupled simulation: implements the coupling strategy and convergence criteria (Section \ref{sec:pc-coupling}), the communication
-between the participants (Section \ref{sec:pc-comm}), the mapping of data between meshes (Section \ref{sec:pc-map}). preCICE is configured by means of an ~\ac{XML} file (Section \ref{sec:pc-config}).
-
-
-
-\subsection{Implemented coupling strategies}
-\label{sec:pc-coupling}
-
-The \textit{partitioned approach} (Section \ref{sec:coupling}) is obviously the coupling strategy adopted by preCICE. It allows both \textit{explicit} (Section \ref{subsec:explicit}) and \textit{implicit} coupling (Section \ref{subsec:implicit}). The possible variants are four:
-
-\begin{itemize}
-	\item \texttt{serial-explicit}: a serial, weakly coupled algorithm (Figure \ref{fig:serial-explicit}). The first solver uses the second solver solution at the last time step to compute its current solution. In contrast, the second solver needs the current first solution to compute its solution at the same time instance. The order of execution is user defined.
-	\item \texttt{parallel-explicit}: both solvers advance in parallel (Figure \ref{fig:parallel-explicit}) and exchange data at the end of each time step, resulting in a less stable procedure. The bottleneck of this procedure is related to the most time consuming solver.
-	\item \texttt{serial-implicit}: a serial strongly coupled algorithm (Figure \ref{fig:serial-implicit}). The user can define the order of execution, the coupling algorithm (basically all the algorithms described in Section \ref{sec:strong-coupling}) and its parameters in a section of the configuration file named \texttt{acceleration}.
-	\item \texttt{parallel-implicit}: again both solvers execute in parallel (Figure \ref{fig:parallel-implicit}). An implicit scheme modifies the result of the fixed-point iteration on both data \cite{mehl2016parallel}. 
-\end{itemize}
-
-
-
-\subsection{Communication strategies}
-\label{sec:pc-comm}
-
-All the participants need to communicate with each other, in order to share coupling data.
-Each solver might be executed in multiple processes or on different nodes of a cluster (\textit{intrafield parallelism}).
-This form of parallelization requires efficient forms of communication between the solver in order to avoid that data transfer becomes a bottleneck during a simulation.
-
-preCICE implements a fully parallel process-to-process communication approach \cite{Shukaev2015} using:
-
-\begin{itemize}
-	\item \textit{~\ac{MPI}}: available on 	most scientific computers, it may be necessary to adapt/change the MPI versions of the respective single-physics solvers or of preCICE.
-	\item \textit{~\ac{TCP/IP}}: popular means of network communication and free of incompatibilities between versions.
-\end{itemize}
-
-As to performances, MPI is the best technique especially when a high numbers of nodes is present. Anyway, socket communication is quite as fast, such that
-both techniques are very well-suited for larger-scale simulations \cite{gatzhammer2014efficient}.
-
-In each solver, executed in parallel, one "master" process is defined to manage the progress of the simulation. No central node is required. The participating
-processes use asynchronous point-to-point (M:N) communication. The channels are static and defined in the beginning of the simulation. This sets a limit in using preCICE with dynamically adaptive meshes or immersed boundaries.
-
-\subsection{Data mapping}
-\label{sec:pc-map}
-
-Even if volume coupling is possible, preCICE is mainly designed to couple simulations that share a common surface boundary (namely \textit{conforming meshes}, in the terminology used in Section \ref{sec:conforming-mesh}). The meshes don't need to be node-to-node coincident, so it is necessary to map variables at the interface, preserving the geometry (i.e. no gaps or superpositions at the interface) and the mass and energy balances. 
-
-The user defines which data are shared by each \textit{participant} (i.e. solver) and the way data is shared in the configuration section named \texttt{mapping}. As described in Section \ref{sec:data-mapping}, two kinds of mapping are available:
-
-\begin{itemize}
-	\item \texttt{consistent}: the value of a node at the one grid is the same as the value of the corresponding node (or nodes) at the other grid. In general the number of fluid nodes is at least the same or, more often, exceeds the nodes of the structure, so a single structural node is associated to several fluid nodes. The mapping of displacements is consistent: in the simplest case, all fluid nodes experience the same displacement of a single solid node, otherwise an interpolation is performed (see Section \ref{sec:data-mapping} for a detailed explanation and Figure \ref{fig:consistent} for an example).
-	\item \texttt{conservative}: in the same conditions as before, forces are mapped from multiple fluid nodes to a single solid node in an additive manner (see Section \ref{sec:data-mapping} and Figure \ref{fig:conservative} for an example).
-\end{itemize} 
-
-Along with the mapping strategy, a method must be defined: \texttt{nearest-neighbor}, \texttt{nearest-projection}, \texttt{rbf} (see Section \ref{sec:data-mapping}). For the latest method, preCICE implements a wide variety of basis functions, with Gaussian and thin plate splines being the most widely used.
-
- 
-
-\subsection{Configuration}
-\label{sec:pc-config}
-
-In order to run a multi-physics simulation with preCICE, all the participating, \textit{adapted} solvers have to be started (the order is irrelevant).
-Some configuration files are needed:
-
-\begin{itemize}
-	\item each adapter in general needs its own configuration file. It normally contains information about the boundaries (wet-surface) used for the coupling, names of exchanged data, mesh and the name of the common preCICE configuration file, plus other parameters, specific to the adapter. The one for the MBDyn adapter will be described in more detail in Chapter \ref{cha:adapter} and in Appendix \ref{app:mbd-config-file}.
-	\item preCICE configuration file: This is an XML file and each participant points at it. It defines all the information relevant to the simulation:
-	\begin{itemize}
-		\item type and name of exchanged data and meshes over which those data are passed
-		\item which solvers participate in the simulation, which data produce or consume, and how the mapping is performed
-		\item how solvers communicate among each other
-		\item coupling scheme and all the necessary information 
-	\end{itemize}
-	
-	The structure of a preCICE configuration file is illustrated in Appendix \ref{app:pc-config-file}.
-		
-\end{itemize}
-
-
-\subsection{Application Program Interface}
-\label{sec:pc-api}
-
-A solver, in order to be coupled to preCICE, must either provide a way to access its core functions (e.g. initialize, set input data, read output, advance...) from outside the code (via API, socket, etc...) or it has to be slightly modified in order to perform all the operations required by the preCICE library.
-
-The result is an \textit{adapter}, which can be the modified and recompiled original solver, or a standalone piece of code that communicates with the original unmodified solver on one side and with the preCICE library on the other. The adapter groups together all the calls to the preCICE methods from its API (a list of the API calls, taken from the official documentation, can be found in Appendix \ref{sec:api-code}).
-
-While preCICE is written in C++, there exist APIs also for other languages, so that the adapter can be written also in C, Fortran or Python.
-
-A coupling consists of a configuration and an initialization phase, multiple coupling advancements and a finalization phase: the general structure of an adapter can be found in \ref{sec:adapter-code}.
-
-
-\subsection{Official Adapters}
-\label{sec:pc-adapters}
-
-
-This work introduces an adapter to preCICE for MBDyn. It is based on previous MBDyn adapters and on the examples given on the preCICE website\footnote{\href{https://github.com/precice/precice/wiki/Adapter-Example}{github.com/precice/precice/wiki/Adapter-Example}}.
-Official adapters are currently available for several free solvers, e.g. CalculiX, Code-Aster and SU2. Also some closed-source software packages are supported. A (maybe outdated) list of official adapters can be found in \cite{uekermann2017official}, while the current status of coupled codes can be found at the following link: \href{https://www.precice.org/codes/}{preCICE adapters}.
+This chapter illustrates the main software tools used in this work. First, the multibody dynamics solver \textit{MBDyn}  is shortly presented in Section \ref{sec:mbdyn}. Then, the coupling library \textit{preCICE} is introduced in Section \ref{sec:precice}.
 
 
 \section{MBDyn}
@@ -401,5 +293,113 @@ The \texttt{.out} file contains information regarding the simulation iterations 
 %all the above mentioned quantities are expressed in the global inertial frame
 %
 
+
+
+\section{preCICE}
+\label{sec:precice}
+
+The main information concerning preCICE is taken from the official documentation: that is \cite{gatzhammer2014efficient} and  \cite{bungartz2016precice}. The preCICE website is also a source of documentation\footnote{\href{http://www.precice.org}{www.precice.org}}.
+
+The open-source\footnote{The code can be accessed via Github: \href{https://github.com/precice/precice}{github.com/precice/precice}} software library preCICE provides the components to connect traditional single-physics solvers and create a partitioned multi-physics simulation (e.g. fluid-structure interaction, conjugated heat transfer, solid-solid interaction, etc.).
+It aims at coupling existing solvers in a partitioned black-box manner (see Section \ref{sec:coupling}):  only minimal information about the solver is available and connection involves just interface nodes. 
+In order to be flexible and easily implemented, the impact on the solvers should be as minimal as possible: for this reason, preCICE offers a high level ~\ac{API} (Section \ref{sec:pc-api}) different languages, such as C/C++, Fortran and Python.
+The ability to switch among different solvers is advantageous as it provides a lot of flexibility in developing and testing new coupled components.
+
+In a nutshell, preCICE simply affects the input and observes the output of the solvers (called \textit{participants}). The required data and control elements are accessed using an \textit{adapter}, i.e. a  ``glue code'' that is attached to the corresponding solver and communicates the information with the library.
+
+preCICE performs all the actions required to perform a coupled simulation: implements the coupling strategy and convergence criteria (Section \ref{sec:pc-coupling}), the communication
+between the participants (Section \ref{sec:pc-comm}), the mapping of data between meshes (Section \ref{sec:pc-map}). preCICE is configured by means of an ~\ac{XML} file (Section \ref{sec:pc-config}).
+
+
+
+\subsection{Implemented coupling strategies}
+\label{sec:pc-coupling}
+
+The \textit{partitioned approach} (Section \ref{sec:coupling}) is obviously the coupling strategy adopted by preCICE. It allows both \textit{explicit} (Section \ref{subsec:explicit}) and \textit{implicit} coupling (Section \ref{subsec:implicit}). The possible variants are four:
+
+\begin{itemize}
+	\item \texttt{serial-explicit}: a serial, weakly coupled algorithm (Figure \ref{fig:serial-explicit}). The first solver uses the second solver solution at the last time step to compute its current solution. In contrast, the second solver needs the current first solution to compute its solution at the same time instance. The order of execution is user defined.
+	\item \texttt{parallel-explicit}: both solvers advance in parallel (Figure \ref{fig:parallel-explicit}) and exchange data at the end of each time step, resulting in a less stable procedure. The bottleneck of this procedure is related to the most time consuming solver.
+	\item \texttt{serial-implicit}: a serial strongly coupled algorithm (Figure \ref{fig:serial-implicit}). The user can define the order of execution, the coupling algorithm (basically all the algorithms described in Section \ref{sec:strong-coupling}) and its parameters in a section of the configuration file named \texttt{acceleration}.
+	\item \texttt{parallel-implicit}: again both solvers execute in parallel (Figure \ref{fig:parallel-implicit}). An implicit scheme modifies the result of the fixed-point iteration on both data \cite{mehl2016parallel}. 
+\end{itemize}
+
+
+
+\subsection{Communication strategies}
+\label{sec:pc-comm}
+
+All the participants need to communicate with each other, in order to share coupling data.
+Each solver might be executed in multiple processes or on different nodes of a cluster (\textit{intrafield parallelism}).
+This form of parallelization requires efficient forms of communication between the solver in order to avoid that data transfer becomes a bottleneck during a simulation.
+
+preCICE implements a fully parallel process-to-process communication approach \cite{Shukaev2015} using:
+
+\begin{itemize}
+	\item \textit{~\ac{MPI}}: available on 	most scientific computers, it may be necessary to adapt/change the MPI versions of the respective single-physics solvers or of preCICE.
+	\item \textit{~\ac{TCP/IP}}: popular means of network communication and free of incompatibilities between versions.
+\end{itemize}
+
+As to performances, MPI is the best technique especially when a high numbers of nodes is present. Anyway, socket communication is quite as fast, such that
+both techniques are very well-suited for larger-scale simulations \cite{gatzhammer2014efficient}.
+
+In each solver, executed in parallel, one "master" process is defined to manage the progress of the simulation. No central node is required. The participating
+processes use asynchronous point-to-point (M:N) communication. The channels are static and defined in the beginning of the simulation. This sets a limit in using preCICE with dynamically adaptive meshes or immersed boundaries.
+
+\subsection{Data mapping}
+\label{sec:pc-map}
+
+Even if volume coupling is possible, preCICE is mainly designed to couple simulations that share a common surface boundary (namely \textit{conforming meshes}, in the terminology used in Section \ref{sec:conforming-mesh}). The meshes don't need to be node-to-node coincident, so it is necessary to map variables at the interface, preserving the geometry (i.e. no gaps or superpositions at the interface) and the mass and energy balances. 
+
+The user defines which data are shared by each \textit{participant} (i.e. solver) and the way data is shared in the configuration section named \texttt{mapping}. As described in Section \ref{sec:data-mapping}, two kinds of mapping are available:
+
+\begin{itemize}
+	\item \texttt{consistent}: the value of a node at the one grid is the same as the value of the corresponding node (or nodes) at the other grid. In general the number of fluid nodes is at least the same or, more often, exceeds the nodes of the structure, so a single structural node is associated to several fluid nodes. The mapping of displacements is consistent: in the simplest case, all fluid nodes experience the same displacement of a single solid node, otherwise an interpolation is performed (see Section \ref{sec:data-mapping} for a detailed explanation and Figure \ref{fig:consistent} for an example).
+	\item \texttt{conservative}: in the same conditions as before, forces are mapped from multiple fluid nodes to a single solid node in an additive manner (see Section \ref{sec:data-mapping} and Figure \ref{fig:conservative} for an example).
+\end{itemize} 
+
+Along with the mapping strategy, a method must be defined: \texttt{nearest-neighbor}, \texttt{nearest-projection}, \texttt{rbf} (see Section \ref{sec:data-mapping}). For the latest method, preCICE implements a wide variety of basis functions, with Gaussian and thin plate splines being the most widely used.
+
+ 
+
+\subsection{Configuration}
+\label{sec:pc-config}
+
+In order to run a multi-physics simulation with preCICE, all the participating, \textit{adapted} solvers have to be started (the order is irrelevant).
+Some configuration files are needed:
+
+\begin{itemize}
+	\item each adapter in general needs its own configuration file. It normally contains information about the boundaries (wet-surface) used for the coupling, names of exchanged data, mesh and the name of the common preCICE configuration file, plus other parameters, specific to the adapter. The one for the MBDyn adapter will be described in more detail in Chapter \ref{cha:adapter} and in Appendix \ref{app:mbd-config-file}.
+	\item preCICE configuration file: This is an XML file and each participant points at it. It defines all the information relevant to the simulation:
+	\begin{itemize}
+		\item type and name of exchanged data and meshes over which those data are passed
+		\item which solvers participate in the simulation, which data produce or consume, and how the mapping is performed
+		\item how solvers communicate among each other
+		\item coupling scheme and all the necessary information 
+	\end{itemize}
+	
+	The structure of a preCICE configuration file is illustrated in Appendix \ref{app:pc-config-file}.
+		
+\end{itemize}
+
+
+\subsection{Application Program Interface}
+\label{sec:pc-api}
+
+A solver, in order to be coupled to preCICE, must either provide a way to access its core functions (e.g. initialize, set input data, read output, advance...) from outside the code (via API, socket, etc...) or it has to be slightly modified in order to perform all the operations required by the preCICE library.
+
+The result is an \textit{adapter}, which can be the modified and recompiled original solver, or a standalone piece of code that communicates with the original unmodified solver on one side and with the preCICE library on the other. The adapter groups together all the calls to the preCICE methods from its API (a list of the API calls, taken from the official documentation, can be found in Appendix \ref{sec:api-code}).
+
+While preCICE is written in C++, there exist APIs also for other languages, so that the adapter can be written also in C, Fortran or Python.
+
+A coupling consists of a configuration and an initialization phase, multiple coupling advancements and a finalization phase: the general structure of an adapter can be found in \ref{sec:adapter-code}.
+
+
+\subsection{Official Adapters}
+\label{sec:pc-adapters}
+
+
+This work introduces an adapter to preCICE for MBDyn. It is based on previous MBDyn adapters and on the examples given on the preCICE website\footnote{\href{https://github.com/precice/precice/wiki/Adapter-Example}{github.com/precice/precice/wiki/Adapter-Example}}.
+Official adapters are currently available for several free solvers, e.g. CalculiX, Code-Aster and SU2. Also some closed-source software packages are supported. A (maybe outdated) list of official adapters can be found in \cite{uekermann2017official}, while the current status of coupled codes can be found at the following link: \href{https://www.precice.org/codes/}{preCICE adapters}.
 
 
