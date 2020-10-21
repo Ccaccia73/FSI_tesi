@@ -1337,23 +1337,43 @@ For this reason a sensitivity analysis has been carried out in order to understa
 
 It can be interesting to understand what combination of simulation parameters influence most the convergence or divergence of the model. We decided to focus on the FSI3 benchmark and perturb some of the input parameters.
 
+Table \ref{table:FSI3-adim} shows that the two test cases present the same Cauchy Number $C_Y$. It looks that, at first, it might not be a significant parameter to understand the limits of application of this setup. For that reason we decided to vary the \textit{mass number} $M$ and the \textit{reduced velocity} $U_R$ and observe in which cases the simulation diverges.
 
+We started from the original FSI3 test case with the same configuration parameters given in Section \ref{sec:FSI2}, and modified the following parameters:
 
+\begin{enumerate}
+    \item $\rho_f$ (fluid density): $100\rightarrow1000$ \si{kg.m^{-3}}, so that the mass number is in the range $0.\rightarrow1$. A mass number of $0.1$ has shown to converge (i.e. FSI2 benchmark) while previous tests, characterized by smaller mass number, did not present convergence issues. Solid density $\rho_s$ is kept fixed at $1000$ \si{kg.m^{-3}}. 
+    \item $E$ (structure elastic modulus): $5.6\cdot10^{6}\rightarrow2\cdot10^{11}$ \si{Pa}, so ranging from the elastic modulus of a soft rubber (used in the benchmark) to the one of steel. The corresponding reduced velocity $U_R$ ranges from $\approx7\cdot10^{-4}\rightarrow0.13 $
+    \item $\vec{u}$ (mean flow velocity): $0.2\rightarrow10$ \si{m.s^{-1}} so that the Reynolds number $Re$ ranges from 20 (as in FSI1) to 1000. 
+\end{enumerate}
 
+We were interested in keeping the simulation time short, so each experiment lasted one second: the first $0.5$\si{s} have been used to ramp up forces on the structure from $\$10\%$ up to $100\%$, then the simulation evolves for the remaining $0.5$\si{s}. A simulation is considered converged if it reaches the final time, without crashing and without non-physical results due to lack of convergence at some time steps.
+
+The results are presented in the following subsections.
 
 
 \subsection{FSI3 sensitivity Analysis}
 
- (Re=200)
+The first scenario is a perturbation of the FSI3 test case, i.e. with $\vec{u}=2$\si{m.s^{-1}} and $Re=200$. The results are presented in the following table:
+
+
+\input{tables/fsi3}
+
+
+
 
 \subsection{FSI1 sensitivity Analysis}
 
  (Re=20)
 
+\input{tables/fsi1}
 
 
 \subsection{Sensitivity Analysis at higher velocity}
 
- (Re=20)
+ (Re=1000)
+
+\input{tables/test1000}
+
 
 \subsection{Conclusions}
