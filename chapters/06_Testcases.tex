@@ -79,7 +79,7 @@ The beam section is uniform and rectangular ($w \times h$) and the physical prop
 		\label{fig:cnt-beams}
 \end{figure}
 
-The inertia of the structure is provided by 2 \texttt{body} elements (see Section \ref{sec:mbd-body} attached to the second and third nodes of each beam (see Figure \ref{fig:mbdyn-beam-model}). The center of gravity of each body is offset by $-l/4$ in x-direction (where $l$ is the length of the single beam element). Each body has the following inertial properties (see Figure \ref{fig:cnt-mass}): 
+The inertia of the structure is provided by 2 \texttt{body} elements (see Section \ref{sec:mbd-body} attached to the second and third nodes of each beam (see Figure \ref{fig:mbdyn-beam-model}). The center of gravity of each body placed at the corresponding node. Each body has the following inertial properties (see Figure \ref{fig:cnt-mass}): 
 
 \begin{equation}
     m = \rho wh \frac{l}{4} \quad I = \frac{m}{12} \begin{bmatrix} h^2+w^2 & 0 & 0 \\ 0 & \frac{l^2}{16} + w^2 & 0 \\ 0 & 0 & \frac{l^2}{16} + h^2 \end{bmatrix}
@@ -102,22 +102,22 @@ The inertia of the structure is provided by 2 \texttt{body} elements (see Sectio
     (b) +(-5pt,0) coordinate (b2) edge ["h"] (b2 |- a)
     (c) +(3.5pt,-3.5pt) coordinate (c2) edge ["w"] ([xshift=3.5pt,yshift=-3.5pt]e)
     ;
-    \daxis{1} {-8,-1,-1.5} [right][above][left];
-    \dpoint{q}{-2.5}{-1}{-1.5};
-    \dpoint{r}{0}{-1}{-1.5};
-    \dpoint{s}{-\cubex}{-1}{-1.5};
-    \dpoint{t}{\cubex}{-1}{-1.5};
-    \beam{4}{q}{r};
-    \dhinge{1}{q};
+    \daxis{1} {-9,-1,-1.5} [right][above][left];
+    %\dpoint{q}{-2.5}{-1}{-1.5};
+    \dpoint{r}{-2}{-1}{-1.5};
+    \dpoint{s}{-6}{-1}{-1.5};
+    \dpoint{t}{2}{-1}{-1.5};
+    %\beam{4}{q}{r};
+    %\dhinge{1}{q};
     \dhinge{1}{r};
     \dhinge{1}{s};
     \dhinge{1}{t};
-    \dnotation{1}{q}{CoG};
+    \dnotation{1}{r}{CoG}[below right];
     \dnotation{1}{r}{$n_2$};
     \dnotation{1}{s}{$n_1$};
     \dnotation{1}{t}{$n_3$};
-    \ddimensioning{xy}{q}{r}{1.5}[ $l/4$ ];
-    \ddimensioning{xy}{s}{t}{-2.5}[ $l$ ];
+    %\ddimensioning{xy}{q}{r}{1.5}[ $l/4$ ];
+    %\ddimensioning{xy}{s}{t}{-2.5}[ $l$ ];
     
 \end{tikzpicture}
     	\caption{\texttt{body} element attached to node 2 of the \texttt{beam} element}
