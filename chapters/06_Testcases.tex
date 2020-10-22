@@ -1343,11 +1343,11 @@ We started from the original FSI3 test case with the same configuration paramete
 
 \begin{enumerate}
     \item $\rho_f$ (fluid density): $100\rightarrow1000$ \si{kg.m^{-3}}, so that the mass number is in the range $0.\rightarrow1$. A mass number of $0.1$ has shown to converge (i.e. FSI2 benchmark) while previous tests, characterized by smaller mass number, did not present convergence issues. Solid density $\rho_s$ is kept fixed at $1000$ \si{kg.m^{-3}}. 
-    \item $E$ (structure elastic modulus): $5.6\cdot10^{6}\rightarrow2\cdot10^{11}$ \si{Pa}, so ranging from the elastic modulus of a soft rubber (used in the benchmark) to the one of steel. The corresponding reduced velocity $U_R$ ranges from $\approx7\cdot10^{-4}\rightarrow0.13 $
+    \item $E$ (structure elastic modulus): $5.6\cdot10^{6}\rightarrow2\cdot10^{11}$ \si{Pa}, so ranging from the elastic modulus of a soft rubber (used in the benchmark) to the one of steel. The corresponding reduced velocity, at $\vec{u}=2$\si{m.s^{-1}}, $U_R$ ranges from $\approx7\cdot10^{-4}\rightarrow0.13 $
     \item $\vec{u}$ (mean flow velocity): $0.2\rightarrow10$ \si{m.s^{-1}} so that the Reynolds number $Re$ ranges from 20 (as in FSI1) to 1000. 
 \end{enumerate}
 
-We were interested in keeping the simulation time short, so each experiment lasted one second: the first $0.5$\si{s} have been used to ramp up forces on the structure from $\$10\%$ up to $100\%$, then the simulation evolves for the remaining $0.5$\si{s}. A simulation is considered converged if it reaches the final time, without crashing and without non-physical results due to lack of convergence at some time steps.
+We were interested in keeping the simulation time short, so each experiment lasted one second: the first $0.5$\si{s} have been used to ramp up forces on the structure from $\$10\%$ up to $100\%$, then the simulation evolves for the remaining $0.5$\si{s}. A simulation is considered successfully completed if it reaches the final time without non-physical results due to lack of convergence at some time steps.
 
 The results are presented in the following subsections.
 
@@ -1356,24 +1356,102 @@ The results are presented in the following subsections.
 
 The first scenario is a perturbation of the FSI3 test case, i.e. with $\vec{u}=2$\si{m.s^{-1}} and $Re=200$. The results are presented in the following table:
 
+% \input{tables/fsi3}
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ c | c | c c c c c |} 
+			&  & \multicolumn{5}{c}{mass ratio} \\
+			
+			$U_R$ & E[\si{MPa}] & 0.1 & 0.2 & 0.25 & 0.5 & 1 \\
+			\hline
+			
+			$1.41\cdot 10^{-4}$ & $2\cdot 10^{5}$ & \cellcolor{green!10}2.204 & \cellcolor{green!10} & \cellcolor{green!10}2.618 & \cellcolor{green!10}3.126 & \cellcolor{green!10}4.418 \\
+			$6.32\cdot 10^{-4}$ & $1\cdot 10^{4}$ & \cellcolor{green!10} & \cellcolor{green!10}15.024 & \cellcolor{green!10}43.1 & \cellcolor{red!10} & \cellcolor{red!10} \\        
+			$2\cdot 10^{-3}$ & $1\cdot 10^{3}$ & \cellcolor{green!10}23.46 & \cellcolor{green!10} & \cellcolor{green!10}10.78 & \cellcolor{red!10} & \cellcolor{red!10} \\
+			$6.32\cdot 10^{-3}$ & $1\cdot 10^{2}$ & \cellcolor{green!10} & \cellcolor{green!10}7.592 & \cellcolor{green!10}11.788 & \cellcolor{red!10} & \cellcolor{red!10} \\
+			$1.41\cdot 10^{-2}$ & $20$ & \cellcolor{green!10}11.46 & \cellcolor{green!10} & \cellcolor{green!10}87.675 & \cellcolor{red!10} & \cellcolor{red!10} \\
+			$2.67\cdot 10^{-2}$ & $5.6$ & \cellcolor{green!10}7.216 & \cellcolor{green!10}36.426 & \cellcolor{red!10} & \cellcolor{red!10} & \cellcolor{red!10}\textbf{FSI3} \\
+			\hline                        
+		\end{tabular}
+	\end{center}
+	\caption{FSI3 sensitivity analysis: \textit{green cells} simulation completed with average number of iterations, \textit{red cells} simulation diverged}
+	\label{table:FSI3-sens}
+\end{table}
 
-\input{tables/fsi3}
+
+Table \ref{table:FSI3-sens} shows that there is a limit in the ability of the system to work. It is situated in the range between $0.25$ and $0.5$. This can improve for stiffer material (and so smaller $U_R$) and be worse for more flexible material. The lower right corner of the table, which represents the FSI3 setup, appears to be quite far from the actual range of convergence of the system. The table also shows the average number of iterations required for each time step to converge. A trend is visible (even if it does not hold for every case): the higher \textit{mass ratio} the more iterations are needed. The similar trend is visible for $U_R$.
 
 
+The empty green cells have not been simulated. It is supposed that, if a simulation completes successfully for a given \textit{mass ratio}, it will complete also for a lower one. Conversely, if a simulation does not work for a given $U_R$, it will not work for a higher $U_R$ (i.e. for a more flexible material).   
 
 
 \subsection{FSI1 sensitivity Analysis}
 
- (Re=20)
+The same kind of analysis has been conducted considering a fluid velocity of $0.2$\si{m.s^{-1}} $(Re=20)$, thus replicating FSI1 test case in \cite{turek2006proposal}.  
 
-\input{tables/fsi1}
+%\input{tables/fsi1}
+\begin{table}[!hb]
+	\begin{center}
+		\begin{tabular}{ c | c | c c c c c |} 
+			&  & \multicolumn{5}{c}{mass ratio} \\
+			
+			$U_R$ & E[\si{MPa}] & 0.1 & 0.2 & 0.25 & 0.5 & 1 \\
+			\hline
+			
+			$1.41\cdot 10^{-5}$ & $2\cdot 10^{5}$ & \cellcolor{green!10} & \cellcolor{green!10}2.138 & \cellcolor{green!10} & \cellcolor{green!10}2.146 & \cellcolor{green!10}3.064 \\
+			$6.32\cdot 10^{-5}$ & $1\cdot 10^{4}$ & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10}2.337 & \cellcolor{red!10} & \cellcolor{red!10} \\        
+			$2\cdot 10^{-4}$ & $1\cdot 10^{3}$ & \cellcolor{green!10} & \cellcolor{green!10}9.83 & \cellcolor{yellow!10} & \cellcolor{red!10} & \cellcolor{red!10} \\
+			$6.32\cdot 10^{-4}$ & $1\cdot 10^{2}$ & \cellcolor{green!10}8.688 & \cellcolor{green!10} & \cellcolor{yellow!10} 24.45 & \cellcolor{red!10} & \cellcolor{red!10} \\
+			$1.41\cdot 10^{-3}$ & $20$ & \cellcolor{green!10} & \cellcolor{yellow!10}18.238 & \cellcolor{yellow!10}38.398 & \cellcolor{red!10} & \cellcolor{red!10} \\
+			$2.67\cdot 10^{-3}$ & $5.6$ & \cellcolor{green!10}6.314 & \cellcolor{red!10} & \cellcolor{red!10} & \cellcolor{red!10} & \cellcolor{red!10}\textbf{FSI1} \\
+			\hline                        
+		\end{tabular}
+	\end{center}
+	\caption{FSI1 sensitivity analysis}
+	\label{table:FSI1-sens}
+\end{table}
+
+Table \ref{table:FSI1-sens} illustrates the results: as in the previous section, \textit{green cells} indicate that the simulation with the average number of iterations reported, \textit{red cells} indicate that simulation diverged. In this case \textit{yellow cells} indicate that the simulation finished, but at some point reached the maximum number of iterations, or the progressive loading of the structure is difficult. It can be possible that there exist a better set of coupling parameters that makes the test work better, nevertheless it looks to be a symptom of the fact that the simulation is close to the limits of applicability.
+
+Comparing the results with Table \ref{table:FSI3-sens}, it can be seen that the range of feasible parameters becomes smaller. This seems to be in accordance with the idea that a lower fluid velocity the the interaction is stronger, thus making the convergence more difficult.
+
+Similarly, the lower right cell represents test case FSI1 and it seems to be not possible to simulate it with the current setup.
 
 
 \subsection{Sensitivity Analysis at higher velocity}
 
+In order to have more insight on the influence of the physical parameters on the simulation, also a higher fluid velocity of $10$\si{m.s^{-1}} $(Re=1000)$ has been considered.
+
  (Re=1000)
 
-\input{tables/test1000}
+%\input{tables/test1000}
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ c | c | c c c c c |} 
+			&  & \multicolumn{5}{c}{mass ratio} \\
+			
+			$U_R$ & E[\si{MPa}] & 0.1 & 0.2 & 0.25 & 0.5 & 1 \\
+			\hline
+			
+			$7.07\cdot 10^{-4}$ & $2\cdot 10^{5}$ & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10}8.647 \\
+			$3.16\cdot 10^{-3}$ & $1\cdot 10^{4}$ & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10}9.713 \\        
+			$1\cdot 10^{-2}$ & $1\cdot 10^{3}$ & \cellcolor{green!10} & \cellcolor{green!10}14.101 & \cellcolor{green!10}50.731 & \cellcolor{green!10} & \cellcolor{green!10}36.566 \\
+			$3.16\cdot 10^{-2}$ & $1\cdot 10^{2}$ & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10}17.122 & \cellcolor{red!10} & \cellcolor{red!10} \\
+			$7.07\cdot 10^{-2}$ & $20$ & \cellcolor{green!10} & \cellcolor{green!10} & \cellcolor{green!10}35.046 & \cellcolor{red!10} & \cellcolor{red!10} \\
+			$1.34\cdot 10^{-1}$ & $5.6$ & \cellcolor{green!10}11.725 & \cellcolor{red!10} & \cellcolor{red!10} & \cellcolor{red!10} & \cellcolor{red!10} \\
+			\hline                        
+		\end{tabular}
+	\end{center}
+	\caption{Re 1000 sensitivity analysis}
+	\label{table:Re1000-sens}
+\end{table}
 
+Table \ref{table:Re1000-sens} shows a pattern similar to the previous experiments. In this case, more combinations of parameters appear to be feasible. 
 
-\subsection{Conclusions}
+\subsection{Analysis of the results}
+
+The current knowledge regarding the setup of coupling parameters does not allow to correctly simulate the benchmark experiments FSI1 and FSI3, characterized by a mass ratio of $1$. Perturbing some of the parameters, thus lowering the mass ratio $M$ or the reduced velocity $U_R$, it is possible to reach feasible configurations. 
+
+Tables \ref{table:FSI3-sens} to \ref{table:Re1000-sens} show a similar path: the upper left part of the table contains feasible configurations, while the lower right part the unfeasible ones. If the fluid velocity is lower, more configurations fail.
+
+Those aspects appear to agree with the explanations given in Section \ref{sec:added-mass} and in the cited literature. The model considered here shows a a clear relationship between mass ratio, structure stiffness and simulation outcome at a prescribed fluid velocity. The same clear path would not hold if we considered reduced velocity $U_R$ only, thus putting all experiments together. For example, row 1 of table \ref{table:Re1000-sens} tells that $U_r \approx 7\cdot 10^{-4}$ would allow to reach $M=1$, while row 4 of table \ref{table:FSI1-sens} tells that $U_r \approx 6.3\cdot 10^{-4}$ would allow to reach only $M\approx0.2$. 

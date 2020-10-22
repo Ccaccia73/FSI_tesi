@@ -3,6 +3,93 @@
 %\markboth{Conclusions}{}
 %\addcontentsline{toc}{chapter}{Conclusions}
 
+In this thesis, we  developed an adapter for MBDyn to enable fluid-structure interaction simulations with the coupling library preCICE.
+The adaprer has been validated both qualitatively and quantitatively with several test cases.
+This work gives insights into the basics of FSI simulations and allows to classify the implemented partitioned
+coupling among the wide variety of coupling strategies
 
-pippo
+The adapter that we propose applies to a wider set of OpenFOAM solvers, is more
+configurable, and can be plugged in at runtime without requiring any modifications to the
+solver’s source code – an extra step that previously raised difficulties for the user.
 
+
+Our proposed adapter not only allows for higher compatibility, but also makes the preparation
+stage easier because it can simply be “plugged-in” at runtime. Up to now, this
+required additional changes in the solver’s source code. This was achieved by wrapping the
+adapter into a function object, a pattern also used by bundled post-processing tools.
+
+Our adapter is also more flexible. The solver-specific parameters are read from the
+OpenFOAM configuration files (dictionaries) and the user does not need to specify them
+elsewhere. The boundary conditions on the interfaces are configured through the adapter’s
+configuration file (YAML) and have been extended to support more solvers. The adapter
+can now directly read any additionally required material properties from the case files,
+instead of requiring modifications to the solver to read them. In case a solver uses different
+names for the required fields, these are also configurable.
+
+We validated the proposed adapter with multiple solvers, for two scenarios. The first
+one was a flow over a heated plate, described in [19.]. In most of the cases, the result files
+using the proposed adapter were identical to the files that were produced using the previous
+adapters. In some cases, sporadic errors in the order of the results’ precision were observed.
+In the case of the buoyantBoussinesqPimpleFoam, a problem was discovered and corrected
+in the previous implementation, which was an example for the need for checkpointing in
+implicit coupling. The second scenario was a shell-and-tube heat exchanger, a complex
+
+This work makes preCICE compatible with a wide range of OpenFOAM solvers used
+widely in both academia and industry. This brings preCICE not only closer to users but
+also to developers. Being designed with extensibility in mind, our proposed adapter could
+be equipped with additional boundary conditions for mechanical fluid-structure interaction
+or other computational fields, making multi-physics simulations more accessible. In this
+direction, the adapter could be ported to older versions and other variants of OpenFOAM.
+Test cases should be developed, in order to make the continuous development of the adapter
+for multiple OpenFOAM versions easier. Additionally, tutorials would help to reach new
+users. In order to convince the OpenFOAM community, examples that highlight the advantages
+of preCICE over the monolithic OpenFOAM solvers for conjugate heat transfer
+should be presented. Developing additional modules for mechanical fluid-structure interaction
+or acoustics would help to establish preCICE and OpenFOAM as standard components
+of multi-physics simulations, leading to benefits for both communities
+
+
+
+
+An adapter for linking the CFD solver SU2 with the multiphysics coupling tool preCICE is developed in
+this work and validated both qualitatively and quantitatively with several testcases.
+This work gives insights into the basics of FSI simulations and allows to classify the implemented partitioned
+coupling among the wide variety of solver strategies. The integration of the adapter into the code
+structure of SU2 is explained, as well as its implementation itself. The coupling approach is validated
+via generic two- and three-dimensional testcases, and the well-known numerical benchmark scenario FSI3
+([39]). The adapter is capable of handling three-dimensional, real-world examples. This is exemplified
+by simulating a long, slender cylinder under turbulent flow conditions. The practical background of this
+simulation is research on brush seals for e.g. gas turbines. However, time did not suffice to obtain meaningful
+simulation results in the scope of this thesis. Thus, work on this topic will be continued. Once
+feasible single-cylinder simulation results are achieved, scenarios involving multiple cylinders in a channel
+should be simulated in order to include possible mutual interactions of these structures. Thereby, the
+real conditions in brush seals can be approximated more precisely. In its current version, the adapter
+is limited to a single wet surface in the SU2 mesh file. While it is technically possible to define the
+surface of multiple cylinders as a single wet surface, it is more accurate to extend the adapter such that
+an arbitrary number of separate FSI interfaces can be defined. Moreover, it might be useful to integrate
+a load ramping functionality in the adapter, such that at the beginning of an FSI simulation the forces
+exerted on the structure are reduced by a factor, which is consequently increased to recover the real
+force values after a certain number of time steps. This might help to stabilize simulations as the initially
+occurring, large displacements can be reduced by this method. Recently, several RBF mapping methods
+have been included in preCICE, which can be used for parallel simulations. Applying these elaborate
+interpolation procedures instead of NN mapping allows to use finer solid meshes without encountering
+oscillatory forces at the wet surface, such that simulation results are expected to significantly improve
+(compared to simulations done with NN mapping). Furthermore, the spatial oscillations at the FSI interface
+are expected to vanish. Consequently, further testing with the FSI3 benchmark scenario will be
+done in order to verify this.
+The adapter is implemented such that it perfectly integrates into SU2, allowing to reuse characteristic
+functionalities like turbulence modeling, convergence acceleration via dual time stepping and multi-grid
+functionalities. Moreover, usage of preCICE for coupled FSI simulations can be configured via the native
+SU2 configuration file. A single executable of SU2 can be used for different FSI scenarios and even
+fluid-only computations without the need for recompilation. The adapter allows for inter- and intrafield
+parallel simulations. While no ALE implementation is currently available for the incompressible solver
+in SU2, the adapter is already prepared for this feature, possibly extending the FSI capabilities to the
+incompressible regime in the future.
+Although intrinsic FSI functionalities were recently added to SU2, the coupling with preCICE offers more
+flexibility, as even commercial partner solvers can be chosen for multiphysics simulations. Moreover, the
+coupling algorithms and data mapping methods of preCICE are more elaborate. The possibility of
+running fully-parallel simulations outperforms the intrinsic FSI capabilities with regard to HPC.
+Another practically very useful outcome of this work is the description of the procedure for integrating the
+adapter into SU2 and building it with preCICE. Thus, users can easily extend SU2 to FSI via preCICE
+guided by this thesis, which addresses both SU2 and preCICE communities. The adapter will soon be
+included in the preCICE repository.
