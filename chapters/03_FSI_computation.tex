@@ -678,7 +678,7 @@ When a solid moves or vibrates in a fluid domain, the interaction changes the wa
 
 Besides the physical aspects of the interaction, some numerical issues arise when trying to simulate this kind of problems.
 
-The numerical issue named ~\ac{AME} is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
+The numerical issue named \textit{added mass effect}(~\ac{AME}) is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
 
 Weakly coupled algorithms give good results in aeroelasticity studies, but they are known to become unstable under certain conditions, in particular when fluid and structure densities are comparable ($M \approx 1$, see Section \ref{subsec:mass-ratio}) and when the structure is particularly slender \cite{causin2005added}.
 Under the same conditions, strongly coupled algorithms exhibit convergence problems.
@@ -713,6 +713,6 @@ It has been observed that loose coupling of fluid and structural part in the con
 Simulations show that reducing the time step may result in increased instability. The AME is inherent in the coupling itself: in sequentially staggered schemes the fluid forces depend upon predicted structural
 interface displacements rather than the correct ones and thus contain a portion of incorrect coupling forces. This contribution yields the instability \cite{degroote2008stability}.
 
-Provided that the stability limit is not exceeded, implicit methods behave differently n incompressible regime: the number or subiterations required to reach convergence during a single time step increases when the time step decreases. Besides, achieving the monolithic solution limit is not guaranteed (\cite{forster2006artificial}, \cite{van2009added}).
+Provided that the stability limit is not exceeded, implicit methods behave differently in incompressible regime: the number or subiterations required to reach convergence during a single time step increases when the time step decreases. Besides, achieving the monolithic solution limit is not guaranteed (\cite{forster2006artificial}, \cite{van2009added}).
 
 These observations are consistent with the aforementioned physical explanation.

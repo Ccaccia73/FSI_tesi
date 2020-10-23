@@ -150,9 +150,10 @@
 \usepackage{hyperref}
 \hypersetup{
 	colorlinks=true,
-	linkcolor=red,
+	linkcolor=[rgb]{0 0 0.5},
 	filecolor=magenta,      
 	urlcolor=blue,
+	citecolor=[rgb]{0.0, 0.45,0.0}
 }
 
 \urlstyle{same}
@@ -318,7 +319,8 @@
 
 % Bibliografia
 \cleardoublepage
-\bibliographystyle{IEEEtran}
+%\bibliographystyle{IEEEtran}
+\bibliographystyle{acm}
 \bibliography{bibliography/thesis}
 \addcontentsline{toc}{chapter}{Bibliography}
 
