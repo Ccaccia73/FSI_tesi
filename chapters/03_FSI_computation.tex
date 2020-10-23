@@ -1,7 +1,7 @@
 \chapter{Computational aspects of Fluid-Structure Interaction problems}
 \label{cha:computation}
 
-This section deals with the computational aspects of FSI problems. The first possible categorization of solution techniques distinguishes between monolithic and partitioned approach, as discussed in Section \ref{sec:monolithic}. This work is based on the latter approach, so the two different coupling strategies, namely strong and weak, are discussed in Section \ref{sec:coupling}. As strong coupling is generally needed for accurate solution, ad overview of strong coupling algorithms is given in Section \ref{sec:strong-coupling}. Section \ref{sec:interface-mesh} focuses on aspects concerning the interface mesh, and how the solid and the fluid exchange data between them. Finally \ref{sec:added-mass} briefly describes a common issue arising in strongly coupled problems: the ~\ac{AME}.
+This section deals with the computational aspects of FSI problems. The first possible categorization of solution techniques distinguishes between monolithic and partitioned approach, as discussed in Section \ref{sec:monolithic}. This work is based on the latter approach, so the two different coupling strategies, namely strong and weak, are discussed in Section \ref{sec:coupling}. As strong coupling is generally needed for accurate solution, ad overview of strong coupling algorithms is given in Section \ref{sec:strong-coupling}. Section \ref{sec:interface-mesh} focuses on aspects concerning the interface mesh, and how the solid and the fluid exchange data between them. Finally \ref{sec:added-mass} briefly describes a common issue arising in strongly coupled problems: the \acrfull{ame}.
 
 
 \section{Monolithic and Partitioned Approach}
@@ -372,7 +372,7 @@ As mentioned in the previous section, implicit methods require some post-process
 
 Equation \ref{eq:fp-def} represents the composition of the solid and the fluid solution, while Equation \ref{eq:fp-2} represents the resulting fixed point equation. As the order of execution can be switched, in Equation \ref{eq:fp3}, where the \textit{residual} is defined, the input data $d_s$ is generically substituted with $d$.
 
-The basic approach to solve the fixed point equation is to perform the corresponding ~\ac{FPI}:
+The basic approach to solve the fixed point equation is to perform the corresponding \acrfull{fpi}:
 
 \begin{equation}
 	x_{i+1} = H(x_i) \quad i=1,2,\ldots
@@ -474,7 +474,7 @@ When building matrices $V^k$ and $W^k$ (lines 6-7 ), it is possible to use infor
 
 Finally, to ensure linear independence of columns in the multi-secant system for Jacobian estimation, a filter can be used \cite{haelterman2016improving}, in order to drop nearly dependent columns of $Q^k$ and avoid singularity of the approximated Jacobian.
 
-The above algorithm is usually denominated in FSI  ~\ac{IQN-ILS} (or Anderson acceleration). There exist other algorithms, like generalized Broyden (IQN-IMVJ) or manifold mapping to solve the problem. A complete desciption of those methods goes beyond the scope of this work: a description of the most common algorithms can be found in \cite{blom2016review}, while a comparison of the performances can be found in \cite{lindner2015comparison}.
+The above algorithm is usually denominated in FSI  \acrfull{iqnils} (or Anderson acceleration). There exist other algorithms, like generalized Broyden (IQN-IMVJ) or manifold mapping to solve the problem. A complete desciption of those methods goes beyond the scope of this work: a description of the most common algorithms can be found in \cite{blom2016review}, while a comparison of the performances can be found in \cite{lindner2015comparison}.
 
 
 \subsection{Convergence criteria}
@@ -667,7 +667,7 @@ different mapping strategies can be implemented \cite{bungartz2016precice}:
 \begin{itemize}
 	\item \textit{Nearest Neighbor}: finds the closest point on the source mesh and uses its value for the target mesh. It does not require any topological information and is first-order accurate. It is the computationally easiest implementation and it is useful when interface meshes are coincident.
 	\item \textit{Nearest Projection}: projects the points of the target mesh on the source mesh, interpolates the data linearly and assigns the values to the target mesh. It requires topology information for the source mesh. The interpolation on the mesh elements is second order accurate.
-	\item \textit{~\ac{RBF}}: this method does not requires topological information and works well on general meshes. The mapping uses radial basis functions centered at the grid points of the source mesh \cite{lindner2017radial}.
+	\item \textit{\acrfull{rbf}}: this method does not requires topological information and works well on general meshes. The mapping uses radial basis functions centered at the grid points of the source mesh \cite{lindner2017radial}.
 \end{itemize}
 
 
@@ -678,7 +678,7 @@ When a solid moves or vibrates in a fluid domain, the interaction changes the wa
 
 Besides the physical aspects of the interaction, some numerical issues arise when trying to simulate this kind of problems.
 
-The numerical issue named \textit{added mass effect}(~\ac{AME}) is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
+The numerical issue named \acrfull{ame} is introduced here, as it is relevant for both strongly and weakly coupled partitioned approaches in the solution of FSI problems. 
 
 Weakly coupled algorithms give good results in aeroelasticity studies, but they are known to become unstable under certain conditions, in particular when fluid and structure densities are comparable ($M \approx 1$, see Section \ref{subsec:mass-ratio}) and when the structure is particularly slender \cite{causin2005added}.
 Under the same conditions, strongly coupled algorithms exhibit convergence problems.

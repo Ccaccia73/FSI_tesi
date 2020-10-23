@@ -302,13 +302,13 @@ The main information concerning preCICE is taken from the official documentation
 
 The open-source\footnote{The code can be accessed via Github: \href{https://github.com/precice/precice}{github.com/precice/precice}} software library preCICE provides the components to connect traditional single-physics solvers and create a partitioned multi-physics simulation (e.g. fluid-structure interaction, conjugated heat transfer, solid-solid interaction, etc.).
 It aims at coupling existing solvers in a partitioned black-box manner (see Section \ref{sec:coupling}):  only minimal information about the solver is available and connection involves just interface nodes. 
-In order to be flexible and easily implemented, the impact on the solvers should be as minimal as possible: for this reason, preCICE offers a high level ~\ac{API} (Section \ref{sec:pc-api}) different languages, such as C/C++, Fortran and Python.
+In order to be flexible and easily implemented, the impact on the solvers should be as minimal as possible: for this reason, preCICE offers a high level \acrfull{api} (Section \ref{sec:pc-api}) different languages, such as C/C++, Fortran and Python.
 The ability to switch among different solvers is advantageous as it provides a lot of flexibility in developing and testing new coupled components.
 
 In a nutshell, preCICE simply affects the input and observes the output of the solvers (called \textit{participants}). The required data and control elements are accessed using an \textit{adapter}, i.e. a  ``glue code'' that is attached to the corresponding solver and communicates the information with the library.
 
 preCICE performs all the actions required to perform a coupled simulation: implements the coupling strategy and convergence criteria (Section \ref{sec:pc-coupling}), the communication
-between the participants (Section \ref{sec:pc-comm}), the mapping of data between meshes (Section \ref{sec:pc-map}). preCICE is configured by means of an ~\ac{XML} file (Section \ref{sec:pc-config}).
+between the participants (Section \ref{sec:pc-comm}), the mapping of data between meshes (Section \ref{sec:pc-map}). preCICE is configured by means of an \acrfull{xml} file (Section \ref{sec:pc-config}).
 
 
 
@@ -336,8 +336,8 @@ This form of parallelization requires efficient forms of communication between t
 preCICE implements a fully parallel process-to-process communication approach \cite{Shukaev2015} using:
 
 \begin{itemize}
-	\item \textit{~\ac{MPI}}: available on 	most scientific computers, it may be necessary to adapt/change the MPI versions of the respective single-physics solvers or of preCICE.
-	\item \textit{~\ac{TCP/IP}}: popular means of network communication and free of incompatibilities between versions.
+	\item \textit{\acrfull{mpi}}: available on 	most scientific computers, it may be necessary to adapt/change the MPI versions of the respective single-physics solvers or of preCICE.
+	\item \textit{\acrfull{tcpip}}: popular means of network communication and free of incompatibilities between versions.
 \end{itemize}
 
 As to performances, MPI is the best technique especially when a high numbers of nodes is present. Anyway, socket communication is quite as fast, such that

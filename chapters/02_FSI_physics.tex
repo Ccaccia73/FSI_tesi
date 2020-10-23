@@ -9,7 +9,7 @@ As outlined in the introduction, the fluid and the solid domain of a FSI problem
 \section{Description of motion}
 \label{sec:desc-motion}
 
-In a FSI model, the fluid in motion deforms the solid because of the forces exerted to the structure. The change in the shape of the solid modifies the fluid domain, causing a different flow behavior. For this reason it is necessary to describe formally the kinematics and the dynamics of the whole process. Classical continuum mechanics considers the motion of particles by means of two different perspectives  \cite{batra2006elements}: the \textit{Eulerian description}, briefly described in section \ref{subsec:euler}, and the \textit{Lagrangian description}, outlined in section \ref{subsec:lagrange}. Those two perspectives are typically combined into the \textit{~\ac{ALE}} method, described in section \ref{subsec:ALE}.
+In a FSI model, the fluid in motion deforms the solid because of the forces exerted to the structure. The change in the shape of the solid modifies the fluid domain, causing a different flow behavior. For this reason it is necessary to describe formally the kinematics and the dynamics of the whole process. Classical continuum mechanics considers the motion of particles by means of two different perspectives  \cite{batra2006elements}: the \textit{Eulerian description}, briefly described in section \ref{subsec:euler}, and the \textit{Lagrangian description}, outlined in section \ref{subsec:lagrange}. Those two perspectives are typically combined into the \textit{\acrfull{ale}} method, described in section \ref{subsec:ALE}.
 
 \subsection{Eulerian perspective}
 \label{subsec:euler}
@@ -33,7 +33,7 @@ where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes the same q
 \end{figure}
 
 A computational mesh can be interpreted as a number of observers distributed across the domain of interest and connected to each other in order to form a a grid with nodes. If the particles of the domain move, a purely euclidean mesh does not move and the position other nodes remain fixed at any instance of time \cite{Cheng2006SlidingFL}. 
-This behavior is represented in Figure \ref{fig:eulerian} (adapted from \cite{Cheng2006SlidingFL}). The mesh is independent of particles movement, resulting in a convenient choice for ~\ac{CFD} problems, where fluid flows throughout the whole
+This behavior is represented in Figure \ref{fig:eulerian} (adapted from \cite{Cheng2006SlidingFL}). The mesh is independent of particles movement, resulting in a convenient choice for \acrfull{cfd} problems, where fluid flows throughout the whole
 computational domain. Within this approach, proper mesh refinement is crucial for computational accuracy as it defines to what extent small scale movement can be modeled and resolved \cite{donea2017arbitrary}.
 
 \subsection{Lagrangian perspective}
@@ -61,7 +61,7 @@ This perspective is again translated into computational meshes: at a reference i
 
 In this situation large-scale and irregular motions and more importantly deformation lead to distortions of the computational mesh, which yields smaller accuracy in simulations requiring to apply techniques to keep the desired accuracy \cite{lipton2010robustness}.
 
-Lagrangian perspective is the usual method of choice for ~\ac{CSM} simulations.
+Lagrangian perspective is the usual method of choice for \acrfull{csm} simulations.
 
 Eulerian and Lagrangian descriptions are related \cite{bertram2012elasticity}. A mapping between them can described by the \textit{motion} function $\phi$ such that:
 
@@ -77,7 +77,7 @@ mapping of the particle at its reference configuration $\vec{X}$: the mapping mu
 \subsection{ALE method}
 \label{subsec:ALE}
 
-As outlined above, CSM and CFD problems adopt different perspectives. The ~\ac{ALE} approach, a combination of the two points of view, is used for FSI problems. As the name implies, an ALE observer moves arbitrarily with respect to a specific material particle.
+As outlined above, CSM and CFD problems adopt different perspectives. The \acrfull{ale} approach, a combination of the two points of view, is used for FSI problems. As the name implies, an ALE observer moves arbitrarily with respect to a specific material particle.
 Figure \ref{fig:ale} depicts such a situation.
 
 \begin{figure}[htbp!]
@@ -121,7 +121,7 @@ Finally a formal definition of the interface is given in section \ref{sec:interf
 \subsection{Fluid domain}
 \label{sec:fluid}
 
-An exhaustive description of all possible fluid models is far beyond the scope of this work. A quite general model is the viscous compressible one described by the ~\ac{NSE}. 
+An exhaustive description of all possible fluid models is far beyond the scope of this work. A quite general model is the viscous compressible one described by the \acrfull{nse}. 
 
 \begin{subequations}
 \begin{eqnarray}
@@ -161,7 +161,7 @@ with $\mu$ being the dynamic viscosity and \textit{S} the rate of deformation te
 
 A detailed derivation of such equations and the theory beyond can be found for example in  \cite{quartapelle2013fluidodinamicaI} and \cite{quartapelle2013fluidodinamicaC} or in \cite{pope2001turbulent}. 
 
-The set of equations above, even with a Newtonian fluid model, lack some other information in order to form a closed set of ~\ac{PDE}. A conductive heat flux model is needed  (e.g. Fourier’s Law), the caloric and thermodynamic equations of state have to be chosen, a proper turbulence model if needed (see \cite{pope2001turbulent}) and finally, the appropriate initial and boundary conditions for the problem \cite{galdi2011introduction} must be defined.
+The set of equations above, even with a Newtonian fluid model, lack some other information in order to form a closed set of \acrfull{pde}. A conductive heat flux model is needed  (e.g. Fourier’s Law), the caloric and thermodynamic equations of state have to be chosen, a proper turbulence model if needed (see \cite{pope2001turbulent}) and finally, the appropriate initial and boundary conditions for the problem \cite{galdi2011introduction} must be defined.
 
 Simplifications can be done to obtain less sophisticated models such as: adiabatic, inviscid, incompressible, and many others. Dimensional Analysis is a powerful tool to determine to what extent some reduced models are meaningful, and it is widely used in fluid dynamics, as described in section \ref{sec:dimensional}. Most CFD software codes allow to set up simulations with the most suitable model which can be coupled with a solid model to build a FSI problem. Some further details are given in section \ref{sec:monolithic}. 
 
@@ -179,7 +179,7 @@ The  de-Saint Venant-Kirchhoff model \cite{ogden1997non} is very commonly used w
 	\item \textit{isotropic}: the stress-strain relationship is independent from the direction of the load
 \end{itemize}
 
-A general expression of the dynamic equation can be derived from the ~\ac{VWP} applied to an arbitrary control volume: 
+A general expression of the dynamic equation can be derived from the \acrfull{vwp} applied to an arbitrary control volume: 
 
 \begin{equation}
 	\label{eq:mech}
@@ -240,15 +240,15 @@ The \textit{beam} model splits the description of the geometry into two subprobl
 \end{figure}
 
 
-The beam model can be used to build elements of a ~\ac{FEM}. For example, the beam element can be modeled by means of a Finite Volume approach, as described in \cite{ghiringhelli2000multibody}, which computes the internal forces as functions of the straining of the reference line and orientation at selected points along the line itself, called evaluation points.
+The beam model can be used to build elements of a \acrfull{fem}. For example, the beam element can be modeled by means of a Finite Volume approach, as described in \cite{ghiringhelli2000multibody}, which computes the internal forces as functions of the straining of the reference line and orientation at selected points along the line itself, called evaluation points.
 
-This approach is particularly interesting for FSI problems in which slender structures are involved. A mapping is needed between the fluid-solid interface and the reference line movement, which will be described in Sections \ref{sec:mbd-beam} and \ref{sec:mbd-forces}.
+This approach is particularly interesting for \acrshort{fsi} problems in which slender structures are involved. A mapping is needed between the fluid-solid interface and the reference line movement, which will be described in Sections \ref{sec:mbd-beam} and \ref{sec:mbd-forces}.
 
 
 \subsection{Interface and interaction}
 \label{sec:interface}
 
-Since FSI problems are centered on the interaction of the fluid and solid domain, their common interface needs to be described properly. A simple representation of the situation at the so called \textit{wet surface} is shown in Figure \ref{fig:interface}. Quantities related to the solid use S subscript, while fluid domain and the interface are labeled with F and FS, respectively. 
+Since \acrshort{fsi} problems are centered on the interaction of the fluid and solid domain, their common interface needs to be described properly. A simple representation of the situation at the so called \textit{wet surface} is shown in Figure \ref{fig:interface}. Quantities related to the solid use S subscript, while fluid domain and the interface are labeled with F and FS, respectively. 
 
 \begin{figure}[htbp!]
 	\centering

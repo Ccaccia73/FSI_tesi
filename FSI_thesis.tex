@@ -15,7 +15,10 @@
 \hypersetup{colorlinks=true,allcolors=black}
 \usepackage{microtype} % migliora la scrittura del testo
 \usepackage{appendix} % serve per personalizzare l'appendice
-\usepackage[printonlyused]{acronym} % serve per creare l'elenco degli acronimi
+
+% \usepackage[printonlyused]{acronym} % serve per creare l'elenco degli acronimi
+\usepackage[acronym]{glossaries}
+
 \usepackage{eurosym} % serve per scrivere il singolo dell'euro
 \usepackage{siunitx} % serve per mettere le unita` di misura nel SI
 \usepackage{mathtools} % serve per fare le formule matematiche (carica anche AMSMATH)
@@ -181,6 +184,29 @@
 \DeclarePairedDelimiter{\norma}{\lVert}{\rVert} % per fare la norma
 
 
+\newacronym{fsi}{FSI}{Fluid-Structure Interaction}
+\newacronym{mbdyn}{MBDyn}{MultiBody Dynamics analysis software}
+\newacronym{precice}{preCICE}{precise Code Interaction Coupling Environment}
+\newacronym{ale}{ALE}{arbitrary Lagrangian-Eulerian}
+\newacronym{cfd}{CFD}{Computational Fluid Dynamics}
+\newacronym{csm}{CSM}{Computational Solid Mechanics}
+\newacronym{nse}{NSE}{Navier Stokes Equations}
+\newacronym{pde}{PDE}{Partial Differential Equations}
+\newacronym{vwp}{VWP}{Virtual Work Principle}
+\newacronym{fem}{FEM}{Finite Element Method}
+\newacronym{fvm}{FVM}{Finite Volume Method}
+\newacronym{ame}{AME}{added mass effect}
+\newacronym{fpi}{FPI}{fixed point iteration}
+\newacronym{iqnils}{IQN-ILS}{interface quasi Newton with inverse Jacobian from a least squares model}
+\newacronym{rbf}{RBF}{Radial Basis Function}
+\newacronym{api}{API}{application programming interface}
+\newacronym{xml}{XML}{extensible markup language}
+\newacronym{mpi}{MPI}{message passing interface}
+\newacronym{tcpip}{TCP/IP}{Transmission Control Protocol/Internet Protocol}
+\newacronym{dof}{DoF}{degree of freedom}
+
+
+\makeglossaries
 
 \begin{document}
 
@@ -311,7 +337,6 @@
 % Acronimi
 \cleardoublepage
 \input{chapters/acronyms}
-
 
 % modifica intestazione della bibliografia
 \fancyhead[LE,RO]{\nouppercase{\leftmark}} % cancella il tutto maiuscolo
