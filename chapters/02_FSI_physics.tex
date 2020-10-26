@@ -2,7 +2,7 @@
 \label{cha:physics}
 
 
-Dynamic models of solids or fluids aim at describing the evolution of an initial configuration through time. Structural mechanics and fluid dynamics use different perspectives when describing the motion of respectively a solid or a fluid particle. When dealing with FSI problems the two approaches need to be combined in order to obtain a suitable description of the two domains and their interface: this aspect is treated in \ref{sec:desc-motion}.
+Dynamic models of solids or fluids aim at describing the evolution of an initial configuration through time. Structural mechanics and fluid dynamics use different perspectives when describing the motion of respectively a solid or a fluid particle. When dealing with \acrshort{fsi} problems the two approaches need to be combined in order to obtain a suitable description of the two domains and their interface: this aspect is treated in \ref{sec:desc-motion}.
 
 As outlined in the introduction, the fluid and the solid domain of a FSI problem might be described by means of many different models: some of them are outlined in section \ref{sec:models}.  \textit{Dimensional analysis} and the use of dimensionless numbers is a powerful tool used to classify fluid dynamics problems: some of the principles used there can be applied to FSI problems in order to classify them: this can help define and classify FSI problems, as described in section \ref{sec:classification}.
 
@@ -32,7 +32,7 @@ where $\Theta$ is a quantity of interest and $\tilde{\Theta}$ denotes the same q
 	\label{fig:eulerian}
 \end{figure}
 
-A computational mesh can be interpreted as a number of observers distributed across the domain of interest and connected to each other in order to form a a grid with nodes. If the particles of the domain move, a purely euclidean mesh does not move and the position other nodes remain fixed at any instance of time \cite{Cheng2006SlidingFL}. 
+A computational mesh can be interpreted as a number of observers distributed across the domain of interest and connected to each other in order to form a a grid with nodes. If the particles of the domain move, a purely euclidean mesh does not move and the position of the nodes remains fixed at any instance of time \cite{Cheng2006SlidingFL}. 
 This behavior is represented in Figure \ref{fig:eulerian} (adapted from \cite{Cheng2006SlidingFL}). The mesh is independent of particles movement, resulting in a convenient choice for \acrfull{cfd} problems, where fluid flows throughout the whole
 computational domain. Within this approach, proper mesh refinement is crucial for computational accuracy as it defines to what extent small scale movement can be modeled and resolved \cite{donea2017arbitrary}.
 
@@ -48,7 +48,7 @@ A \textit{lagrangian observer} focuses on a single particles and follows it thro
 	\label{fig:lagrangian}
 \end{figure}
 
-The motion of the particle and the other quantities of interest can be described by reference coordinates (or \textit{material coordinates}) in Euclidean space $(X, Y, Z)$, uniquely identifying the observed particle at a reference configuration \cite{XING201957}. Usually $t = 0$ is chosen as reference but this is not mandatory. The Lagrangian observer only registers changes concerning one specific particle as time advances. Thus, quantities of interest can be described as:
+The motion of the particle and the other quantities of interest can be described by reference coordinates (or \textit{material coordinates}) in Euclidean space $(X, Y, Z)$, uniquely identifying the observed particle at a reference configuration \cite{XING201957}. Usually $t = 0$ is chosen as reference time but this is not mandatory. The Lagrangian observer only registers changes concerning one specific particle as time advances. Thus, quantities of interest can be described as:
 
 \begin{equation}
 	\Theta = \hat{\Theta}(X, Y, Z, t)
@@ -59,7 +59,7 @@ Information about a fixed point in space is not directly available and no convec
 
 This perspective is again translated into computational meshes: at a reference instance of time, mesh nodes are attached to material particles. As these move, the mesh nodes move with them causing the mesh to deform. Figure \ref{fig:lagrangian} describes the situation. The mesh nodes always coincide with their respective particles.
 
-In this situation large-scale and irregular motions and more importantly deformation lead to distortions of the computational mesh, which yields smaller accuracy in simulations requiring to apply techniques to keep the desired accuracy \cite{lipton2010robustness}.
+In this situation, large-scale and irregular motions (and more importantly deformations) lead to distortions of the computational mesh, which yields smaller accuracy in simulations. This requires the application of techniques to keep the desired accuracy \cite{lipton2010robustness}.
 
 Lagrangian perspective is the usual method of choice for \acrfull{csm} simulations.
 
@@ -71,13 +71,12 @@ Eulerian and Lagrangian descriptions are related \cite{bertram2012elasticity}. A
 \label{eq:lag-motion}
 \end{equation}
 
-Equation \ref{eq:lag-motion} tells that he Eulerian, spatial position $\vec{x}$ of a particle at time t is the
-mapping of the particle at its reference configuration $\vec{X}$: the mapping must be bijective.
+Equation \ref{eq:lag-motion} tells that the Eulerian, spatial position $\vec{x}$ of a particle at time $t$ is the mapping of the particle at its reference configuration $\vec{X}$: the mapping must be bijective.
 
 \subsection{ALE method}
 \label{subsec:ALE}
 
-As outlined above, CSM and CFD problems adopt different perspectives. The \acrfull{ale} approach, a combination of the two points of view, is used for FSI problems. As the name implies, an ALE observer moves arbitrarily with respect to a specific material particle.
+As outlined above, \acrshort{csm} and \acrshort{cfd} problems adopt different perspectives. The \acrfull{ale} approach, a combination of the two points of view, is used for \acrshort{fsi} problems. As the name implies, an \acrshort{ale} observer moves arbitrarily with respect to a specific material particle.
 Figure \ref{fig:ale} depicts such a situation.
 
 \begin{figure}[htbp!]
@@ -87,11 +86,12 @@ Figure \ref{fig:ale} depicts such a situation.
 	\label{fig:ale}
 \end{figure}
 
-When dealing with computational meshes, an ALE mesh is considered as it can move almost arbitrarily with respect to the motion of the underlying particles, as shown in Figure \ref{fig:ale-mesh}.
-The only constraint is that node movements should not distort the mesh too much as this leads to computational inaccuracy. Many algorithm exist to implement suitable quality criteria and keep the mesh motion reasonable and to allow the nodes to follow moving particles up to a certain extent \cite{de2007mesh}.
+When dealing with computational meshes, an \acrshort{ale} mesh is considered as it can move almost arbitrarily with respect to the motion of the underlying particles, as shown in Figure \ref{fig:ale-mesh}.
+The only constraint is that node movements should not distort the mesh too much as this leads to computational inaccuracy. Many algorithms exist to implement suitable quality criteria and keep the mesh motion reasonable and to allow the nodes to follow moving particles up to a certain extent \cite{de2007mesh}.
 
-Since the mesh motion and material particle motion are not directly linked, a new unknown is introduced:  the relative movement between the ALE mesh and the material domain. This approach is particularly useful in FSI problems: fluid and solid must follow the moving interface between them for physical reasons.
-Since the solid domain is usually described in a Lagrangian perspective, the solid mesh is kept attached to the FSI interface. However, also the fluid domain must deform to avoid formation of gaps between the meshes. Therefore, in ALE methods the fluid mesh nodes at the interface move with it. Fluid mesh nodes follow the fluid particles sticking to the interface (for viscous flows), while the rest of the fluid mesh is allowed to move in such way that mesh distortions are kept minimal, to preserve computational accuracy \cite{ramm1998fluid}.
+Since the mesh motion and material particle motion are not directly linked, a new unknown is introduced:  the relative movement between the \acrshort{ale} mesh and the material domain. This approach is particularly useful in \acrshort{fsi} problems: fluid and solid must follow the moving interface between them for physical reasons.
+
+Since the solid domain is usually described in a Lagrangian perspective, the solid mesh is kept attached to the \acrshort{fsi} interface. However, also the fluid domain must deform to avoid formation of gaps between the meshes. Therefore, in \acrshort{ale} methods the fluid mesh nodes at the interface move with it. Fluid mesh nodes follow the fluid particles sticking to the interface (for viscous flows), while the rest of the fluid mesh is allowed to move in such way that mesh distortions are kept minimal, to preserve computational accuracy \cite{ramm1998fluid}.
 
 \begin{figure}[htbp!]
 	\centering
@@ -114,8 +114,8 @@ Since the solid domain is usually described in a Lagrangian perspective, the sol
 \section{Domains and interface}
 \label{sec:models}
 
-Fluid-structure interaction implies that the overall model is determined by models defining the fluid behavior and the solid behavior, briefly described in sections \ref{sec:solid} and \ref{sec:fluid}. A short overview of beam models is given in section \ref{sec:beam} as it is relevant for the model developed in this work.
-Finally a formal definition of the interface is given in section \ref{sec:interface}, as it is necessary to define suitable coupling conditions at the common boundary of the solid and the fluid.
+\acrlong{fsi} implies that the overall model is determined by models defining the fluid behavior and the solid behavior, briefly described in sections \ref{sec:fluid} and \ref{sec:solid}. A short overview of beam models is given in section \ref{sec:beam} as it is relevant for the model developed in this work.
+Finally a formal definition of the interface is given in section \ref{sec:interface}, as it is necessary to impose suitable coupling conditions at the common boundary of the solid and the fluid.
 
 
 \subsection{Fluid domain}
@@ -163,7 +163,7 @@ A detailed derivation of such equations and the theory beyond can be found for e
 
 The set of equations above, even with a Newtonian fluid model, lack some other information in order to form a closed set of \acrfull{pde}. A conductive heat flux model is needed  (e.g. Fourier’s Law), the caloric and thermodynamic equations of state have to be chosen, a proper turbulence model if needed (see \cite{pope2001turbulent}) and finally, the appropriate initial and boundary conditions for the problem \cite{galdi2011introduction} must be defined.
 
-Simplifications can be done to obtain less sophisticated models such as: adiabatic, inviscid, incompressible, and many others. Dimensional Analysis is a powerful tool to determine to what extent some reduced models are meaningful, and it is widely used in fluid dynamics, as described in section \ref{sec:dimensional}. Most CFD software codes allow to set up simulations with the most suitable model which can be coupled with a solid model to build a FSI problem. Some further details are given in section \ref{sec:monolithic}. 
+Simplifications can be done to obtain less sophisticated models such as: adiabatic, inviscid, incompressible, and many others. Dimensional Analysis is a powerful tool to determine to what extent some reduced models are meaningful, and it is widely used in fluid dynamics, as described in section \ref{sec:dimensional}. Most \acrshort{cfd} software codes allow to set up simulations with the most suitable model which can be coupled with a solid model to build a \acrshort{fsi} problem. Some further details are given in section \ref{sec:monolithic}. 
 
 
 \subsection{Solid domain}
@@ -183,7 +183,7 @@ A general expression of the dynamic equation can be derived from the \acrfull{vw
 
 \begin{equation}
 	\label{eq:mech}
-	\frac{\partial^2 \vec{u} }{\partial t^2} = \nabla \cdot \mathbf{T} + \rho \vec{f}
+	\rho \frac{\partial^2 \vec{u} }{\partial t^2} = \nabla \cdot \mathbf{T} + \rho \vec{f}
 \end{equation}
 
 In equation \ref{eq:mech}:
@@ -223,9 +223,9 @@ The set of PDEs is completed when suitable initial and boundary conditions are d
 \subsection{Models with reduced dimensionality: beams}
 \label{sec:beam}
 
-The equations introduced in section \ref{sec:solid} may be a tough task to solve even of the case of isotropic hyperelasticity, when considering a 3-D domain. Even with today's computers and using finite elements techniques, it is not always feasible or convenient to treat a solid as a three-dimensional continuum. Body with particular geometric features can be seen as lower dimension bodies, with respect to the governing equations \cite{hjelmstad2007fundamentals}. Such bodies are called \textit{beams} (one dimension) , \textit{plates} or \textit{shells} (two dimensions).
+The equations introduced in section \ref{sec:solid} may be a tough task to solve even in case of isotropic hyperelasticity, when considering a 3-D domain. Even with today's computers and using finite elements techniques, it is not always feasible or convenient to treat a solid as a three-dimensional continuum. Bodies with particular geometric features can be seen as lower dimension ones, with respect to the governing equations \cite{hjelmstad2007fundamentals}. Such bodies are called \textit{beams} (one dimension), \textit{plates} or \textit{shells} (two dimensions).
 
-The \textit{beam} model splits the description of the geometry into two subproblems:
+The \textit{beam} model splits the description of the geometry into two sub-problems:
 \begin{enumerate}
 	\item a beam is defined by its \textit{reference line} and the movement (displacement and rotation) of the solid is completely defined by it (see Figure \ref{fig:beam-model}),
 	\item the beam \textit{cross section} is considered as a whole, its movement depends on the movement of the reference line, stresses are generalized into \textit{resultants} (axial, bending, shear, torsional) which represent the aggregate effect of all of the stresses acting on the cross section. The constitutive properties of the section (axial, shear, torsion and bending stiffness) allow to relate stresses and deformations (by means of VWP) and close the problem.
@@ -260,13 +260,13 @@ Since \acrshort{fsi} problems are centered on the interaction of the fluid and s
 In order to have a physically correct behavior, some conditions have to be met \cite{hou2012numerical}:
 
 \begin{itemize}
-	\item solid and fluid domains should not overlap nor separate,
+	\item solid and fluid domains should neither overlap nor separate,
 	\item for a viscous fluid model, the flow velocity at the interface must equal the boundary velocity (\textit{no-slip} condition),
 	\item for an inviscid fluid model, only velocity components normal to the wet surface have to be equal to the structural 	velocity as the fluid may slip freely in tangential direction at any boundary,
-	\item forces exchanged at the interface must at equilibrium.
+	\item forces exchanged at the interface must be at equilibrium.
 \end{itemize}
 
-The first conditions result in the \textit{kinematical requirement} that the displacements of fluid and solid domains, as well as their respective velocities have to be equal at the wet surface (denoted by $\Gamma_{FS}$): 
+The first two conditions result in the \textit{kinematical requirement} that the displacements of fluid and solid domains, as well as their respective velocities have to be equal at the wet surface (denoted by $\Gamma_{FS}$): 
 
 \begin{eqnarray}
  \Delta\vec{x}_F &=& \vec{u}_S \\
@@ -285,7 +285,7 @@ $\bm{\sigma} \in \mathbb{R}^{3 \times 3}$ represents the stress tensor (note tha
 \section{Classification of FSI problems}
 \label{sec:classification}
 
-In the previous chapters we have seen that there exist a lot of models that can describe fluid flow and solid mechanics. In FSI problems we need to couple two of them: the variety of coupled problems seems to be so large that  single FSI model that is applicable to every problem appears to be unfeasible. For this reason it is useful to classify FSI problems and look for specific properties in each class.  
+In the previous chapters we have seen that there exist a lot of models that can describe fluid flow and solid mechanics. In \acrlong{fsi} problems we need to couple two of them: the variety of coupled problems seems to be so large that  single FSI model that is applicable to every problem appears to be unfeasible. For this reason it is useful to classify FSI problems and look for specific properties in each class.  
 The first step is to switch from dimensional quantities to dimensionless ones.
 
 
@@ -299,7 +299,7 @@ This theorem states that the number of dimensionless quantities, P, is equal to 
 \subsection{Dimensional analysis in fluid domain}
 \label{sec:dim-fluid}
 
-Dimensional analysis is widely used in fluid dynamics. In order to keep the analysis simple,, we consider the adimensionalization of the incompressible Navier-Stokes momentum equation for a Newtonian fluid \cite{fox2020fox}:
+Dimensional analysis is widely used in fluid dynamics. In order to keep the analysis simple, we consider the adimensionalization of the incompressible Navier-Stokes momentum equation equation for a Newtonian fluid \cite{fox2020fox}:
 
 \begin{equation}
 	\frac{\partial \vec{v}}{\partial t} + \left(\vec{v} \cdot \nabla \right) \vec{v} = -\frac{\nabla p}{\rho} + \nu \nabla ^2 \vec{v} + \vec{g}
@@ -315,7 +315,7 @@ The variables involved in equation \ref{eq:inc-ns} are the following:
 	\item \textit{p}: pressure field
 	\item $\rho$: fluid density
 	\item $\nu$: fluid kinematic viscosity
-	\item $\vec{g}$: gravity
+	\item $\vec{g}$: gravity (or body forces)
 	\item \textit{L}: reference dimension
 	\item $V_0$: reference velocity
 \end{itemize}
@@ -330,7 +330,7 @@ The variables involved in equation \ref{eq:inc-ns} are the following:
 		\hline
 		L & 0 & 1 & 1  & -1 & -3 & 2  & 1  & 1 & 1  \\ 
 		M & 0 & 0 & 0  &  1 &  1 & 0  & 0  & 0 & 0  \\
-		T & 1 & 0 & -1 & -1 &  0 & -1 & -2 & 0 & -1 \\ 
+		T & 1 & 0 & -1 & -2 &  0 & -1 & -2 & 0 & -1 \\ 
 	\end{tabular}
 \end{center}
 \caption{fluid  matrix of dimension exponents}
@@ -343,8 +343,8 @@ The rank of the above matrix is 3 so 6 dimensionless parameters are needed to re
 	\item \textit{length}: $\vec{x}^* = \frac{\vec{x}}{L}$
 	\item \textit{velocity}: $\vec{v}^* = \frac{\vec{v}}{V_0}$
 	\item \textit{time}: $t^* = \frac{V_0 t}{L} = \frac{t}{T_{fluid}}$
-	\item \textit{pressure}: possible choices: $p^* = \frac{p}{\rho V_0^2}$ or, if viscous forces are dominant, $p*= \frac{p L}{\rho \nu V_0}$
-	\item \textit{Reynolds number}: $Re=\frac{V_0 L}{\nu}$. It defines the ratio between inertia and viscous forces.
+	\item \textit{pressure}: possible choices: $p^* = \frac{p}{\rho V_0^2}$ or, if viscous forces are dominant, $p^*= \frac{p L}{\rho \nu V_0}$
+	\item \textit{Reynolds number}: $Re=\frac{V_0 L}{\nu}$. It defines the ratio between inertia and viscous forces
 	\item \textit{Froude number}: $Fr = \frac{V_0}{\sqrt{g L}}$. It defines the ratio between the flow inertia to the body field forces
 \end{itemize} 
 
@@ -356,7 +356,7 @@ The adimensionalized momentum equation becomes:
 	\label{eq:adim-ns}
 \end{equation}
 
-From Equation \ref{eq:adim-ns} a lot of models might be derived: from \textit{Stokes regime} when viscosity is dominant, to \textit{Euler regime} when viscosity is negligible with respect to inertia forces.
+From Equation \ref{eq:adim-ns} a lot of models might be derived, from \textit{Stokes regime} when viscosity is dominant, to \textit{Euler regime} when viscosity is negligible with respect to inertia forces.
 
 
 \subsection{Dimensional analysis in solid domain}
@@ -383,7 +383,7 @@ From the variables above the following parameters can be derived:
 	\item \textit{displacement}: $\frac{\vec{u}}{L}$: dimensionless displacement
 	\item \textit{time}: $\frac{t \sqrt{\frac{E}{\rho_S}}}{L} = \frac{t}{T_{solid}}$ dimensionless time
 	\item entity of displacements: $\frac{U_0}{L} = \delta$: \textit{displacement number}
-	\item gravity: $\frac{\rho_S g L}{E}$: elastogravity number
+	\item gravity: $\frac{\rho_S g L}{E}$: \textit{elastogravity number}
 \end{itemize}
 
 $T_{solid}$ can be seen as $\frac{L}{c}$ with $c = \sqrt{\frac{E}{\rho_S}}$ which is the scale of elastic wave velocity. The displacement number $\delta$ tells how big the structure displacement are related to the overall dimension, and defines the \textit{large displacements} region.
@@ -394,24 +394,24 @@ Finally, the \textit{elastogravity number} combines gravity (or body forces in g
 It is now possible to undertake the dimensional analysis of a fully coupled fluid and solid interaction problem. Some of the parameters are only defined in the fluid side or in the solid side (e.g. viscosity or stiffness). Some parameters are common to both domains (e.g. length scale or gravity). The variables of interest are now the velocity in the fluid and the displacements in the solid. Each of them can be related to all the parameters without separation. For example, the fluid velocity relationship is of the kind:
 
 \begin{eqnarray}
-	 g(\vec{v}; \vec{x},t; \rho, \mu, V_0; \rho_S. E; \vec{g}, L) = 0
+	 g(\vec{v}; \vec{x},t; \rho, \mu, V_0; \rho_S, E; \vec{g}, L) = 0
 	 \label{eq:vel-param}
 \end{eqnarray}
 
 
-Equation \ref{eq:vel-param} is composed of 11 dimensional parameters. Applying $\pi$ theorem, the total number of independent dimensionless parameter expected is 8. Starting from the ones derived in the previous sections:
+Equation \ref{eq:vel-param} is composed of 11 dimensional parameters. Applying $\pi$ theorem, the total number of independent dimensionless parameters is expected to be 8. Starting from the ones derived in the previous sections:
 
 \begin{enumerate}
 	\item $\vec{x}^* = \frac{\vec{x}}{L}$: dimensionless coordinates
 	\item $\vec{v}^* = \frac{\vec{v}}{V_0}$: dimensionless fluid velocity
-	\item $t*_f = \frac{V_0 t}{L}$: dimensionless time
+	\item $t^*_f = \frac{V_0 t}{L}$: dimensionless time
 	\item $Re = \frac{V_0 L}{\nu}$: Reynolds number
 	\item $Fr = \frac{V_0}{\sqrt{gL}}$: Froude number
 	\item $\delta = \frac{U_0}{L}$: displacement number
 	\item $\frac{\rho_S g L}{E}$: elastogravity number
 \end{enumerate}
 
-The 7 quantities above derive from the separated problem. The last one necessarily mixes things from the fluid and the solid side otherwise it would have been found in one uncoupled case. There is no unique choice for this parameter, the following are the most common ones.
+The 7 quantities above derive from the separated problems. The last one necessarily mixes things from the fluid and the solid side otherwise it would have been found in one uncoupled case. There is no unique choice for this parameter, the following are the most common ones.
 
 \subsubsection{Mass number}
 \label{subsec:mass-ratio}
@@ -433,21 +433,21 @@ Another possible choice is the reduced velocity:
 	 U_R = \frac{V_0}{\sqrt{\frac{E}{\rho_S}}}
 \end{equation}
 
-It is the ratio between the fluid free velocity and the velocity of elastic waves in a solid, \textit{c}. It contains information on the way the two dynamics are related and it can range different orders of magnitude.
+It is the ratio between the free fluid velocity and the velocity of elastic waves in a solid, \textit{c}. It contains information on the way the two dynamics are related and it can range different orders of magnitude.
 
 \subsubsection{Cauchy number}
 
-Another possible parameter combines stresses or stiffness: the  Cauchy number, as defined in \cite{de2001fluides}:
+Another possible parameter combines stresses or stiffness. It is known as the  Cauchy number, as defined in \cite{de2001fluides}:
 
 \begin{equation}
 	C_Y = \frac{\rho V_0^2}{E}
 \end{equation}
 
-It is the ratio between the fluid inertial forces, quantified by the dynamic pressure and the stiffness of the solid E. 
+It is the ratio between the fluid inertial forces, quantified by the dynamic pressure, and the stiffness of the solid E. 
 The higher it is, the more the solid is elastically deformed by the flow.
 
 
-These are actually the most important parameters involving FSI problems. Among them, there is no universally better choice. But there are efficient choices, that would be more helpful
-in solving a given problem. 
+These are actually the most important parameters involving \acrlong{fsi} problems. Among them, there is no universally better choice but there are efficient choices that would be more helpful
+in solving or in analyzing a given problem. 
 
 
