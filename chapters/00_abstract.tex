@@ -3,6 +3,19 @@
 \markboth{Abstract}{}
 \addcontentsline{toc}{chapter}{Abstract}
 
-This thesis describes bla bla...\\
-\newline
-\keywords{one, two, three, four}
+
+The simulation of \acrfull{fsi} phenomena allows to gain more insight on complex interactions and helps predict their effects. It is possible to perform those simulations in different ways: one of them involves partitioned algorithms, which include a fluid solver, a structural solver and a third component which performs the interaction between the other two.
+
+In this thesis, the \acrfull{mbdyn} is linked to the multiphysics coupling library \acrfull{precice}, with the purpose of extending \acrshort{mbdyn} capabilities to \acrshort{fsi} simulations.
+
+For this reason, ad \textit{adapter}, written in C++, has been developed to implement this connection.
+
+Coupling \acrshort{mbdyn} with \acrshort{precice} represents and advantage because it allows to choose among a considerable number of fluid solvers, including a lot of well-validated open source and commercial codes.
+
+The coupling has been successfully tested in different scenarios, including some well-known \acrshort{fsi} problems. Also some limits of applicability, emerged in one of those benchmarks, has been analyzed.
+
+
+\vspace{5mm}
+
+
+\keywords{fluid structure interaction, partitioned algorithms, multibody dynamics, MBDyn, preCICE}
