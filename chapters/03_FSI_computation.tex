@@ -1,19 +1,20 @@
+% !TeX spellcheck = en_US
 \chapter{Computational aspects of Fluid-Structure Interaction problems}
 \label{cha:computation}
 
-This section deals with the computational aspects of FSI problems. The first possible categorization of solution techniques distinguishes between monolithic and partitioned approach, as discussed in Section \ref{sec:monolithic}. This work is based on the latter approach, so the two different coupling strategies, namely strong and weak, are discussed in Section \ref{sec:coupling}. As strong coupling is generally needed for accurate solution, ad overview of strong coupling algorithms is given in Section \ref{sec:strong-coupling}. Section \ref{sec:interface-mesh} focuses on aspects concerning the interface mesh, and how the solid and the fluid exchange data between them. Finally \ref{sec:added-mass} briefly describes a common issue arising in strongly coupled problems: the \acrfull{ame}.
+This section deals with the computational aspects of \acrshort{fsi} problems. The first possible categorization of solution techniques distinguishes between monolithic and partitioned approach, as discussed in Section \ref{sec:monolithic}. This work is based on the latter approach, so its two different coupling strategies, namely strong and weak, are discussed in Section \ref{sec:coupling}. As strong coupling is generally needed for accurate solution, an overview of strong coupling algorithms is given in Section \ref{sec:strong-coupling}. Section \ref{sec:interface-mesh} focuses on aspects concerning the interface mesh, and how the solid and the fluid exchange data between them. Finally \ref{sec:added-mass} briefly describes a common issue arising in strongly coupled problems: the \acrfull{ame}.
 
 
 \section{Monolithic and Partitioned Approach}
 \label{sec:monolithic}
 
-Analytical solutions are impossible to obtain for the large majority of FSI problems; on the other hand, laboratory experiments may be costly, unfeasible or limited. For those reasons, numerical simulations may be employed to analyze the physics involved in the interaction between fluids and solids. With the current capabilities of computer technology, simulations of scientific and engineering models have become increasingly detailed and sophisticated.
+Analytical solutions are impossible to obtain for the large majority of \acrlong{fsi} problems; on the other hand, laboratory experiments may be costly, unfeasible or limited. For those reasons, numerical simulations may be employed to analyze the physics involved in the interaction between fluids and solids. With the current capabilities of computer technology, simulations of scientific and engineering models have become increasingly detailed and sophisticated.
 
 The numerical methods used to solve FSI problems may be roughly classified into two classes: the \textit{monolithic approach} and the \textit{partitioned approach}. There is no exact distinction between the two approaches, as they might be seen differently among fields of applications. The idea here is to consider how many solvers are used to find a solution.
 
 In the \textit{monolithic approach}, the whole problem is treated as a unique entity and solved simultaneously with a specialized ad hoc solver (see Figure \ref{fig:monolithic}). The fluid and structure dynamics form a single system of equations for the entire problem, which is solved simultaneously by a unified algorithm. The interface conditions are implicit in the solution procedure \cite{hubner2004monolithic}, \cite{ryzhakov2010monolithic}.
 
-This approach can potentially achieve better accuracy, as they solve the system of equations exactly the interface conditions are implicit in the model \cite{richter2017fluid}, but it may require more resources and expertise to develop from scratch a specialized code (it solves a very specific model) that can be cumbersome to maintain.
+This approach can potentially achieve better accuracy, as it solves the system of equations exactly and the interface conditions are implicit in the model \cite{richter2017fluid}, but it may require more resources and expertise to develop from scratch a specialized code (it solves a very specific model) that can be cumbersome to maintain.
 
 \begin{figure}[htbp!]
 	\centering
@@ -36,7 +37,7 @@ This approach can potentially achieve better accuracy, as they solve the system 
 
 	\node[status] at (8,0) {
 	\begin{tabular}{c}
-		$S_f(t_{n}+1)$ \\
+		$S_f(t_{n+1})$ \\
 		\\
 		$S_s(t_{n+1})$
 \end{tabular}};
@@ -54,7 +55,7 @@ This approach can potentially achieve better accuracy, as they solve the system 
 \end{figure}
 
 
-On the other hand, in the \textit{partitioned approach}, the fluid and the solid domains are treated as two distinct computational fields, with their respective meshes, that have to be solved separately (see Figure \ref{fig:partitioned}: how data are passed between solvers is detailed in Section \ref{sec:coupling}). The interface conditions are used explicitly to communicate information between the fluid and structure solutions. This implies that the flow does not change while the solution of the structural equations is calculated and vice versa \cite{degroote2009performance}. The partitioned approach thus requires a third software module (i.e. a coupling algorithm) to incorporate the interaction aspects. It communicates the boundary conditions described in Section \ref{sec:interface}: that is forces or stresses (dynamic data) calculated by the fluid solver at the wet surface are passed to the solid component and displacements or velocities (kinematic data) computed by the solid solver at the interface are sent to the fluid component in return. Finally, fluid and structural solutions together yield the FSI solution.
+On the other hand, in the \textit{partitioned approach}, the fluid and the solid domains are treated as two distinct computational fields, with their respective meshes, that have to be solved separately (see Figure \ref{fig:partitioned}: how data are passed between solvers is detailed in Section~\ref{sec:coupling}). The interface conditions are used explicitly to communicate information between the fluid and structure solutions. This implies that the flow does not change while the solution of the structural equations is calculated and vice versa \cite{degroote2009performance}. The partitioned approach thus requires a third software module (i.e. a coupling algorithm) to incorporate the interaction aspects. It communicates the boundary conditions described in Section \ref{sec:interface}: that is forces or stresses (dynamic data) calculated by the fluid solver at the wet surface are passed to the solid component and displacements or velocities (kinematic data) computed by the solid solver at the interface are sent to the fluid component in return. Finally, fluid and structural solutions together yield the FSI solution.
 
 \begin{figure}[htbp!]
 	\centering
@@ -101,7 +102,7 @@ On the other hand, in the \textit{partitioned approach}, the fluid and the solid
 A big advantage of this approach is that software modularity is preserved: different and efficient solution techniques can be used for the flow equations and structural equations. Provided that they can exchange data, existing solvers for the fluid and solid problem can be reused, ranging from commercial to academic and open-source codes. Those solvers are usually well-validated.
 Besides, compared to monolithic procedures, the programming efforts are lower for partitioned approaches, as only the coupling of the existing solvers has to be implemented rather than the solvers themselves.
 The challenge of this approach is, however, to define and implement algorithms to achieve accurate and efficient fluid-structure interaction solution with minimal code modification. Particularly, the interface
-location that divides the fluid and the structure domains changes in time. The partitioned approach requires that the fluid solver has ALE capabilities, as introduced in Section \ref{subsec:ALE}.
+location that divides the fluid and the structure domains changes in time. The partitioned approach requires that the fluid solver has \acrshort{ale} capabilities, as introduced in Section \ref{subsec:ALE}.
 More detailed and practical explanations about the coupling component used in this work are given in Section \ref{sec:precice}. 
 
 
@@ -110,14 +111,14 @@ More detailed and practical explanations about the coupling component used in th
 
 Because of the modularity, the partitioned approach has gained much attention in research. The structure sketched in Figure \ref{fig:partitioned} needs to be detailed and specialized in function of the coupling strategies.
 
-In an interface multi-physics coupling like FSI, the boundary surface is in common between the two sides of the simulation. The results make sense and are numerically stable only if the two sides of the interface are in agreement, since the output values of the one simulation become input values for the other (and vice-versa).
+In an interface multi-physics coupling like \acrshort{fsi}, the boundary surface is in common between the two sides of the simulation. The results make sense and are numerically stable only if the two sides of the interface are in agreement, since the output values of the one simulation become input values for the other (and vice-versa).
 The solution strategies can be roughly divided into weakly and strongly coupled approaches. They are often referred to as \textit{explicit} and \textit{implicit} methods in the literature.
 When the fluid and solid solutions are computed iteratively until some convergence criteria within the same time step, the scheme is called \textit{implicit coupling}. The faster, simpler but less precise \textit{explicit coupling} consists in executing a fixed number of iterations (typically one per time step) and exchange coupling values without convergence checks. 
 
 \subsection{Explicit coupling schemes}
 \label{subsec:explicit}
 
-As in the previous Section, $S_f$ represents the fluid solver, which computes the pressures (named $d_f$ here) at the deformable boundary and $S_s$ is the structure solver, which uses these forces to compute the displacement and velocity of the boundary (named $d_s$). In a \textit{serial-explicit} (or \textit{conventional staggered}) coupling scheme, the solver $S_f$ uses the old time step boundary values $d_s^{(n)}$ to compute the values of $d_f^{(n+1)}$ for the next time step:
+As in the previous Section, $S_f$ represents the fluid solver, which computes the pressures (named $d_f$ here) at the deformable boundary. $S_s$ is the structure solver, which uses these forces to compute the displacement and velocity of the boundary (named $d_s$). In a \textit{serial-explicit} (or \textit{conventionally staggered}) coupling scheme, the solver $S_f$ uses the old time step boundary values $d_s^{(n)}$ to compute the values of $d_f^{(n+1)}$ for the next time step:
 
 \begin{equation}
 	d_f^{(n+1)} = S_f\left(d_s^{(n)}\right)
@@ -144,7 +145,7 @@ In order to reduce execution time, the solvers might run in parallel, using data
 \end{subequations}
 
 
-The two explicit schemes are shown schematically in Figures \ref{fig:serial-explicit} and \ref{fig:parallel-explicit}.
+The two explicit approaches are shown schematically in Figures \ref{fig:serial-explicit} and \ref{fig:parallel-explicit}.
 
 \begin{figure}[htbp!]
 	\centering
@@ -204,7 +205,7 @@ The two explicit schemes are shown schematically in Figures \ref{fig:serial-expl
 	\caption{Explicit coupling schemes}
 \end{figure}
 
-In general, an explicit coupling is not enough to regain the exact (as in the monolithic approach) solution of the problem as the matching coupling conditions between the solvers is not enforced within each time step: no balance between fluid and structural domain with respect to forces and displacements at the interface can be guaranteed (\cite{hou2012numerical}, \cite{degroote2009performance}). Nevertheless, explicit coupling yields good results if the interaction between fluid and solid is weak as in aeroelastic simulations, where in general the simulations show small displacements of the structure within a single time step and the flow field isn't much influenced by the structural displacements \cite{farhat2006provably}.
+In general, an explicit coupling is not enough to regain the exact (as in the monolithic approach) solution of the problem as the matching of coupling conditions between the solvers is not enforced within each time step: no balance between fluid and structural domain with respect to forces and displacements at the interface can be guaranteed (\cite{hou2012numerical}, \cite{degroote2009performance}). Nevertheless, explicit coupling yields good results if the interaction between fluid and solid is weak as in aeroelastic simulations, where in general the simulations show small displacements of the structure within a single time step and the flow field isn't much influenced by the structural displacements \cite{farhat2006provably}.
 
 \subsection{Implicit coupling schemes}
 \label{subsec:implicit}
@@ -406,7 +407,7 @@ The under-relaxation is defined by:
 \end{equation} 
 
 Where $\omega$ in Equation \ref{eq:ur} is the \textit{relaxation factor}. The relaxation parameter has to be small enough to keep the iteration from diverging, but as large as possible in order to use as much of the new solution as possible \cite{kuttler2008fixed}. The optimal $\omega$ value is problem specific and not known a priori.
-A suitable dynamic relaxation parameter, is a better choice, like the \textit{Aitken under-relaxation} \cite{irons1969version} which adapts the factor at each iteration with the following relation:
+A suitable dynamic relaxation parameter is a better choice, like the \textit{Aitken under-relaxation} \cite{irons1969version} which adapts the factor at each iteration with the following relation:
 
 \begin{equation}
 	\omega_i = -\omega_{i-1} \frac{r_{i-1}^T \left(r_i - r_{i-1}\right)}{ \lVert r_i - r_{i-1} \rVert ^2}
@@ -431,7 +432,7 @@ Under-relaxation is a good choice for easy stable problems, but is outperformed 
 	\label{eq:fp-jac}
 \end{subequations}
 
-The \textit{residual} at iteration \textit{k} is defined in Equation \ref{eq:nm1}, if the Jacobian matrix of the equation is known, a Newton iteration can be performed as in Equation \ref{eq:nm2}. The updated values can be computed using Equation \ref{eq:nm3}.
+The \textit{residual} at iteration \textit{k} is defined in Equation \ref{eq:nm1}. If the Jacobian matrix of the equation is known, a Newton iteration can be performed as in Equation \ref{eq:nm2}. The updated values can be computed using Equation \ref{eq:nm3}.
 
 In situations where:
 \begin{itemize}
@@ -439,10 +440,11 @@ In situations where:
 	\item the cost of a function evaluation is sufficiently high that numerical estimation of the Jacobian is prohibitive, 
 \end{itemize}
 
-there exist a number of matrix-free methods that use only information derived from the consecutive iterates and that build an approximation based on those values. This approach is known as \textit{quasi-Newton method} \cite{haelterman2009quasi}.
+there exist a number of matrix-free methods that use only information derived from the consecutive iterations and that build an approximation based on those values. This approach is known as \textit{quasi-Newton method} \cite{haelterman2009quasi}.
 Input and output data of $H$ and $R$ are used to approximate the solution of \ref{eq:nm3}. Algorithm \ref{alg:qnls} (taken from \cite{uekermann2013parallel}) shows the basics steps to estimate data at next step using the \textit{Quasi Newton Least Squares Method}:
 
 \begin{algorithm}[H]
+	\label{alg:qnls}
 	\SetAlgoLined
 	\KwResult{$d_{k+1}$}
 	initial value $d_0$\;
@@ -451,30 +453,33 @@ Input and output data of $H$ and $R$ are used to approximate the solution of \re
 	\For{$k = 1 \ldots$}{
 		$\tilde{d}_k = H(d_k)$ and $r^k = \tilde{d}_k - d_k$\;
 		$V^k = \left[\Delta r_0^k, \ldots , \Delta r^k_{k-1} \right]$ with $\Delta r^k_i =r^i - r^k$\;
+		\label{alg:vk}
 		$W^k = \left[\Delta \tilde{d}^k_0, \ldots , \Delta \tilde{d}^k_{k-1}  \right]$ with $\Delta \tilde{d}^k_i = \tilde{d}_i - d_k$\;
+		\label{alg:wk}
 		decompose $V^k = Q^kU^k$\;
+		\label{alg:qu}
 		solve the first $k$ lines of $U^k \alpha = - Q^{k^T}R^k$\;
+		\label{alg:alpha}
 		$\Delta \tilde{d}^k = W^k\alpha$\;
+		\label{alg:c-space}
 		$d_{k+1} = \tilde{d}_k + \Delta \tilde{d}_k$\;
-		
 	}
-	\label{alg:qnls}
-	\caption{Quasi Newton Least Squares method}
+	\caption{Quasi-Newton Least Squares method}
 \end{algorithm}
 
-In algorithm \ref{alg:qnls} the matrices $V^k$ and $W^k$ are constructed from the previous iterations and the known values of $d_0, \ldots d_k$ and $\tilde{d}_0, \ldots, \tilde{d}_k$. $\Delta \tilde{d}^k$ is constructed in the column space of $W^k$ (line 10). For this reason a least squares problem is solved:
+In algorithm \ref{alg:qnls} the matrices $V^k$ and $W^k$ are constructed from the previous iterations and the known values of $d_0, \ldots d_k$ and $\tilde{d}_0, \ldots, \tilde{d}_k$. $\Delta \tilde{d}^k$ is constructed in the column space of $W^k$ (line \ref{alg:c-space}). For this reason a least squares problem is solved:
 
 \begin{equation}
 	\alpha = \argmin_{\beta \in \mathbb{R}^k} \lVert V^k\beta + R(d_k) \rVert
 \end{equation}
 
-The least squares problem is solved  computing the decomposition of $V^k$ into an orthogonal matrix $Q^k \in \mathbb{R}^{k \times k} $ and an upper triangular matrix $U^k \in \mathbb{R}^{n \times k}$ (line 8). Then $\alpha$ is computed in line 9.
+The least squares problem is solved  computing the decomposition of $V^k$ into an orthogonal matrix $Q^k \in \mathbb{R}^{k \times k} $ and an upper triangular matrix $U^k \in \mathbb{R}^{n \times k}$ (line \ref{alg:qu}). Then $\alpha$ is computed in line \ref{alg:alpha}.
 
-When building matrices $V^k$ and $W^k$ (lines 6-7 ), it is possible to use information from previous time steps.
+When building matrices $V^k$ and $W^k$ (lines \ref{alg:vk}-\ref{alg:wk} ), it is possible to use information from previous time steps.
 
 Finally, to ensure linear independence of columns in the multi-secant system for Jacobian estimation, a filter can be used \cite{haelterman2016improving}, in order to drop nearly dependent columns of $Q^k$ and avoid singularity of the approximated Jacobian.
 
-The above algorithm is usually denominated in FSI  \acrfull{iqnils} (or Anderson acceleration). There exist other algorithms, like generalized Broyden (IQN-IMVJ) or manifold mapping to solve the problem. A complete desciption of those methods goes beyond the scope of this work: a description of the most common algorithms can be found in \cite{blom2016review}, while a comparison of the performances can be found in \cite{lindner2015comparison}.
+The above algorithm is usually denominated in FSI  \acrfull{iqnils} (or Anderson acceleration). There exist other algorithms, like generalized Broyden (IQN-IMVJ) or manifold mapping to solve the problem. A complete description of those methods goes beyond the scope of this work: a presentation of the most common algorithms can be found in \cite{blom2016review}, while a comparison of the performances can be found in \cite{lindner2015comparison}.
 
 
 \subsection{Convergence criteria}
@@ -482,14 +487,14 @@ The above algorithm is usually denominated in FSI  \acrfull{iqnils} (or Anderson
 
 At each time step, the coupling algorithm enforce matching conditions at the wet surface up to a convergence criterion. If not sufficiently met, another iteration within the same time step is performed. The fixed point formulation itself induces a criterion based on the residual itself $r_{k+1}$.
 
-A scalar, \textit{absolute convergence criterion} can de defined as in Equation \ref{eq:abscrit}: it is useful for close to zero values of the coupling quantities, when rounding errors become important:
+A scalar \textit{absolute convergence criterion} can de defined as in Equation \ref{eq:abscrit}: it is useful for close to zero values of the coupling quantities, when rounding errors become important:
 
 \begin{equation}
 	\lVert r_{k+1} \rVert \leq \epsilon_{abs}
 	\label{eq:abscrit}
 \end{equation}
 
-A more common \textit{relative convergence criterion}, defined in Equation \ref{eq:relcrit} is particularly useful when different quantities (e.g. forces and displacements) are compared together to evaluate convergence:
+The more common \textit{relative convergence criterion}, defined in Equation \ref{eq:relcrit}, is particularly useful when different quantities (e.g. forces and displacements) are compared together to evaluate convergence:
 
 
 \begin{equation}
@@ -502,7 +507,7 @@ A more common \textit{relative convergence criterion}, defined in Equation \ref{
 \section{Interface Mesh and Data Mapping}
 \label{sec:interface-mesh}
 
-FSI methods can also be classified considering how the fluid and solid meshes are treated. The \textit{conforming mesh methods} consider the interface as a physical boundary condition (see Section \ref{sec:conforming-mesh}), while \textit{non-conforming mesh methods} treat the boundary location as a constraint imposed on the model equations (see Section \ref{sec:nonconforming-mesh}) \cite{hou2012numerical}.
+\acrshort{fsi} methods can also be classified considering how the fluid and solid meshes are treated. The \textit{conforming mesh methods} consider the interface as a physical boundary condition (see Section \ref{sec:conforming-mesh}), while \textit{non-conforming mesh methods} treat the boundary location as a constraint imposed on the model equations (see Section \ref{sec:nonconforming-mesh}) \cite{hou2012numerical}.
 
 
 \subsection{Non-conforming Mesh methods}
@@ -545,7 +550,7 @@ Conforming mesh methods adapt very well to the partitioned approach described in
 Fluid and structure meshes need share the boundary of the wet surface, as the coupling conditions are enforced by applying kinematic or dynamic conditions to those boundaries.
 Node-to-node matching of fluid and structure meshes at the interface is not required, as long as a suitable mapping between the interface nodes is performed (see Section \ref{sec:data-mapping}).
 
-The match between the interfaces must hold at each time step: this implies that both solid and fluid domains need to deform. Deformation is easily expressed in the solid domain as the structural mesh is usually represented in Lagrangian perspective (see Section \ref{subsec:lagrange}). ALE perspective (Section \ref{subsec:ALE}) for the fluid domain becomes necessary in this case.
+The match between the interfaces must hold at each time step: this implies that both solid and fluid domains need to deform. Deformation is easily expressed in the solid domain as the structural mesh is usually represented in Lagrangian perspective (see Section \ref{subsec:lagrange}). \acrshort{ale} perspective (Section \ref{subsec:ALE}) for the fluid domain becomes necessary in this case.
 
 Mesh deformation can turn out to be a complicated task as in general the fluid mesh is deformed during motion (see Figure \ref{fig:ale-mesh}). Mesh smoothing techniques need to be applied in order to keep a good mesh quality in terms of distorted elements which can lead to accuracy loss in simulations. (the following video shows highly distorted fluid elements during FSI motion: \href{https://youtu.be/zJ7PR90Y2TI}{video}). 
 
@@ -599,7 +604,7 @@ In the \textit{consistent mapping} a value on a node of one grid has the same va
 			\node [n,draw=blue!20] (f3) at (5,2.5) {\scriptsize{$2mm$}};
 			\node [n,draw=blue!20] (f4) at (7,2.5) {\scriptsize{$1mm$}};
 			\node [n,draw=blue!20] (f5) at (9,2.5) {\scriptsize{$0mm$}};
-			\node [n,draw=orange!50] (s1) at (3,0) {\scriptsize{$2mm$}};
+			\node [n,draw=orange!50] (s1) at (3,0) {\scriptsize{$3mm$}};
 			\node [n,draw=orange!50] (s2) at (7,0) {\scriptsize{$1mm$}};
 			
 			\draw [very thick, blue!20] (0,2.5) -- (f1);
@@ -613,11 +618,11 @@ In the \textit{consistent mapping} a value on a node of one grid has the same va
 			\draw [very thick, orange!50] (s1) -- (s2);
 			\draw [very thick, orange!50] (s2) -- (10,0);
 			
-			\draw[->] (f2)-- (s1) node[midway,left] {\scriptsize{$2mm$}};
+			\draw[->] (f2)-- (s1) node[midway,left] {\scriptsize{$3mm$}};
 			\draw[->] (f4)-- (s2) node[midway,right] {\scriptsize{$1mm$}};
 			
 		\end{tikzpicture}
-		\caption{consistent mapping}
+		\caption{consistent mapping (nearest neighbor)}
 		\label{fig:consistent}
 	\end{subfigure}
 	\newline
@@ -674,7 +679,7 @@ different mapping strategies can be implemented \cite{bungartz2016precice}:
 \section{Stability: Added Mass Effect}
 \label{sec:added-mass}
 
-When a solid moves or vibrates in a fluid domain, the interaction changes the way in which the structure behaves. There exist a vast variety of literature (e.g.: \cite{chen1976added}, \cite{conca1997added}, \cite{gauthier2017numerical}, \cite{ricciardi2015modelling}) describing the effects of FSI in terms of \textit{added mass}, \textit{added damping} or even \textit{added stiffness} on a vibrating structure in function of fluid properties (e.g. density or viscosity), or flow properties (e.g. velocity), or geometry.
+When a solid moves or vibrates in a fluid domain, the interaction changes the way in which the structure behaves. There exist a vast variety of literature (e.g.: \cite{chen1976added}, \cite{conca1997added}, \cite{gauthier2017numerical}, \cite{ricciardi2015modelling}) describing the effects of \acrlong{fsi} in terms of \textit{added mass}, \textit{added damping} or even \textit{added stiffness} on a vibrating structure in function of fluid properties (e.g. density or viscosity), or flow properties (e.g. velocity), or geometry.
 
 Besides the physical aspects of the interaction, some numerical issues arise when trying to simulate this kind of problems.
 
@@ -685,34 +690,33 @@ Under the same conditions, strongly coupled algorithms exhibit convergence probl
 
 For this reason, the mass ratio $M$ is a suitable indicator to determine the kind of interaction between solid and fluid: when $M \ll 1$ (i.e. when the solid is much denser than the fluid), the interaction is weak, while when densities are comparable the interaction is strong and imposes some limits on the partitioned solution techniques.
 
-The problem has been analyzed in literature by means of ``toy FSI models'' (in \cite{causin2005added}, \cite{degroote2008stability} or \cite{mehl2016parallel}). Even though the number of parameters affecting stability is large and not completely understood in complex scenarios, all of the studies point out the mass-ratio $M$ as the most relevant parameter.
+The problem has been analyzed in literature by means of ``toy FSI models'' (in \cite{causin2005added}, \cite{degroote2008stability} or \cite{mehl2016parallel}). Even though the number of parameters affecting stability is large and not completely understood in complex scenarios, all of the studies point out the mass ratio $M$ as the most relevant parameter.
 
 A simplistic explanation of the phenomenon stems from the idea that at the interface, fluid and structure have no gaps (Section \ref{sec:interface}). For this reason, if the structure moves, also the fluid particles around it have to move: the acceleration of the surrounding fluid results in greater inertial forces and the structure appears more inert. 
 
 Added mass effect appears both in incompressible and in compressible fluid models, but with slightly different effects and implications.
 
 
-\subsection{AME in compressible regime}  
+\subsection{\acrshort{ame} in compressible regime}  
 
-In compressible regime, using a weakly coupled algorithm which does not enforce mass and energy balance at the interface (see Section \ref{subsec:explicit}) imposes a limit to the mass ratio above which the simulation becomes unstable and the algorithm fails to find a solution \cite{bodnar2014fluid}.
+In compressible regime, using a weakly coupled algorithm, which does not enforce mass and energy balance at the interface (see Section \ref{subsec:explicit}), imposes a limit to the mass ratio above which the simulation becomes unstable and the algorithm fails to find a solution \cite{bodnar2014fluid}.
 
-A strongly coupled algorithm (Section \ref{subsec:implicit}) does not become unstable, but converges slowly: many subiterations are needed at each time step in order to reach the required convergence criteria (Section \ref{sec:convergence}).
+A strongly coupled algorithm (Section \ref{subsec:implicit}) does not become unstable, but converges slowly: many sub-iterations are needed at each time step in order to reach the required convergence criteria (Section \ref{sec:convergence}).
 
 It can be shown that, in the compressible case, changing the time step of the partitioned simulation can be beneficial to the solution. The time step reduction to an arbitrarily small value cannot stabilize a weakly coupled algorithms when the stability criterion on the mass ratio is not met, but has an effect on strongly coupled ones \cite{van2009added}.  
 
-A step size reduction can compensate a higher mass-ratio value \cite{forster2006artificial}:
-the convergence of a strongly coupled algorithm improves proportionally to the time step reduction. At the theoretical limit of vanishing time step, the monolithic solution could be found. 
+A step size reduction can compensate a higher mass ratio value \cite{forster2006artificial}: the convergence of a strongly coupled algorithm improves proportionally to the time step reduction. At the theoretical limit of vanishing time step, the monolithic solution could be found. 
 
 
-\subsection{AME in incompressible regime}
+\subsection{\acrshort{ame} in incompressible regime}
 
-AME is a much greater issue in incompressible regime than in compressible flows. A simple physical explanation of this fact could be as follows: a deformation of the structure results in a perturbation of the fluid domain close to the structure, which then propagates through the rest of the fluid domain. In compressible models, the speed at which a perturbation propagates (speed of sound) has a finite value. For this reason the effect of a perturbation is spatially limited during a time step. In contrast, in an incompressible model, the speed at which the aforementioned perturbation propagates through the domain is infinitely large. A change in the geometry affects the whole domain without delay and impacts the whole domain at each time step \cite{causin2005added}.
+\acrshort{ame} is a much greater issue in incompressible regime than in compressible flows. A simple physical explanation of this fact could be as follows: a deformation of the structure results in a perturbation of the fluid domain close to the structure, which then propagates through the rest of the fluid domain. In compressible models, the speed at which a perturbation propagates (speed of sound) has a finite value. For this reason the effect of a perturbation is spatially limited during a time step. In contrast, in an incompressible model, the speed at which the aforementioned perturbation propagates through the domain is infinitely large. A change in the geometry affects the whole domain without delay and impacts the whole domain at each time step \cite{causin2005added}.
 
 It has been observed that loose coupling of fluid and structural part in the context of incompressible flow and slender structures frequently yields unstable computations \cite{forster2006artificial}. However, strict stability limits exist also for strongly coupled algorithms. Those limits have a different relation to the time step with respect to compressible models.
 
 Simulations show that reducing the time step may result in increased instability. The AME is inherent in the coupling itself: in sequentially staggered schemes the fluid forces depend upon predicted structural
 interface displacements rather than the correct ones and thus contain a portion of incorrect coupling forces. This contribution yields the instability \cite{degroote2008stability}.
 
-Provided that the stability limit is not exceeded, implicit methods behave differently in incompressible regime: the number or subiterations required to reach convergence during a single time step increases when the time step decreases. Besides, achieving the monolithic solution limit is not guaranteed (\cite{forster2006artificial}, \cite{van2009added}).
+Provided that the stability limit is not exceeded, implicit methods behave differently in incompressible regime: the number or sub-iterations required to reach convergence during a single time step increases when the time step decreases. Besides, achieving the monolithic solution limit is not guaranteed (\cite{forster2006artificial}, \cite{van2009added}).
 
 These observations are consistent with the aforementioned physical explanation.
