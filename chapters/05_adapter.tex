@@ -2,13 +2,13 @@
 \label{cha:adapter}
 
 
-To prepare an existing simulation code for coupling, preCICE has to be integrated with the solver, using  API described in Section \ref{sec:pc-api} and in Appendix \ref{sec:api-code}. The "glue-code" required for this operation is called \textit{adapter}, as depicted in Figure \ref{fig:adapter-scheme}.
+To prepare an existing simulation code for coupling, \acrshort{precice} has to be integrated with the solver, using  API described in Section \ref{sec:pc-api} and in Appendix \ref{sec:api-code}. The ``glue-code'' required for this operation is called \textit{adapter}, as depicted in Figure \ref{fig:adapter-scheme}.
 
 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.92\textwidth]{images/adapter_scheme}
-	\caption{Coupling CFD to CSM via preCICE.The existing solver code, the adapter and the linked library are highlighted (image taken from \cite{uekermann2017official}).}
+	\caption{Coupling \acrshort{cfd} to \acrshort{csm} via preCICE.The existing solver code, the adapter and the linked library are highlighted (image taken from \cite{uekermann2017official}).}
 	\label{fig:adapter-scheme}
 \end{figure}
 
@@ -16,7 +16,7 @@ To prepare an existing simulation code for coupling, preCICE has to be integrate
 \section{Design of the adapter structure}
 
 
-In order to couple MBDyn with preCICE a C++ adapter has been implemented within the scope of this work. The \textit{adapter} needs to be integrated with both the MBDyn solver and the coupling library. The two connections are distinct but strictly interconnected.
+In order to couple \acrshort{mbdyn} with \acrshort{precice}, a C++ adapter has been implemented within the scope of this work. The \textit{adapter} needs to be integrated with both the MBDyn solver and the coupling library. The two connections are distinct but strictly interconnected.
 The adapter has the advantage of being completely independent from both the preCICE library and MBDyn. The first connection is achieved via the API given by the library \texttt{libprecice.so}, the second connection exploits the API given by MBDyn through its library \texttt{libmbc.so}.
 
 
@@ -37,7 +37,7 @@ The main class is \texttt{MBDynAdapter}, which implements the functions given by
 \subsection{Class MBDynAdapter}
 \label{sec:mbdyn-adapter.h}
 
-The file \texttt{MBDynAdapter.h} and its source file \texttt{MBDynAdapter.cpp} implements all the methods required to perform and FSI simulation with MBDyn as the solid solver. The basic steps are:
+The file \texttt{MBDynAdapter.h} and its source file \texttt{MBDynAdapter.cpp} implement all the methods required to perform a \acrshort{fsi} simulation with MBDyn as the solid solver. The basic steps are:
 
 \begin{enumerate}
 	\item prepare the MBDyn solver,
@@ -49,8 +49,8 @@ The file \texttt{MBDynAdapter.h} and its source file \texttt{MBDynAdapter.cpp} i
 
 \subsubsection{Initialization}
 
-In the initialization phase, the instance of \texttt{MBDynAdapter} gets a \texttt{json} file (see Section \ref{sec:mbdyn-adapter-input}) that contains all the parameters useful for the simulation.
-Then it instantiates the \texttt{MBDynConnector} (see Section \ref{sec:mbdyn-connector.h}) which takes care of all the operations concerning MBDyn: in particular starting the simulation the creating an instance of \texttt{MBCNodal} in order to have access to the simulation.
+In the initialization phase, the instance of \texttt{MBDynAdapter} gets a \acrfull{json} file (see Section \ref{sec:mbdyn-adapter-input}) that contains all the parameters useful for the simulation.
+Then it instantiates the \texttt{MBDynConnector} (see Section \ref{sec:mbdyn-connector.h}) which takes care of all the operations concerning MBDyn: in particular starting the simulation and creating an instance of \texttt{MBCNodal} in order to have access to the simulation.
 
 In the next step an instance of \texttt{precice::SolverInterface} is initialized and configured with all the relevant information data:
 
@@ -60,12 +60,12 @@ In the next step an instance of \texttt{precice::SolverInterface} is initialized
 	\item information regarding the data to be read and written
 \end{itemize} 
 
-The next initialization step concerns the definition of the interface mesh. The data concerning the vertices is stored in the \texttt{MBDynConnector} to be used to plot the output and is passed to the \texttt{SolverInterface} to define the wet surface nodes. The mesh nodes are stored in the same text file that is used by MBDyn to build the \texttt{external structural mapping} information (see Section \ref{sec:mbd-forces}). This means that the MBDyn mapped points coincide with the interface mesh on the structural side (note that it doesn't have to be the same mesh of the fluid side, as preCICE can map non identical meshes, as described in \ref{sec:pc-map}). The suitable size of memory is then initialized to contain the coupling information: mainly \textit{displacements}, to be written on the preCICE interface, and \textit{forces}, to be read from the interface.
+The next initialization step is the definition of the interface mesh. The data concerning the vertices are stored in the \texttt{MBDynConnector} to be used to plot the output and are passed to the \texttt{SolverInterface} to define the wet surface nodes. The mesh nodes are stored in the same text file that is used by MBDyn to build the \texttt{external structural mapping} information (see Section \ref{sec:mbd-forces}). This means that the MBDyn mapped points coincide with the interface mesh on the structural side (note that it doesn't have to be the same mesh of the fluid side, as preCICE can map non identical meshes, as described in \ref{sec:pc-map}). The suitable size of memory is then initialized to contain the coupling information: mainly \textit{displacements}, to be written on the preCICE interface, and \textit{forces}, to be read from the interface.
 
 
 \subsubsection{Execution}
 
-The simulation phase of the adapter follows the steps briefly described in Section \ref{sec:pc-api} and in Appendix \ref{app:pc-api}. The most important elements of the codeare  illustrated in listing \ref{lst:adapter-exec}.
+The simulation phase of the adapter follows the steps briefly described in Section \ref{sec:pc-api} and in Appendix \ref{app:pc-api}. The most important elements of the code are  illustrated in listing \ref{lst:adapter-exec}.
 
 The main execution phases include:
 
@@ -146,7 +146,7 @@ The instance of \texttt{MBDynConnector} is initialized within the \texttt{MBDynA
 
 The first task is to read the mesh of interface points. The mesh file location is passed through the input file: to avoid too much duplication, it is the same file used by MBDyn to build the mapping matrix before the simulation (see Section \ref{sec:mbd-forces}). The mesh file contains information concerning the interface points and the connectivity. The $(x,y,z)$ coordinates are passed to preCICE to build the structural part of the interface mesh. The same points, together with the connectivity, are stored in the \texttt{MBDynConnector} and are used to write the output in \textit{VTK} format during the simulation (see Section \ref{sec:mbdyn-adapter-output}).
 
-The following task consists in starting MBDyn. The input file location is passed through the input file and a separated process is spawned with the parameters required to run an MBDyn program. Upon a correct initialization, the MBDyn simulations hangs waiting for an external connection (i.e. the \texttt{external structural mapping}).
+The following task consists in starting MBDyn. The MBDyn input file location is passed through the \acrshort{json} file and a separated process is spawned with the parameters required to run an MBDyn program. Upon a correct initialization, the MBDyn simulations hangs waiting for an external connection (i.e. the \texttt{external structural mapping}).
 
 Finally, an instance of \texttt{MBCNodal} is created to take care of the communication with MBDyn: a socket is opened and the communication is initialized. 
 
@@ -156,19 +156,19 @@ Finally, an instance of \texttt{MBCNodal} is created to take care of the communi
 During the execution phase, \texttt{MBDynConnector} steers the simulation on the MBDyn side. Some of the actions have been already introduced in listing \ref{lst:adapter-exec}:
 
 \begin{itemize}
-    \item send \textit{forces} to the \texttt{external structural mapping} points
-    \item perform the simulation step
-    \item retrieve \textit{displacements}
-    \item inform MBDyn that the time step has converged or not
+    \item send \textit{forces} to the \texttt{external structural mapping} points,
+    \item perform the simulation step,
+    \item retrieve \textit{displacements},
+    \item inform MBDyn that the time step has converged or not.
 \end{itemize}
 
-If the time step has converged and at a user defined interval, the simulation data are saved.
+If the time step has converged (at a user defined time interval), the simulation data are saved.
 
 
 \section{Input parameters}
 \label{sec:mbdyn-adapter-input}
 
-Some input data are needed in order to perform a simulation. Such data are stored in a \texttt{json} file\footnote{see for example \href{https://www.json.org/json-en.html}{json.org} for some information about the syntax}. The file is given as input in the form:
+Some input data are needed in order to perform a simulation. Such data are stored in a \acrshort{json} file\footnote{see for example \href{https://www.json.org/json-en.html}{json.org} for some information about the syntax}. The file is given as input in the form:
 \begin{lstlisting}[language=bash]
 mbdyn-beam-adapter -f config.json
 \end{lstlisting}
@@ -176,42 +176,42 @@ mbdyn-beam-adapter -f config.json
 An example of input file is given in Appendix \ref{app:mbd-config-file}. The type of data can be related to different aspects of the simulation:
 
 \begin{enumerate}
-    \item preCICE
+    \item preCICE:
     \begin{itemize}
-        \item \texttt{precice-config}: the interface must be initialized with the \textit{preCICE configuration file} (see Section \ref{sec:pc-config} and Appendix \ref{app:pc-config-file})
-        \item \texttt{readDataName}: label of the data to be read from the interface (typically forces)
-        \item \texttt{writeDataName}: label of the data to be written (typically displacements)
-        \item \texttt{participantName}: label the participant in the FSI simulation
-        \item \texttt{meshName}: label of the interface mesh in the FSI simulation
+        \item \texttt{precice-config}: the interface must be initialized with the \textit{preCICE configuration file} (see Section \ref{sec:pc-config} and Appendix \ref{app:pc-config-file}),
+        \item \texttt{readDataName}: label of the data to be read from the interface (typically forces),
+        \item \texttt{writeDataName}: label of the data to be written (typically displacements),
+        \item \texttt{participantName}: label the participant in the FSI simulation,
+        \item \texttt{meshName}: label of the interface mesh in the FSI simulation.
     \end{itemize}
-    \item MBDyn
+    \item MBDyn:
     \begin{itemize}
-        \item \texttt{mesh}: location of the file containing the points mapped in MBDyn
-        \item \texttt{mbdyn-input}: input file name to be passed to MBDyn
-        \item \texttt{node-socket}: name of the socket to exchange data between the adapter and MBDyn (the name has been made configurable to allow different simulations to run in parallel using different sockets: the user must take care to use the same name in the MBDyn input file)
+        \item \texttt{mesh}: location of the file containing the points mapped in MBDyn,
+        \item \texttt{mbdyn-input}: input file name to be passed to MBDyn,
+        \item \texttt{node-socket}: name of the socket to exchange data between the adapter and MBDyn (the name has been made configurable to allow different simulations to run in parallel using different sockets: the user must take care to use the same name in the MBDyn input file),
         \item \texttt{mbdyn-output}: location and prefix of all MBDyn related output files (see Section \ref{sec:mbd-output} and Appendix \ref{sec:mbdyn-output-file}).
     \end{itemize}
-    \item Simulation
+    \item Simulation:
     \begin{itemize}
-        \item \texttt{displacement-delta}: Boolean value that tells the adapter whether to pass the relative displacement between two consecutive iterations or the displacement from the initial configuration. This is mainly due to compatibility with different fluid adapters (e.g. the current version of the \textit{SU2 adapter} requires delta displacements)  
-        \item \texttt{iterstart}: the following four parameters are used to give progression to the forces applied to the structure (Figure \ref{fig:sim-coeff} gives an example of the behavior). The purpose is to ease the beginning of the simulation, letting the flow settle and avoiding initial spikes in the application of the forces that could result in a diverging simulation.
-        The current parameter tells \texttt{MBDynConnector} how many iterations to perform with a reduced starting coefficient (200 in the example)
-        \item \texttt{coeff0}: this value is the initial coefficient ($0.1$ in the example)
-        \item \texttt{period}: this value is the number of iterations to reach 1 (600 in the example)
-        \item \texttt{ramp-type}: label defining the type of ramp. A linear law or a $1/2 \cdot (1-\cos)$ law can be used
+        \item \texttt{displacement-delta}: Boolean value that tells the adapter whether to pass the relative displacement between two consecutive iterations or the displacement from the initial configuration. This is mainly due to compatibility with different fluid adapters (e.g. the current version of the \textit{SU2 adapter} requires delta displacements),  
+        \item \texttt{iterstart}: the following four parameters are used to give progression to the forces applied to the structure (Figure \ref{fig:sim-coeff} gives an example of the behavior). The purpose is to ease the beginning of the simulation, letting the flow settle and avoiding initial spikes in the application of the forces that could result in a diverging simulation,
+        The current parameter tells \texttt{MBDynConnector} how many iterations to perform with a reduced starting coefficient (200 in the example),
+        \item \texttt{coeff0}: this value is the initial coefficient ($0.1$ in the example),
+        \item \texttt{period}: this value is the number of iterations to reach 1 (600 in the example),
+        \item \texttt{ramp-type}: label defining the type of ramp. A linear law or a $1/2 \cdot (1-\cos)$ law can be used.
     \end{itemize}
-    \item Output (see Section \ref{sec:mbdyn-adapter-output} for some more details)
+    \item Output (see Section \ref{sec:mbdyn-adapter-output} for some more details):
     \begin{itemize}
-        \item \texttt{write-interval}: value that defines how often the \texttt{MBDynConnector} writes output data
-        \item \texttt{resultant-file}: location of the file containing the resultant and moment of the fluid forces applied to the structure. 
-        \item \texttt{root-coords}: vector containing the coordinates of the point about which the resultant moment has to be computed
+        \item \texttt{write-interval}: value that defines how often the \texttt{MBDynConnector} writes output data,
+        \item \texttt{resultant-file}: location of the file containing the resultant and moment of the fluid forces applied to the structure, 
+        \item \texttt{root-coords}: vector containing the coordinates of the point about which the resultant moment has to be computed,
         \item \texttt{vtk-output}: location and prefix of the output file. 
     \end{itemize}
-    \item Some parameters are used for debug purposes and might be removed in future releases
+    \item Some parameters are used for debug purposes and might be removed in future releases:
     \begin{itemize}
-        \item \texttt{pre-iteration}: number of simulation iterations performed by MBDyn before coupling with the fluid solver. This can ease the initial coupling in case the definition of the structural model isn't in equilibrium
-        \item \texttt{read-coords}: Boolean value used to read the mapped points coordinates back in the adapter from MBDyn instead of reading the mesh file. 
-        \item \texttt{every-iteration}: Boolean value used to force the adapter to write output data at each coupling iteration 
+        \item \texttt{pre-iteration}: number of simulation iterations performed by MBDyn before coupling with the fluid solver. This can ease the initial coupling in case the definition of the structural model isn't in equilibrium,
+        \item \texttt{read-coords}: Boolean value used to read the mapped points coordinates back in the adapter from MBDyn instead of reading the mesh file,
+        \item \texttt{every-iteration}: Boolean value used to force the adapter to write output data at each coupling iteration.
     \end{itemize}
 \end{enumerate}
 
@@ -227,20 +227,19 @@ An example of input file is given in Appendix \ref{app:mbd-config-file}. The typ
 \section{Output results}
 \label{sec:mbdyn-adapter-output}
 
-Besides the output strictly related to preCICE, concerning information about convergence and number of iterations, or the output strictly related to the MBDyn solution (see Appendix \ref{sec:mbdyn-output-file}), the adapter gives two types of output.
+Besides the output strictly related to \acrshort{precice}, concerning information about convergence and number of iterations, or the output strictly related to the \acrshort{mbdyn} solution (see Appendix \ref{sec:mbdyn-output-file}), the adapter gives two types of output.
 
-The information concerning the interface mesh points is saved in \texttt{vtu} file format, which is a binary XML VTK  file format used to store data on unstructured grids of points. A sequential number corresponding to the current iteration is appended to the name of the file so that any visualization software (e.g. \textit{ParaView}\footnote{\href{https://www.paraview.org/}{paraview.org}}) can load the whole dataset as a time series. Each file contains the following vector data:
+The information concerning the interface mesh points is saved in \texttt{vtu} file format, which is a binary \acrshort{xml} VTK  file format used to store data on unstructured grids of points. A sequential number corresponding to the current iteration is appended to the name of the file so that any visualization software (e.g. \textit{ParaView}\footnote{\href{https://www.paraview.org/}{paraview.org}}) can load the whole dataset as a time series. Each file contains the following vector data:
 
 \begin{itemize}
-    \item displacement
-    \item displacement delta
-    \item velocity
-    \item nodal force
+    \item displacement,
+    \item displacement delta,
+    \item velocity,
+    \item nodal force,
 \end{itemize}
 
 for each node. An example of visualization is given in Figure \ref{fig:vtk-out}. For debug purposes also the area and the normal of each cell can be saved. 
 
-output: VTK and resultants
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{images/vtk_disp.png}
