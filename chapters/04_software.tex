@@ -1,25 +1,25 @@
 \chapter{Software Packages used in this work}
 \label{cha:software}
 
-This chapter illustrates the main software tools used in this work. First, the multibody dynamics solver \textit{MBDyn}  is shortly presented in Section \ref{sec:mbdyn}. Then, the coupling library \textit{preCICE} is introduced in Section \ref{sec:precice}.
+This chapter illustrates the main software tools used in this work. First, the \acrfull{mbdyn}  is shortly presented in Section \ref{sec:mbdyn}. Then, the coupling library \acrfull{precice} is introduced in Section \ref{sec:precice}.
 
 
 \section{MBDyn}
 \label{sec:mbdyn}
 
 
-MBDyn is free and open-source\footnote{the software is available through a public git repository \href{https://gitlab.polimi.it/Pub/mbdyn}{gitlab.polimi.it/Pub/mbdyn}} general purpose Multibody Dynamics analysis software developed at the \textit{Dipartimento di Scienze e Tecnologie Aerospaziali}  of the University Politecnico di Milano.
+\acrshort{mbdyn} is free and open-source\footnote{the software is available through a public git repository \href{https://gitlab.polimi.it/Pub/mbdyn}{gitlab.polimi.it/Pub/mbdyn}} general purpose Multibody Dynamics analysis software developed at the \textit{Dipartimento di Scienze e Tecnologie Aerospaziali}  of the University Politecnico di Milano.
 
 Most of the information concerning MBDyn is taken from the official documentation given in the software website\footnote{MBDyn website: \href{https://www.mbdyn.org/}{mbdyn.org}} and from the input manual\footnote{a copy can be found at the following link [\href{https://www.mbdyn.org/userfiles/documents/mbdyn-input-1.7.3.pdf}{input manual}] or in the code repository}.
 
-MBDyn allows to build a simulate multibody system, which\footnote{see Wikipedia entry: \href{https://en.wikipedia.org/wiki/Multibody_system}{Multibody system}} is the study of the dynamic behavior of interconnected rigid or flexible bodies, each of which may undergo large translational and rotational displacements.
+MBDyn allows to build a system to simulate multi-body dynamics, which\footnote{see Wikipedia entry: \href{https://en.wikipedia.org/wiki/Multibody_system}{Multibody system}} is the study of the behavior of interconnected rigid or flexible bodies, each of which may undergo large translational and rotational displacements.
 
-MBDyn can simulate linear and non-linear dynamic of rigid and flexible bodies (including geometrically exact and composite-ready beam and shell finite elements, component mode synthesis elements, lumped elements) subjected to kinematic constraints, external forces and control subsystems\cite{masarati2014efficient}. 
+MBDyn can simulate linear and non-linear dynamics of rigid and flexible bodies (including geometrically exact and composite-ready beam and shell finite elements, component mode synthesis elements, lumped elements) subjected to kinematic constraints, external forces and control subsystems\cite{masarati2014efficient}. 
 MBDyn has been developed to serve as an analysis tool for rotorcraft research and can simulate essential fixed-wing and rotorcraft aerodynamics.
 
-As explained more in detail later, MBDyn is open to be connected to other software components to perform multiphysics simulations. In particular, it is possible to pass externally computed forces  and to steer the multibody simulation from an external API: this feature has been particularly useful in building and \textit{adapter} to couple MBDyn with the library preCICE (see Chapter \ref{cha:adapter}).
+As explained more in detail later, MBDyn is open to be connected to other software components to perform multi-physics simulations. In particular, it is possible to pass externally computed forces and to steer the multi-body simulation from an external \acrshort{api}: this feature has been particularly useful in building and \textit{adapter} to couple MBDyn with the library preCICE (see Chapter \ref{cha:adapter}).
 
-In this section we give a short introduction to some of the relevant features of MBDyn, starting form basic information on the input file syntax (Section \ref{sec:mbd-syntax}), and the output files (Section \ref{sec:mbd-output}). Then some of the elements relevant for the description of the models used in the this work are presented: nodes (Section \ref{sec:mbd-node}), beam elements (Section \ref{sec:mbd-beam}), bodies (Section \ref{sec:mbd-body}) and forces (Section \ref{sec:mbd-forces}). 
+In this section we give a short introduction to some of the relevant features of MBDyn, starting form basic information on the input file syntax (Section \ref{sec:mbd-syntax}), and the output files (Section \ref{sec:mbd-output}). Then some of the elements relevant for the description of the models used in the this work are presented: nodes (Section \ref{sec:mbd-node}), beam elements (Section \ref{sec:mbd-beam}), bodies (Section \ref{sec:mbd-body}), joints (Section \ref{sec:mbd-joint}) and forces (Section \ref{sec:mbd-forces}). 
 
 
 \subsection{Basic syntax}
@@ -58,11 +58,11 @@ As illustrated in listing \ref{lst:mbd-struct}, statements are logically divided
 The sequence of relevant valid blocks is:
 
 \begin{itemize}
-    \item \texttt{data}: defines the kind of problem to be solved by the analysis. The most significant one is \texttt{initial value} and is already defined in the example. 
-    \item type of problem:  block takes the name of the problem defined in the data block (\texttt{initial value} in this case) and contains all the information required by the integration method to perform the desired simulation (e.g. simulation type, time step, number of iterations, tolerance ...).
-    \item \texttt{control data}: mostly contains information about the problem that is required to ensure that a consistent model will be generated (i.e. the number of nodes, elements, forces...).
-    \item \texttt{nodes}: The nodes block contains all the nodes required by the simulation. They are are defined as the entities that make degrees of freedom available to the simulation, so they must exist before any element is generated.
-    \item \texttt{elements}: contains all the elements. They are defined as the entities that generate equations using the degrees of freedom provided by the nodes.
+    \item \texttt{data}: it defines the kind of problem to be solved by the analysis. The most significant one is \texttt{initial value} and is already defined in the example. 
+    \item type of problem:  it takes the name of the problem defined in the data block (\texttt{initial value} in this case) and contains all the information required by the integration method to perform the desired simulation (e.g. simulation type, time step, number of iterations, tolerance ...).
+    \item \texttt{control data}: it mostly contains the required information to ensure that a consistent model will be generated (i.e. the number of nodes, elements, forces...).
+    \item \texttt{nodes}: this block contains all the nodes required by the simulation. They are defined as the entities that make degrees of freedom available to the simulation, so they must exist before any element is generated.
+    \item \texttt{elements}: it contains all the elements. They are defined as the entities that generate equations using the degrees of freedom provided by the nodes.
 \end{itemize}
 
 We focus now on the main entities of a MBDyn simulation, namely nodes and elements. A detailed example of the input file used in most simulations in this work can be found in Appendix \ref{sec:mbdyn-input-file}.
@@ -90,11 +90,11 @@ Nodes are the starting point to define the elements of a simulation.
 \subsection{Elements}
 \label{sec:mbd-elem}
 
-Elements constitute the components of the multibody model. Each has a unique numerical label and is connected to one or more nodes. They write contributions to nodes equations and represent \textit{connectivity} and \textit{constitutive properties}.
+Elements constitute the components of the multi-body model. Each has a unique numerical label and is connected to one or more nodes. They write contributions to nodes equations and represent \textit{connectivity} and \textit{constitutive properties}.
 
 %Elements that require both displacement and orientation can only be connected to 6 DoFS nodes.
 
-There exist many types of elements in MBDyn, we focus here on the ones used in the FSI simulation: beams, bodies, joints and forces.
+There exist many types of elements in MBDyn, we focus here on the ones used in the \acrshort{fsi} simulation: beams, bodies, joints and forces.
 
 
 
@@ -115,7 +115,7 @@ The beam element is defined by its nodes and a reference line; although 2 and 3 
 \end{figure}
 
 
-The Finite Volume approach described \cite{ghiringhelli2000multibody} is used to model the beam element. It computes the internal forces as functions of the reference line strain and as functions of the  orientation at the \textit{evaluation points} (i.e. integration points, point I and II in Figure \ref{fig:mbdyn-beam-model}) that are between nodes 1 and 2, and between nodes 2 and 3 (at $\xi =-1/\sqrt{3}$ and $\xi = 1/\sqrt{3}$ of a non-dimensional abscissa $-1\leq \xi \leq 1$ ranging from node 1 to node 3).
+The Finite Volume approach described in \cite{ghiringhelli2000multibody} is used to model the beam element. It computes the internal forces as functions of the reference line strain and as functions of the  orientation at the \textit{evaluation points} (i.e. integration points, point I and II in Figure \ref{fig:mbdyn-beam-model}) that are between nodes 1 and 2, and between nodes 2 and 3 (at $\xi =-1/\sqrt{3}$ and $\xi = 1/\sqrt{3}$ of a non-dimensional abscissa $-1\leq \xi \leq 1$ ranging from node 1 to node 3).
 
 
 A 6D constitutive law is defined at each evaluation point: it relates the strains and the curvatures of the beam (and their time derivatives) to the internal forces and moments at the evaluation points in the form:
@@ -152,7 +152,7 @@ Using the convention of \textit{x-axis} as beam axis we have:
 
 \subsubsection{Beam section Constitutive Law}
 
-In dynamic simulations, linear elastic or viscoelastic laws are generally used, even though nonlinear laws can be used.  Focusing on linear laws, MBDyn allows the user to define every constitutive laws, going from an isotropic beam section to a fully anisotropic one: in fact the entire $6 \times 6$ constitutive matrix can be provided. It is up to the user to define a valid law as the matrix must satisfy some constraints, e.g. it must be symmetric. The simplest case of linear elastic constitutive law is represented in Equation \ref{eq:iso-const}, in which a diagonal matrix relates internal forces to strain and curvature of the beam. 
+In dynamic simulations, linear elastic or viscoelastic laws are generally used, even though nonlinear laws can be used.  Focusing on linear laws, MBDyn allows the user to define every kind of constitutive laws, going from an isotropic beam section to a fully anisotropic one: in fact the entire $6 \times 6$ constitutive matrix can be provided. It is up to the user to define a valid law as the matrix must satisfy some constraints, e.g. it must be symmetric. The simplest case of linear elastic constitutive law is represented in Equation \ref{eq:iso-const}, in which a diagonal matrix relates internal forces to strain and curvature of the beam. 
 
 \begin{equation}
     f = \begin{bmatrix} EA & 0 & & \ldots &  & 0 \\
@@ -200,10 +200,10 @@ The \texttt{body} element describes a lumped rigid body when connected to a regu
 \subsection{Forces}
 \label{sec:mbd-forces}
 
-The \texttt{force} element is a general means to introduce a right-hand side to the equations. Structural forces are specific to structural
+The \texttt{force} element is a general means to introduce a right-hand side term to the equations. Structural forces are specific to structural
 nodes and  have three components that may depend on arbitrary parameters and a location in space.
 
-MBDyn allows to communicate with an external software that computes forces based on information on the kinematics of the model. This feature is at the basis of the development of the \textit{adapter}. The following elements can be used.
+MBDyn allows to communicate with an external software that computes forces based on information regarding the kinematics of the model. This feature is at the basis of the development of the \textit{adapter}. The following elements can be used.
 
 
 \subsubsection{External Structural}
@@ -256,7 +256,7 @@ The communication with the external software, in our case the adapter itself, is
 \subsection{Simulation output}
 \label{sec:mbd-output}
 
-There are a bunch of output files regarding a simulation performed with MBDyn. the name of those files is specified with the option \texttt{-o} (otherwise the name is the same as the input file) and the extensions are:
+There are different output files regarding a simulation performed with MBDyn. the name of those files is specified with the option \texttt{-o} (otherwise the name is the same as the input file) and the extensions are:
 
 \begin{itemize}
     \item \texttt{.out}: for miscellaneous output
@@ -298,17 +298,26 @@ The \texttt{.out} file contains information regarding the simulation iterations 
 \section{preCICE}
 \label{sec:precice}
 
-The main information concerning preCICE is taken from the official documentation: that is \cite{gatzhammer2014efficient} and  \cite{bungartz2016precice}. The preCICE website is also a source of documentation\footnote{\href{http://www.precice.org}{www.precice.org}}.
+The main information concerning \acrshort{precice} is taken from the official documentation: i.e. \cite{gatzhammer2014efficient} and  \cite{bungartz2016precice}. The preCICE website is also a source of documentation\footnote{\href{http://www.precice.org}{www.precice.org}}.
 
 The open-source\footnote{The code can be accessed via Github: \href{https://github.com/precice/precice}{github.com/precice/precice}} software library preCICE provides the components to connect traditional single-physics solvers and create a partitioned multi-physics simulation (e.g. fluid-structure interaction, conjugated heat transfer, solid-solid interaction, etc.).
-It aims at coupling existing solvers in a partitioned black-box manner (see Section \ref{sec:coupling}):  only minimal information about the solver is available and connection involves just interface nodes. 
-In order to be flexible and easily implemented, the impact on the solvers should be as minimal as possible: for this reason, preCICE offers a high level \acrfull{api} (Section \ref{sec:pc-api}) different languages, such as C/C++, Fortran and Python.
+It aims at coupling existing solvers in a partitioned black-box manner (see Section \ref{sec:coupling}):  only minimal information about the solver is available and connection involves just the interface nodes. 
+
+In order to be flexible and easily implemented, the impact on the solvers should be as minimal as possible: for this reason, preCICE offers a high level \acrfull{api} (Section \ref{sec:pc-api}) in different languages, such as C/C++, Fortran and Python.
 The ability to switch among different solvers is advantageous as it provides a lot of flexibility in developing and testing new coupled components.
 
 In a nutshell, preCICE simply affects the input and observes the output of the solvers (called \textit{participants}). The required data and control elements are accessed using an \textit{adapter}, i.e. a  ``glue code'' that is attached to the corresponding solver and communicates the information with the library.
 
-preCICE performs all the actions required to perform a coupled simulation: implements the coupling strategy and convergence criteria (Section \ref{sec:pc-coupling}), the communication
-between the participants (Section \ref{sec:pc-comm}), the mapping of data between meshes (Section \ref{sec:pc-map}). preCICE is configured by means of an \acrfull{xml} file (Section \ref{sec:pc-config}).
+preCICE makes all the actions required to perform a coupled simulation: 
+
+\begin{itemize}
+	\item it implements the coupling strategy (Section \ref{sec:pc-coupling}),
+	\item it verifies convergence criteria (Section \ref{sec:pc-coupling}),
+	\item it instantiates the communication between the participants (Section \ref{sec:pc-comm}) ,
+	\item it computes the mapping of data between meshes (Section \ref{sec:pc-map}). 
+\end{itemize}
+
+preCICE is configured by means of an \acrfull{xml} file (Section \ref{sec:pc-config}).
 
 
 
@@ -340,10 +349,10 @@ preCICE implements a fully parallel process-to-process communication approach \c
 	\item \textit{\acrfull{tcpip}}: popular means of network communication and free of incompatibilities between versions.
 \end{itemize}
 
-As to performances, MPI is the best technique especially when a high numbers of nodes is present. Anyway, socket communication is quite as fast, such that
+As to performances, \acrshort{mpi} is the best technique especially when a high numbers of nodes is present. Anyway, socket communication is quite as fast, such that
 both techniques are very well-suited for larger-scale simulations \cite{gatzhammer2014efficient}.
 
-In each solver, executed in parallel, one "master" process is defined to manage the progress of the simulation. No central node is required. The participating
+In each solver, executed in parallel, one ``master'' process is defined to manage the progress of the simulation. No central node is required. The participating
 processes use asynchronous point-to-point (M:N) communication. The channels are static and defined in the beginning of the simulation. This sets a limit in using preCICE with dynamically adaptive meshes or immersed boundaries.
 
 \subsection{Data mapping}
@@ -369,16 +378,16 @@ In order to run a multi-physics simulation with preCICE, all the participating, 
 Some configuration files are needed:
 
 \begin{itemize}
-	\item each adapter in general needs its own configuration file. It normally contains information about the boundaries (wet-surface) used for the coupling, names of exchanged data, mesh and the name of the common preCICE configuration file, plus other parameters, specific to the adapter. The one for the MBDyn adapter will be described in more detail in Chapter \ref{cha:adapter} and in Appendix \ref{app:mbd-config-file}.
+	\item each adapter generally needs its own configuration file. It normally contains information about the boundaries (wet-surface) used for the coupling, the names of exchanged data, mesh and the name of the common preCICE configuration file, together with other parameters, specific to the adapter. The one for the MBDyn adapter will be described in more detail in Chapter \ref{cha:adapter} and in Appendix \ref{app:mbd-config-file}.
 	\item preCICE configuration file: This is an XML file and each participant points at it. It defines all the information relevant to the simulation:
 	\begin{itemize}
-		\item type and name of exchanged data and meshes over which those data are passed
-		\item which solvers participate in the simulation, which data produce or consume, and how the mapping is performed
-		\item how solvers communicate among each other
-		\item coupling scheme and all the necessary information 
+		\item type and name of exchanged data and meshes over which those data are passed,
+		\item which solvers participate in the simulation, which data produce or consume, and how the mapping is performed,
+		\item how solvers communicate among each other,
+		\item the coupling scheme and all the concerning necessary information. 
 	\end{itemize}
 	
-	The structure of a preCICE configuration file is illustrated in Appendix \ref{app:pc-config-file}.
+The structure of a preCICE configuration file is illustrated in Appendix \ref{app:pc-config-file}.
 		
 \end{itemize}
 
