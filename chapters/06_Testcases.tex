@@ -1354,7 +1354,7 @@ The results are presented in the following subsections.
 
 \subsection{FSI3 sensitivity Analysis}
 
-The first scenario is a perturbation of the FSI3 test case, i.e. with $\vec{u}=2$\si{m.s^{-1}} and $Re=200$. The results are presented in the following table:
+The first scenario consists in a perturbation of the FSI3 test case, i.e. keeping $\vec{u}=2$\si{m.s^{-1}} and $Re=200$. The results are illustrated in Table~\ref{table:FSI3-sens}:
 
 % \input{tables/fsi3}
 \begin{table}[!htb]
@@ -1379,8 +1379,7 @@ The first scenario is a perturbation of the FSI3 test case, i.e. with $\vec{u}=2
 \end{table}
 
 
-Table \ref{table:FSI3-sens} shows that there is a limit in the ability of the system to work. It is situated in the range between $0.25$ and $0.5$ of mass ratio. This can improve for stiffer material (and so smaller $U_R$) and be worse for more flexible material. The lower right corner of the table, which represents the FSI3 setup, appears to be quite far from the actual range of convergence of the system. The table also shows the average number of iterations required for each time step to converge. A trend is visible (even if it does not hold for every case): the higher \textit{mass ratio} the more iterations are needed. The similar trend is visible for $U_R$.
-
+Table \ref{table:FSI3-sens} shows that there is a limit in the ability of the coupled system to produce results. It is situated in the range between $0.25$ and $0.5$ of mass ratio. This condition can be improved if the material is much stiffer (which corresponds to a smaller $U_R$) and can become worse when the material is more flexible. The lower right corner of the table, which represents the FSI3 setup, appears to be quite far from the actual range of convergence of the system. The table also shows, for completed simulations, the average number of iterations required for each time step to converge. A trend is visible (even if it does not hold for every case): the higher \textit{mass ratio}, the more iterations are needed. The similar trend is visible for $U_R$.
 
 The empty green cells have not been simulated. It is supposed that, if a simulation completes successfully for a given \textit{mass ratio}, it will complete also for a lower one. Conversely, if a simulation does not work for a given $U_R$, it will not work for a higher $U_R$ (i.e. for a more flexible material).   
 
@@ -1411,9 +1410,9 @@ The same kind of analysis has been conducted considering a fluid velocity of $0.
 	\label{table:FSI1-sens}
 \end{table}
 
-Table \ref{table:FSI1-sens} illustrates the results: as in the previous section, \textit{green cells} indicate that the simulation with the average number of iterations reported, \textit{red cells} indicate that simulation diverged. In this case \textit{yellow cells} indicate that the simulation finished, but at some point reached the maximum number of iterations, or the progressive loading of the structure is difficult. It can be possible that there exist a better set of coupling parameters that makes the test work better, nevertheless it looks to be a symptom of the fact that the simulation is close to the limits of applicability.
+Table \ref{table:FSI1-sens} illustrates the results: as in the previous section, \textit{green cells} indicate that the simulation completed (the number represents the average number of iterations), while \textit{red cells} indicate that the simulation diverged. In this case \textit{yellow cells} indicate that the simulation finished, but at some point it reached the maximum number of iterations, meaning that the progressive loading of the structure is difficult. It can be possible that there exist a better set of coupling parameters that makes a specific test work better, nevertheless it looks to be a symptom of the fact that the simulation is close to the limits of applicability.
 
-Comparing the results with Table \ref{table:FSI3-sens}, it can be seen that the range of feasible parameters becomes smaller. This seems to be in accordance with the idea that a lower fluid velocity makes the interaction stronger, and the convergence more difficult.
+Comparing the results with Table~\ref{table:FSI3-sens}, it can be seen that the range of feasible parameters becomes smaller. This seems to be in accordance with the idea that a lower fluid velocity makes the interaction stronger and the convergence more difficult.
 
 Similarly, the lower right cell represents test case FSI1 and it seems to be not possible to simulate it with the current setup.
 
@@ -1445,13 +1444,14 @@ In order to have more insight on the influence of the physical parameters on the
 	\label{table:Re1000-sens}
 \end{table}
 
-Table \ref{table:Re1000-sens} shows a pattern similar to previous experiments. In this case, a larger number of parameter combinations appear to be feasible. 
+Table \ref{table:Re1000-sens} shows a pattern similar to previous experiments. In this case, a larger number of parameter combinations appears to be feasible. 
 
 \subsection{Analysis of the results}
 
-The current knowledge regarding the setup of coupling parameters does not allow to correctly simulate the benchmark experiments FSI1 and FSI3, characterized by a mass ratio of $1$. Perturbing some of the parameters, thus lowering the mass ratio $M$ or the increasing reduced velocity $U_R$, it is possible to reach feasible configurations. 
+The current knowledge regarding the overall setup of the test case does not allow to correctly simulate the benchmark experiments FSI1 and FSI3, characterized by a mass ratio of $1$.
+Perturbing some of the parameters, thus affecting the mass ratio $M$ or the reduced velocity $U_R$, allows to reach feasible configurations. 
 
-Tables \ref{table:FSI3-sens} to \ref{table:Re1000-sens} show a similar path: the upper left part of the table contains feasible configurations, while the lower right part the unfeasible ones. If the fluid velocity is lower, more configurations fail.
+Tables \ref{table:FSI3-sens} to \ref{table:Re1000-sens} show all a similar path: the upper left part of the table contains feasible configurations, while the lower right part the unfeasible ones. If the fluid velocity is lower, more configurations fail.
 
-Those aspects appear to agree with the explanations given in Section \ref{sec:added-mass} and in the cited literature. The model considered here shows a a clear relationship between mass ratio, structure stiffness and simulation outcome at a prescribed fluid velocity. The same clear path would not hold if we considered reduced velocity $U_R$ only, thus putting all experiments together. For example, row 1 of table \ref{table:Re1000-sens} tells that $U_R \approx 7\cdot 10^{-4}$ would allow to reach $M=1$, while row 4 of table \ref{table:FSI1-sens} tells that $U_R \approx 6.3\cdot 10^{-4}$ would allow to reach only $M\approx0.2$.
+Those aspects appear to agree with the explanations given in Section \ref{sec:added-mass} and in the cited literature. The model considered here shows a a clear relationship between mass ratio, structure stiffness and simulation outcome at a prescribed fluid velocity. The same clear path would not hold if we considered reduced velocity $U_R$ only, thus putting all experiments together. For example, row 1 of Table~\ref{table:Re1000-sens} tells that $U_R \approx 7\cdot 10^{-4}$ would allow to reach $M=1$, while row 4 of Table~\ref{table:FSI1-sens} tells that $U_R \approx 6.3\cdot 10^{-4}$ would allow to reach only $M\approx0.2$.
 
