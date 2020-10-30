@@ -437,7 +437,7 @@ Finally, MBDyn allows to analyze the internal forces of each beam, as represente
 \section{Vertical flap: compressible regime}
 \label{sec:su2-mbd}
 
-A model similar to the one described in the previous section has been used to test the coupling capabilities of the adapter with a different fluid solver: SU2\footnote{\href{https://su2code.github.io/}{su2code.github.io}}. The coupling adapter between SU2 and preCICE allows to build FSI simulations in compressible regime. Besides, SU2 allows to define strictly bidimensional domains, while OpenFOAM and MBDyn are strictly tridimensional. Bidimensionality is enforced in OenFOAM using \textit{empty} boundary conditions, while in MBDyn is enforced through constraints on nodes.
+A model similar to the one described in the previous section has been used to test the coupling capabilities of the adapter with a different fluid solver: SU2\footnote{\href{https://su2code.github.io/}{su2code.github.io}}. The current coupling adapter between SU2 and preCICE allows to build FSI simulations only in compressible regime. Besides, SU2 allows to define bidimensional domains, while OpenFOAM and MBDyn are strictly tridimensional. Bidimensionality is enforced in OenFOAM using \textit{empty} boundary conditions, while in MBDyn is enforced through constraints on nodes.
 For those reasons a similar model has been built. 
 
 
