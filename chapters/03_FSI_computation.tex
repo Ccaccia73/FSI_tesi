@@ -697,7 +697,7 @@ A simplistic explanation of the phenomenon stems from the idea that at the inter
 Added mass effect appears both in incompressible and in compressible fluid models, but with slightly different effects and implications.
 
 
-\subsection{\acrshort{ame} in compressible regime}  
+\subsection{AME in compressible regime}  
 
 In compressible regime, using a weakly coupled algorithm, which does not enforce mass and energy balance at the interface (see Section \ref{subsec:explicit}), imposes a limit to the mass ratio above which the simulation becomes unstable and the algorithm fails to find a solution \cite{bodnar2014fluid}.
 
@@ -708,7 +708,7 @@ It can be shown that, in the compressible case, changing the time step of the pa
 A step size reduction can compensate a higher mass ratio value \cite{forster2006artificial}: the convergence of a strongly coupled algorithm improves proportionally to the time step reduction. At the theoretical limit of vanishing time step, the monolithic solution could be found. 
 
 
-\subsection{\acrshort{ame} in incompressible regime}
+\subsection{AME in incompressible regime}
 
 \acrshort{ame} is a much greater issue in incompressible regime than in compressible flows. A simple physical explanation of this fact could be as follows: a deformation of the structure results in a perturbation of the fluid domain close to the structure, which then propagates through the rest of the fluid domain. In compressible models, the speed at which a perturbation propagates (speed of sound) has a finite value. For this reason the effect of a perturbation is spatially limited during a time step. In contrast, in an incompressible model, the speed at which the aforementioned perturbation propagates through the domain is infinitely large. A change in the geometry affects the whole domain without delay and impacts the whole domain at each time step \cite{causin2005added}.
 
