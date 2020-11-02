@@ -5,15 +5,19 @@
 \addcontentsline{toc}{chapter}{Abstract}
 
 
-The simulation of \acrfull{fsi} phenomena allows to gain more insight on complex interactions and helps predict their effects. It is possible to perform those simulations in different ways: one of them involves partitioned algorithms, which include a fluid solver, a structural solver and a third component which performs the interaction between the other two.
+The computer simulation of \acrfull{fsi} phenomena allows to gain more insight on complex interactions and behaviors of solids immersed in fluid flows, helping predict their effects. Applications range from aeroelasticity, to turbomachinery, or biomechanics, just to name a few. 
 
-In this thesis, the \acrfull{mbdyn} is linked to the multiphysics coupling library \acrfull{precice}, with the purpose of extending \acrshort{mbdyn} capabilities to \acrshort{fsi} simulations.
+It is possible to perform those simulations in different ways: one of them involves a technique known as \textit{partitioned algorithm}. A partitioned algorithm aims at solving a \acrshort{fsi} problem basically by means of three elements, which include a fluid solver, a structural solver and a third component which performs the interaction between the other two. The advantage of this technique consists in reusing and adapting already developed and optimized solvers and connect them. 
 
-For this reason, ad \textit{adapter}, written in C++, has been developed to implement this connection.
+In this thesis, the \acrfull{mbdyn} has been linked to the multiphysics coupling library \acrfull{precice}, with the purpose of extending \acrshort{mbdyn} capabilities in the field of \acrshort{fsi} simulations.
 
-Coupling \acrshort{mbdyn} with \acrshort{precice} represents and advantage because it allows to choose among a considerable number of fluid solvers, including a lot of well-validated open source and commercial codes.
+For this reason, an \textit{adapter}(i.e. a piece of connecting code, in this case written in C++), has been developed to implement this coupling.
 
-The coupling has been successfully tested in different scenarios, including some well-known \acrshort{fsi} problems. Also some limits of applicability, emerged in one of those benchmarks, has been analyzed.
+Coupling \acrshort{mbdyn} with \acrshort{precice} represents and advantage and an extension of capabilities, because many other adapters for the fluid side have already been developed for this library. It is then  possible and simple to choose among a considerable number of fluid solvers, including many well-validated open source and commercial codes. On the other hand, with a fully integrated \textit{MBDyn adapter}, the library preCICE gains the opportunity to connect to a multibody dynamics software, which has not yet been completely developed.  
+
+The coupling between \acrshort{mbdyn} and \acrshort{precice} has been successfully tested in different scenarios, including some well-known \acrshort{fsi} benchmark problems. Also some current limitations of applicability, emerged in one of those benchmarks, have been analyzed.
+
+The current status of the adapter represents a good starting point to explore more in detail the behavior of the \acrshort{mbdyn}-\acrshort{precice} coupling even in more complex scenarios and to use it in real-world applications.
 
 
 \vspace{5mm}

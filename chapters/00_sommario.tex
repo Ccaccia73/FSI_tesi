@@ -3,4 +3,23 @@
 \markboth{Sommario}{}
 \addcontentsline{toc}{chapter}{Sommario}
 
-TODO Tradurre abstract
+
+La simulazione computerizzata di fenomeni di \acrfull{fsi} consente di ottenere una maggiore comprensione di interazioni e comportamenti complessi di corpi solidi immersi in un fluido, aiutando a prevederne gli effetti. Le applicazioni si estendono dall'aeroelasticità, alle turbomacchine od alla biomeccanica, solo per citarne alcune.
+
+\`E possibile eseguire tali simulazioni in modi differenti: uno di questi utilizza una tecnica nota come \textit{algoritmo partizionato}. Un algoritmo partizionato tenta di risolvere un problema di \acrshort{fsi} utilizzando tre elementi: un solutore fluido, un solutore solido ed un terzo componente che si occupa dell'interazione tra gli altri due. Il vantaggio di questa tecnica consiste nel poter riutilizzare ed adattare elementi codice già sviluppato ed ottimizzato e di connetterli. 
+
+In questa tesi, il \acrfull{mbdyn} è stato collegato alla libreria software di simulazione multifisica \acrfull{precice}, con l'obiettivo di estendere, per \acrshort{mbdyn}, le possibilità di simulazione nell'ambito della simulazione fluido-struttura.
+
+Per questa ragione, un \textit{adattatore} (ovvero del codice software di connessione, in questo caso scritto in C++) è stato sviluppato per realizzare questa operazione.
+
+La connessione di \acrshort{mbdyn} con \acrshort{precice} costituisce un vantaggio ed una estensione di potenzialità, in quanto sono già presenti molti adattatori per preCICE in ambito fluidodinamico: diventa così possibile e semplice scegliere tra un considerevole numero di solutori fluidi, tra cui molti codici \textit{open-source} e commerciali molto noti. D'altra parte, con un \textit{adattatore MBDyn} completamente integrato, la libreria preCICE ottiene la possibilità di connettere un solutore multiboby, un aspetto ad oggi non ancora completamente sviluppato.
+
+L'interazione tra \acrshort{mbdyn} e \acrshort{precice} è stata sperimentata con successo in scenari diversi, tra cui una serie di problemi di riferimento in ambito \acrshort{fsi} ben noti in letteratura. Anche alcune attuali limitazioni d'uso, emerse durante lo studio di uno di questi problemi, sono state analizzate. 
+
+Lo stato attuale di conoscenza e sviluppo dell'\textit{adattatore} rappresenta un buon punto di partenza per analizzare più in dettaglio il comportamento dell'interazione tra \acrshort{mbdyn} e \acrshort{precice} anche in scenari più complessi e di utilizzarlo come strumento di analisi in applicazioni reali.
+
+
+\vspace{5mm}
+
+
+\parolechiave{interazione fluido struttura, algoritmi partizionati, dinamica multibody, MBDyn, preCICE}
