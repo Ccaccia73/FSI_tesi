@@ -3,25 +3,29 @@
 %\markboth{Conclusions}{}
 %\addcontentsline{toc}{chapter}{Conclusions}
 
-In this thesis, we  developed an adapter for MBDyn to enable fluid-structure interaction simulations with the coupling library preCICE.
+In this thesis, we  developed an adapter for \acrshort{mbdyn} to enable fluid-structure interaction simulations with the coupling library \acrshort{precice}.
 The adapter has been validated both qualitatively and quantitatively with several test cases.
 
-Positive aspects:
+This work allows MBDyn to extend its capabilities in \acrshort{fsi} simulations, as it can be coupled with a wide set of \acrshort{cfd} solvers which are already connected to preCICE.
 
-\begin{itemize}
-	\item extends MBDyn capabilities to be used with a wide variety of CFD solvers
-	\item allows the simulation of slender bodies in FSI prescribing different structural properties: i.e. the idea of decoupling section structural properties from the shape of the section itself
-	\item it can be also used with other MBDyn elements: i.e. shells
-	\item it does not impact the development of MBDyn as the adapter is completely external
-	\item it is quite configurable at runtime through the json config file
-\end{itemize}
+Among other possible simulations, this connection allows the \acrshort{fsi} simulation of slender bodies immersed in fluid flow and gives the possibility of prescribing different structural properties independently from the external geometry: shape and structural properties of the structure can be decoupled, thus allowing specific and independent tuning of parameters.
 
+The adapter introduced here can also be used with other \acrshort{mbdyn} elements (e.g. shells), simply changing the MBDyn configuration file. Besides, it has been developed independently from MBDyn itself as it makes use of external \acrshort{api}s. So it does not impact directly the development of MBDyn.
 
-Usage goals:
-\begin{itemize}
-	\item include in MBDyn and preCCIE repositories and websites
-	\item find other benchmarks, users, comparisons and use scenarios
-\end{itemize}
+During the development phase, a great attention has been given to the configuration process of a simulation. For this reason, most of the adapter parameters are read at runtime from a \acrshort{json} configuration file.  
+
+Given the development and the tests carried out in this work, some directions of further analysis and development appear to be particularly interesting.
+First of all it is necessary to better understand the limits of application for the whole \acrshort{fsi} setup as it is now: for example if there exists a set of parameters that allows to simulate models similar to the FSI3 benchmark, as it is known to work by simply using a different structural solver.
+
+It will also be important to analyze the behavior and the performances of a simulation in more complex, 3D real world scenarios, where more computational resources are needed.
+
+There can also be future developments in the software code of the adapter itself. Some of them concern the whole simulation: for example it would be useful to  make the configuration easier and less redundant, as some of the parameters are duplicated among the components.
+
+Other extensions are relative to the possibility of applying a variable time step to the \acrshort{mbdyn} simulation: in principle, the fluid and the solid simulation can advance at different time steps, as they might have different specific needs. But in this case, at some point in the simulation, \acrshort{precice} will need to synchronize the two simulations by forcing a prescribed time step to the solvers. For our simulations we kept the time step coincident among the solvers: the fluid solver generally requires a shorter time step and the \acrshort{mbdyn} simulation is not costly. But there can be situations in which this feature might be useful. It has already been partly developed and it does not require much work to be finalized.
+
+Anther, more complex, development would consist in possibly extending MBDyn capabilities to simulate \acrfull{ssi} applications. This would allow to couple MBDyn, though preCICE, with different \acrshort{fem} solvers (or even with itself). This kind of coupling would allow to simulate multibody models, in which some relevant sub-models are simulated by means of a dynamic FEM model. This kind of development would require some modifications also in the MBDyn code.
+
+Some of the preliminary results have been already presented to the \textit{second preCICE community hour}, but for the continuation and the future development of this work we aim at including the code, together with some usage examples, into the MBDyn and preCICE repositories and websites, to find other benchmarks, users, comparisons and use scenarios.
 
 
 %This work gives insights into the basics of FSI simulations and allows to classify the implemented partitioned
@@ -66,14 +70,6 @@ Usage goals:
 %or acoustics would help to establish preCICE and OpenFOAM as standard components
 %of multi-physics simulations, leading to benefits for both communities
 
-Future development:
-\begin{itemize}
-	\item Better understand the limits of application and if there is a setup that allows to simulate FSI3, as it is known to work by simply using a different structural solver.
-	\item Test in more complex, 3D real world scenarios
-	\item make configuration easier, less redundant for the whole FSI simulation
-	\item extend to variable time step
-	\item Possibly extend MBDyn capabilities to simulate SSI applications (solid solid interaction). This would allow to couple MBDyn with different FEM solvers and solve multibody problems together with FEM models on specific parts (da spiegare meglio)
-\end{itemize}
 
 
 
