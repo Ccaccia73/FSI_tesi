@@ -1,6 +1,17 @@
 \chapter{preCICE configuration file}
 \label{app:pc-config-file}
 
+The following represents a rather standard \acrshort{precice} configuration file. Its main parts are:
+
+\begin{itemize}
+	\item definition of the interface dimension (line 3)
+	\item definition of names of exchanged data (lines 5-6)
+	\item definition of the mesh names and which data are read or written (lines 8-15)
+	\item definition of the solvers (participants) together with information concerning the meshes and exchanged data (lines 17-27)
+	\item definition of the communication protocol (line 29)
+	\item definition of the coupling strategy, together with simulation time, time step, convergence criteria and acceleration method (lines 31-40)
+\end{itemize}
+
 \lstset{language=XML}
 \begin{lstlisting}[caption=preCICE configuration file example, label=precice-config]
 <?xml version="1.0"?>

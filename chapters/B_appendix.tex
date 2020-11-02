@@ -1,6 +1,17 @@
 \chapter{MBDyn adapter configuration file}
 \label{app:mbd-config-file}
 
+The data required by the \acrshort{mbdyn} \textit{adapter} are described in Section~\ref{sec:mbdyn-adapter-input}. The order within the file is irrelevant, but for clarity reasons similar parameters have been grouped together:
+
+\begin{itemize}
+	\item Data concerning the \acrshort{precice} coupling (lines 2-6)
+	\item Data necessary for MBdyn coupling (lines 7-11) 
+	\item Data used for the simulation (lines 12-15)
+	\item Information for output (lines 16-19)
+	\item Debug parameters (lines 20-22)
+\end{itemize}
+
+
 \lstset{language=json}
 \begin{lstlisting}[caption=MBDyn adapter configuration file example, label=adapter-config]
 {

@@ -6,19 +6,31 @@
 
 \subsubsection{Main File}
 
+The main file used for the \acrshort{fsi} simulations follows the structure described in Section~\ref{sec:mbd-syntax}.
+
 \lstinputlisting[language=mbdyn, caption=MBDyn input file example, label=map10]{listings/map_10n_3x_21j.mbd}
 
 \subsubsection{Beam nodes}
+
+The position of the nodes (see Section \ref{sec:mbd-node}) is defined with the following included file.
 
 \lstinputlisting[language=mbdyn, caption=MBDyn beam nodes, label=mbd-nodes]{listings/beam.nod}
 
 \subsubsection{Beam elements and Bodies}
 
+\text{beam} elements (see Section \ref{sec:mbd-beam}) and \texttt{body} elements (see Section \ref{sec:mbd-body}) are defined in the following input file.
+
 \lstinputlisting[language=mbdyn, caption=MBDyn beam elements, label=mbd-elems]{listings/beam.elm}
+
+\newpage
 
 \subsubsection{Joints}
 
+In order to keep a simulation bidimensional, some \texttt{joint} elements (see Section \ref{sec:mbd-joint}) are applied to nodes as a constraint.
+
 \lstinputlisting[language=mbdyn, caption=MBDyn joints, label=mbd-joints]{listings/joint.elm}
+
+\newpage
 
 \section{MBDyn output file structure}
 \label{sec:mbdyn-output-file}
