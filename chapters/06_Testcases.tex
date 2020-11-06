@@ -18,7 +18,7 @@ At first, the so-called FSI2 benchmark (characterized by a mass number of $0.1$)
 
 Finally, the FSI3 benchmark has been extensively analyzed (Section \ref{sec:FSI1-FSI3}). It has a mass number of $1$ and, up to now, it hasn't been possible to find a suitable set of coupling parameters that can make this case converge when coupled with MBDyn.
 
-It appears that the \acrfull{ame} (see Section \ref{sec:added-mass}), plays a dominant role in the convergence of a FSI problems with MBDyn. For this reason, a sensitivity analysis has been performed on the FSI3 problem setup (Section \ref{sec:FSI3-sensitivity}). In particular, flow velocity, fluid density and solid stiffness have been varied in order to gain some insight about the range of parameters and adimensional numbers that must be considered to understand how critical a simulation can be.     
+It appears that the \acrfull{ame} (see Section \ref{sec:added-mass}), plays a dominant role in the convergence of a FSI problems with MBDyn. For this reason, a sensitivity analysis has been performed on the FSI3 problem setup (Section \ref{sec:FSI3-sensitivity}). In particular, flow velocity, fluid density and solid stiffness have been varied in order to gain some insight about the range of parameters and dimensionlesssional numbers that must be considered to understand how critical a simulation can be.     
 
 Each section starts with a short description of the test case, including the most relevant parameters: e.g. the fluid domain geometry and discretization, structural and coupling parameters. Finally some results are presented, together with the coupling performances.
 
@@ -350,7 +350,7 @@ The interface mesh is divided into 20 faces for the front and back surfaces of t
 
 \subsection{Results}
 
-The problem considered is characterized by the adimensional parameters given in Table \ref{table:ex1-adim} and its solution is represented in Figure \ref{fig:vf_sol}.
+The problem considered is characterized by the dimensionless parameters given in Table \ref{table:ex1-adim} and its solution is represented in Figure \ref{fig:vf_sol}.
 
 
 \begin{table}[!htb]
@@ -363,7 +363,7 @@ The problem considered is characterized by the adimensional parameters given in 
 			Cauchy number  & $C_Y$ & $2.5\cdot 10^{-5}$  \\			
 		\end{tabular}
 	\end{center}
-	\caption{Vertical flap: adimensional numbers}
+	\caption{Vertical flap: dimensionless numbers}
 	\label{table:ex1-adim}
 \end{table}
 
@@ -585,7 +585,7 @@ The main data concerning the coupling between MBDyn and SU2 are given in Table \
 
 \subsection{Results}
 
-The problem considered is characterized by the adimensional parameters given in Table~\ref{table:comp-adim}: in particular the mass number remains in the order of $\mathcal{O} \left(10^{-3}\right)$. A sketch of the flow solution is represented in Figure \ref{fig:comp_sol}.
+The problem considered is characterized by the dimensionless parameters given in Table~\ref{table:comp-adim}: in particular the mass number remains in the order of $\mathcal{O} \left(10^{-3}\right)$. A sketch of the flow solution is represented in Figure \ref{fig:comp_sol}.
 
 \begin{table}[!htb]
 	\begin{center}
@@ -597,7 +597,7 @@ The problem considered is characterized by the adimensional parameters given in 
 			Cauchy number  & $C_Y$ & $  \approx 2.53 \cdot 10^{-7}$  \\			
 		\end{tabular}
 	\end{center}
-	\caption{Vertical flap (compressible): adimensional numbers}
+	\caption{Vertical flap (compressible): dimensionless numbers}
 	\label{table:comp-adim}
 \end{table}
 
@@ -805,7 +805,7 @@ Most parameters are similar to the ones used in other examples as they turned ou
 
 \subsection{Results}
 
-The problem presented here is characterized by the adimensional parameters given in Table~\ref{table:sq-adim} and its solution is represented in Figure~\ref{fig:sq_sol}.
+The problem presented here is characterized by the dimensionless parameters given in Table~\ref{table:sq-adim} and its solution is represented in Figure~\ref{fig:sq_sol}.
 
 \begin{table}[!htb]
 	\begin{center}
@@ -817,7 +817,7 @@ The problem presented here is characterized by the adimensional parameters given
 			Cauchy number  & $C_Y$ & $  1.24 \cdot 10^{-6}$  \\			
 		\end{tabular}
 	\end{center}
-	\caption{square bluff body: adimensional numbers}
+	\caption{square bluff body: dimensionless numbers}
 	\label{table:sq-adim}
 \end{table}
 
@@ -1092,7 +1092,7 @@ The main coupling data are given in Table \ref{table:FSI2-coupling}. In this cas
 
 \subsection{Results}
 
-The problem presented here is characterized by the adimensional parameters given in Table~\ref{table:FSI2-adim} and its solution is represented in Figure~\ref{fig:FSI2_sol}.
+The problem presented here is characterized by the dimensionless parameters given in Table~\ref{table:FSI2-adim} and its solution is represented in Figure~\ref{fig:FSI2_sol}.
 
 \begin{table}[!htb]
 	\begin{center}
@@ -1104,7 +1104,7 @@ The problem presented here is characterized by the adimensional parameters given
 			Cauchy number  & $C_Y$ & $  7.14 \cdot 10^{-4}$  \\			
 		\end{tabular}
 	\end{center}
-	\caption{FSI2: adimensional numbers}
+	\caption{FSI2: dimensionless numbers}
 	\label{table:FSI2-adim}
 \end{table}
 
@@ -1258,7 +1258,7 @@ As previously stated, the results for the FSI3 case differ by in some cases $50\
 \section{Turek-Hron FSI3 Benchmark}
 \label{sec:FSI1-FSI3}
 
-Omitting for a while the test case named FSI1 as it is not oscillating, we considered the other benchmark proposed in \cite{turek2006proposal}, named FSI3. Its parameters are very similar to FSI2, with the only different properties shown in Table~\ref{table:FSI3-diff}. The corresponding adimensional numbers are given in Table~\ref{table:FSI3-adim}. 
+Omitting for a while the test case named FSI1 as it is not oscillating, we considered the other benchmark proposed in \cite{turek2006proposal}, named FSI3. Its parameters are very similar to FSI2, with the only different properties shown in Table~\ref{table:FSI3-diff}. The corresponding dimensionless numbers are given in Table~\ref{table:FSI3-adim}. 
 
 
 
@@ -1289,7 +1289,7 @@ Omitting for a while the test case named FSI1 as it is not oscillating, we consi
 			Reynolds number & $Re$ & $100$ & $200$ \\	
 		\end{tabular}
 	\end{center}
-	\caption{FSI2-FSI3: adimensional numbers}
+	\caption{FSI2-FSI3: dimensionless numbers}
 	\label{table:FSI3-adim}
 \end{table}
 
