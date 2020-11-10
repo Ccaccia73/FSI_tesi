@@ -120,3 +120,33 @@ The wing motion is achieved by means of a \texttt{total pin joint} element attac
 
 \subsubsection{Coupling}
 
+The main data concerning the coupling between the fluid solver and the structural solver  are given in Table~\ref{table:hc-coupling}:
+
+
+\begin{table}[!htb]
+	\begin{center}
+		\begin{tabular}{ l c  l| c } 
+			\multicolumn{3}{c|}{parameter} & value   \\ 
+			\hline
+			simulation time  & $t$& \si{s} & 2      \\
+			step size & $\Delta t$ & \si{s} & $10^{-3}$   \\
+			\hline
+			coupling scheme & & & serial implicit  $S\rightarrow F$  \\
+			coupling algorithm & & &  IQN-ILS  \\
+			displacement rel. convergence limit & & & $10^{-3}$ \\
+			force rel. convergence limit &&  & $10^{-3}$  \\
+      		interface mesh mapping & & & Nearest neigh. and RBF  \\
+			
+		\end{tabular}
+	\end{center}
+	\caption{naca0012: coupling parameters}
+	\label{table:hc-coupling}
+\end{table}
+
+Different experiments have been carried out considering different parameters. For example, a shorter time step is beneficial for a better mesh displacement, at the expense of a longer simulation time. At the same time, convergence limits have an obvious impact on the simulation time, as more iterations are required in order to reach a lower convergence limit.
+
+Finally, also mesh mapping strategy (see Section \ref{sec:data-mapping}) influence the simulation quality and time: \textit{nearest-neighbor} is faster but can be detrimental for mash movement, on the other side, the \acrfull{rbf} mapping gives better results, but for larger grids ($\approx4000$ points) the computational cost of the mapping becomes relevant. Moreover, it needs to be tuned.
+
+\subsection{Results}
+
+Due to resource constraints, only some preliminary results have been carried out.  
