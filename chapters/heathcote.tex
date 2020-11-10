@@ -132,7 +132,7 @@ The main data concerning the coupling between the fluid solver and the structura
 			step size & $\Delta t$ & \si{s} & $10^{-3}$   \\
 			\hline
 			coupling scheme & & & serial implicit  $S\rightarrow F$  \\
-			coupling algorithm & & &  IQN-ILS  \\
+			coupling algorithm & & &  \acrshort{iqnils}  \\
 			displacement rel. convergence limit & & & $10^{-3}$ \\
 			force rel. convergence limit &&  & $10^{-3}$  \\
       		interface mesh mapping & & & Nearest neigh. and RBF  \\
@@ -164,9 +164,12 @@ Due to resource constraints, only some preliminary results have been carried out
 
 The tip displacement is shown in Figure~\ref{fig:hc-tip-disp}. After the first settling oscillation, the peak tip displacement settles to around $3.62$\si{mm}. compared to the root displacement, the ratio is around $\frac{a_{TIP}}{a_{ROOT}} \approx 1.45$ with a lag of around $27^o$. These results are much closer to the the ones of the\textit{highly-flexible} wing presented in \cite{heathcote2008effect}.
 
-The root displacement is much smaller than the one used in the article in order to keep the mesh deformation small. Nevertheless the difference in the bending of the wing needs to be further analyzed.
+The first eigenfrequency of the model, computed in MBDyn, is $\approx6.8$\si{Hz}. The first eigenfrequency of the metal plate alone, considered as a cantilevered beam, would be around $9$\si{Hz}. The mass of the PDMS lowers the value, as expected. The amplification and the lag found in the simulation seem to be compatible with those theoretical data, while the experimental model seems to be stiffer. Citing the article: ``the airfoil comprises a tear-drop solid aluminium leading edge followed by a flexible steel plate''. The aluminium leading edge might contribute to the overall stiffness of the model.  
 
-On the other hand, the pitch angle of the wing tip, in the second plot of Figure~\ref{fig:hc-tip-disp} shows that the wing is torsionally rigid, as expected.
+The root displacement considered in the simulation is much smaller than the one used in the article in order to keep the mesh deformation small. This aspect might also be a cause of the discrepancy in the results.
+Nevertheless the difference between the experimental and the computer model needs to be further analyzed.
+
+On the other hand, the pitch angle of the wing tip, in the second plot of Figure~\ref{fig:hc-tip-disp}, shows that the wing is torsionally rigid, as expected.
 
 The forces and moment exerted on the wing are shown in Figure~\ref{fig:hc-wing-forces}. Focusing on the force on the $x$-direction, it is possible to compute the  average $C_D$:
 
@@ -174,7 +177,7 @@ The forces and moment exerted on the wing are shown in Figure~\ref{fig:hc-wing-f
  \bar{C}_D  = \frac{\bar{F}_x}{\frac{1}{2} \rho U_0^2 c\cdot b} \approx 0.02615   
 \end{equation}
 
-
+which is close to the values $0.0245\div0.028$ presented in the sources of the article.
 
 \begin{figure}[htbp!]
 	\centering
@@ -183,9 +186,9 @@ The forces and moment exerted on the wing are shown in Figure~\ref{fig:hc-wing-f
 	\label{fig:hc-wing-forces}
 \end{figure}
 
-which is close to the values $0.0245\div0.028$ presented in the sources of the article.
 
-The number of required iteration is, in this model, very stable: 15 iterations are required at each time step to converge, as shown in Figure~\ref{fig:hc-iterations}. As in the previous example, nodal forces converge slower than displacements.
+
+The number of required iterations is, in this model, very stable: 15 iterations are required at each time step to converge, as shown in Figure~\ref{fig:hc-iterations}. As in the previous examples, nodal forces converge slower than displacements.
 
 Finally some images taken from the fluid and the solid side of the simulation are shown in Figure~\ref{fig:hc-fluid-sol} and in Figure~\ref{fig:hc-solid-sol}.
 
@@ -223,7 +226,7 @@ Finally some images taken from the fluid and the solid side of the simulation ar
 	\begin{subfigure}{.75\textwidth}
 		\centering
 	    \includegraphics[width=0.99\textwidth]{images/heathcote/naca0012_dy.png}
-	    \caption{naca0012 deformed shape 10x}
+	    \caption{naca0012 deformed shape (10x)}
 	    \label{fig:hc-wing-disp}
 		%\label{fig:undist}
 	\end{subfigure}
@@ -236,7 +239,7 @@ Finally some images taken from the fluid and the solid side of the simulation ar
     	\caption{naca0012 forces on surface}
     	\label{fig:hc-surf-forces}
 	\end{subfigure}
-	\caption{forces on wing surface}
+	\caption{naca0012 solid domain}
 	\label{fig:hc-solid-sol}
 \end{figure}
 
