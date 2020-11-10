@@ -44,9 +44,79 @@ Besides, information concerning the ratio $\frac{a_{TIP}}{a_{ROOT}}$ and tip pha
 
 \subsection{Simulation setup}
 
+The experimental setup described in \cite{heathcote2008effect} has been replicated in a \acrshort{fsi} simulation using \acrshort{mbdyn} as structural solver and OpenFOAM as \acrshort{cfd} solver.
+
+\subsubsection{Fluid domain}
+
+The fluid domain is represented by a box of size $1.5\times 0.6\times 0.5$\si{m}, as represented in Figure~\ref{fig:hc-mesh}. The boundary conditions are:
+
+\begin{itemize}
+    \item constant inlet velocity for the face at $x=-0.25$\si{m},
+    \item constant pressure for the face at $x=1.25$\si{m},
+    \item symmetry plane at the root of the wing ($z=0$),
+    \item slip walls for the other external surfaces,
+    \item no-slip wall for the wing surface.
+\end{itemize}
+
+The naca0012 wing has been drawn in \textit{Salome} and exported in OpenFOAM as \textit{.stl} file. The mesh has been built with the tool \textit{snappyHexMesh} and it is composed of 218451 cells. 
 
 
 
+\begin{figure}[htbp!]
+	\centering
+	\begin{subfigure}{.75\textwidth}
+		\centering
+		\includegraphics[width=.99\linewidth]{images/heathcote/dom03.png}
+		\caption{mesh bounding box}
+		%\label{fig:undist}
+	\end{subfigure}
+	\newline
+	
+	\centering
+	\begin{subfigure}{.75\textwidth}
+		\centering
+		\includegraphics[width=.99\linewidth]{images/heathcote/dom02.png}
+		\caption{wing detail}
+		%\label{fig:dist}
+	\end{subfigure}
+	\caption{fluid mesh}
+	\label{fig:hc-mesh}
+\end{figure}
 
 
+
+\subsubsection{Interface}
+
+The same naca0012 profile drawn in Salome has been used to generate the interface mesh for the \texttt{external structural mapping} of MBdyn. The interface mesh is composed of 1286 cells (1200 quadrangles and 86 triangles), as shown in Figure~\ref{fig:hc-interface}.
+
+\begin{figure}[htbp!]
+	\centering
+	\includegraphics[width=0.75\textwidth]{images/heathcote/interface01.png}
+	\caption{interface mesh}
+	\label{fig:hc-interface}
+\end{figure}
+
+
+\subsubsection{Structural domain}
+
+The structural model is composed of 10 MBDyn \texttt{beam} elements. Considering the \textit{flexible} (or the \textit{highly flexible}) structure, the stiffness of the wing can be considered completely given by the 1\si{mm} metal plate, as the PDMS, with a Young modulus of $360\div870$ \si{kPa} would contribute with only a small fraction of the overall stiffness.
+
+The stiffness matrix of each beam element is given in Equation~\ref{eq:hc-stiff}, in which $w$ represents the chord and $h$ the metal thickness.
+
+\begin{equation}
+    \begin{bmatrix} Ewh &  & 0 & \ldots &  & 0 \\
+                          & Gwh &  & & & &  \\
+                          & & Gwh & & & \\
+                          & & & G\frac{1}{3}wh^3 & & \vdots \\
+                          & &  sym. & & E\frac{1}{12}wh^3 &  \\
+                          & & & & & E\frac{1}{12}hw^3
+    \end{bmatrix} 
+    \label{eq:hc-stiff}
+\end{equation}
+
+At each of the 21 nodes of the structure there is a \texttt{body} element attached, carrying the mass of the corresponding chunk of beam (both metal and PDMS).
+
+The wing motion is achieved by means of a \texttt{total pin joint} element attached to the root of the wing, which moves the root \texttt{node} with a $\sin(\omega t)$ law along the $y$ direction. The motion starts with a ramp of the  kind $\frac{1}{2}\left(1-\cos\left(\frac{t}{\tau}\right)\right)$ in order to ease convergence.
+
+\subsubsection{Coupling}
 
