@@ -149,28 +149,49 @@ Finally, also mesh mapping strategy (see Section \ref{sec:data-mapping}) influen
 
 \subsection{Results}
 
-Due to resource constraints, only some preliminary results have been carried out. 
+Due to resource constraints, only some preliminary results have been carried out fort the \textit{flexible} wing. In particular, the results obtained with a root displacement of $\pm2.5$\si{mm} at $2.5$\si{Hz} with a fluid velocity of 1\si{m.s^{-1}} are presented here. This corresponds to:
 
+\begin{equation}
+    Re=10000,\quad k_G = 0.785, \quad S_r \approx 1.5\cdot 10^{-2}
+\end{equation}
 
-\begin{figure}[htbp!]
+\begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.75\textwidth]{images/heathcote/naca0012_disp.png}
 	\caption{naca0012 displacement}
 	\label{fig:hc-tip-disp}
 \end{figure}
 
+The tip displacement is shown in Figure~\ref{fig:hc-tip-disp}. After the first settling oscillation, the peak tip displacement settles to around $3.62$\si{mm}. compared to the root displacement, the ratio is around $\frac{a_{TIP}}{a_{ROOT}} \approx 1.45$ with a lag of around $27^o$. These results are much closer to the the ones of the\textit{highly-flexible} wing presented in \cite{heathcote2008effect}.
+
+The root displacement is much smaller than the one used in the article in order to keep the mesh deformation small. Nevertheless the difference in the bending of the wing needs to be further analyzed.
+
+On the other hand, the pitch angle of the wing tip, in the second plot of Figure~\ref{fig:hc-tip-disp} shows that the wing is torsionally rigid, as expected.
+
+The forces and moment exerted on the wing are shown in Figure~\ref{fig:hc-wing-forces}. Focusing on the force on the $x$-direction, it is possible to compute the  average $C_D$:
+
+\begin{equation}
+ \bar{C}_D  = \frac{\bar{F}_x}{\frac{1}{2} \rho U_0^2 c\cdot b} \approx 0.02615   
+\end{equation}
+
+
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.75\textwidth]{images/heathcote/forces_naca0012.png}
+	\includegraphics[width=0.75\textwidth, trim=0 150 0 150, clip]{images/heathcote/forces_naca0012.png}
 	\caption{naca0012 forces}
-	\label{fig:hc-tip-disp}
+	\label{fig:hc-wing-forces}
 \end{figure}
 
+which is close to the values $0.0245\div0.028$ presented in the sources of the article.
+
+The number of required iteration is, in this model, very stable: 15 iterations are required at each time step to converge, as shown in Figure~\ref{fig:hc-iterations}. As in the previous example, nodal forces converge slower than displacements.
+
+Finally some images taken from the fluid and the solid side of the simulation are shown in Figure~\ref{fig:hc-fluid-sol} and in Figure~\ref{fig:hc-solid-sol}.
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.75\textwidth]{images/heathcote/naca0012_iterations.png}
+	\includegraphics[width=0.75\textwidth, trim=0 80 0 100, clip]{images/heathcote/naca0012_iterations.png}
 	\caption{naca0012 iterations}
 	\label{fig:hc-iterations}
 \end{figure}
@@ -192,22 +213,30 @@ Due to resource constraints, only some preliminary results have been carried out
 		\caption{naca0012 pressure profile t=1.2s}
 		%\label{fig:dist}
 	\end{subfigure}
-	\caption{fluid mesh}
-	\label{fig:hc-mesh}
+	\caption{naca0012 fluid domain}
+	\label{fig:hc-fluid-sol}
 \end{figure}
 
 
 \begin{figure}[htbp!]
 	\centering
-	\includegraphics[width=0.75\textwidth]{images/heathcote/naca0012_dy.png}
-	\caption{naca0012 deformed shape 10x}
-	\label{fig:hc-tip-disp}
-\end{figure}
-
-
-\begin{figure}[htbp!]
+	\begin{subfigure}{.75\textwidth}
+		\centering
+	    \includegraphics[width=0.99\textwidth]{images/heathcote/naca0012_dy.png}
+	    \caption{naca0012 deformed shape 10x}
+	    \label{fig:hc-wing-disp}
+		%\label{fig:undist}
+	\end{subfigure}
+	\newline
+	
 	\centering
-	\includegraphics[width=0.75\textwidth]{images/heathcote/naca0012_Fy.png}
-	\caption{naca0012 forces on surface}
-	\label{fig:hc-iterations}
+	\begin{subfigure}{.75\textwidth}
+		\centering
+    	\includegraphics[width=0.99\textwidth]{images/heathcote/naca0012_Fy.png}
+    	\caption{naca0012 forces on surface}
+    	\label{fig:hc-surf-forces}
+	\end{subfigure}
+	\caption{forces on wing surface}
+	\label{fig:hc-solid-sol}
 \end{figure}
+
