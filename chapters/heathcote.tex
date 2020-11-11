@@ -10,7 +10,7 @@ increase in thrust coefficient and a small decrease in power-input requirement, 
 
 Before describing the \acrshort{fsi} model and the simulation, it is necessary to briefly introduce the experimental setup.
 
-The study considers three types of rectangular wings, with profile \textit{naca 0012} and with different section properties, as shown in Figure~\ref{fig:profiles0012}. The section labeled (i) is considered \textit{inflexible}, the one labeled (ii) is considered \textit{flexible} and the last one \textit{highly flexible}.
+The study considers three types of rectangular wings, with profile \textit{NACA 0012} and with different section properties, as shown in Figure~\ref{fig:profiles0012}. The section labeled (i) is considered \textit{inflexible}, the one labeled (ii) is considered \textit{flexible} and the last one \textit{highly flexible}.
 
 \begin{figure}[htbp!]
 	\centering
@@ -58,7 +58,7 @@ The fluid domain is represented by a box of size $1.5\times 0.6\times 0.5$\si{m}
     \item no-slip wall for the wing surface.
 \end{itemize}
 
-The naca0012 wing has been drawn in \textit{Salome} and exported in OpenFOAM as \textit{.stl} file. The mesh has been built with the tool \textit{snappyHexMesh} and it is composed of 218451 cells. 
+The NACA 0012 wing has been drawn in \textit{Salome} and exported in OpenFOAM as \textit{.stl} file. The mesh has been built with the tool \textit{snappyHexMesh} and it is composed of 218451 cells. 
 
 
 
@@ -79,7 +79,7 @@ The naca0012 wing has been drawn in \textit{Salome} and exported in OpenFOAM as 
 		\caption{wing detail}
 		%\label{fig:dist}
 	\end{subfigure}
-	\caption{fluid mesh}
+	\caption{NACA 0012 fluid mesh}
 	\label{fig:hc-mesh}
 \end{figure}
 
@@ -87,12 +87,12 @@ The naca0012 wing has been drawn in \textit{Salome} and exported in OpenFOAM as 
 
 \subsubsection{Interface}
 
-The same naca0012 profile drawn in Salome has been used to generate the interface mesh for the \texttt{external structural mapping} of MBdyn. The interface mesh is composed of 1286 cells (1200 quadrangles and 86 triangles), as shown in Figure~\ref{fig:hc-interface}.
+The same NACA 0012 profile drawn in Salome has been used to generate the interface mesh for the \texttt{external structural mapping} of MBdyn. The interface mesh is composed of 1286 cells (1200 quadrangles and 86 triangles), as shown in Figure~\ref{fig:hc-interface}.
 
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.75\textwidth]{images/heathcote/interface01.png}
-	\caption{interface mesh}
+	\caption{NACA 0012 interface mesh}
 	\label{fig:hc-interface}
 \end{figure}
 
@@ -128,8 +128,8 @@ The main data concerning the coupling between the fluid solver and the structura
 		\begin{tabular}{ l c  l| c } 
 			\multicolumn{3}{c|}{parameter} & value   \\ 
 			\hline
-			simulation time  & $t$& \si{s} & 2      \\
-			step size & $\Delta t$ & \si{s} & $10^{-3}$   \\
+			simulation time  & $t$& [\si{s}] & 2      \\
+			step size & $\Delta t$ & [\si{s}] & $10^{-3}$   \\
 			\hline
 			coupling scheme & & & serial implicit  $S\rightarrow F$  \\
 			coupling algorithm & & &  \acrshort{iqnils}  \\
@@ -139,7 +139,7 @@ The main data concerning the coupling between the fluid solver and the structura
 			
 		\end{tabular}
 	\end{center}
-	\caption{naca0012: coupling parameters}
+	\caption{NACA 0012: coupling parameters}
 	\label{table:hc-coupling}
 \end{table}
 
@@ -158,7 +158,7 @@ Due to resource constraints, only some preliminary results have been carried out
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.75\textwidth]{images/heathcote/naca0012_disp.png}
-	\caption{naca0012 displacement}
+	\caption{NACA 0012 displacement}
 	\label{fig:hc-tip-disp}
 \end{figure}
 
@@ -182,7 +182,7 @@ which is close to the values $0.0245\div0.028$ presented in the sources of the a
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.75\textwidth, trim=0 150 0 150, clip]{images/heathcote/forces_naca0012.png}
-	\caption{naca0012 forces}
+	\caption{NACA 0012 forces}
 	\label{fig:hc-wing-forces}
 \end{figure}
 
@@ -195,7 +195,7 @@ Finally some images taken from the fluid and the solid side of the simulation ar
 \begin{figure}[htbp!]
 	\centering
 	\includegraphics[width=0.75\textwidth, trim=0 80 0 100, clip]{images/heathcote/naca0012_iterations.png}
-	\caption{naca0012 iterations}
+	\caption{NACA 0012 iterations}
 	\label{fig:hc-iterations}
 \end{figure}
 
@@ -204,7 +204,7 @@ Finally some images taken from the fluid and the solid side of the simulation ar
 	\begin{subfigure}{.75\textwidth}
 		\centering
 		\includegraphics[width=.99\linewidth]{images/heathcote/naca0012_U.png}
-		\caption{naca0012 velocity t=1.2s}
+		\caption{NACA 0012 velocity t=1.2s}
 		%\label{fig:undist}
 	\end{subfigure}
 	\newline
@@ -213,10 +213,10 @@ Finally some images taken from the fluid and the solid side of the simulation ar
 	\begin{subfigure}{.75\textwidth}
 		\centering
 		\includegraphics[width=.99\linewidth]{images/heathcote/naca0012_p.png}
-		\caption{naca0012 pressure profile t=1.2s}
+		\caption{NACA 0012 pressure profile t=1.2s}
 		%\label{fig:dist}
 	\end{subfigure}
-	\caption{naca0012 fluid domain}
+	\caption{NACA 0012 fluid domain}
 	\label{fig:hc-fluid-sol}
 \end{figure}
 
@@ -226,7 +226,7 @@ Finally some images taken from the fluid and the solid side of the simulation ar
 	\begin{subfigure}{.75\textwidth}
 		\centering
 	    \includegraphics[width=0.99\textwidth]{images/heathcote/naca0012_dy.png}
-	    \caption{naca0012 deformed shape (10x)}
+	    \caption{NACA 0012 deformed shape (10x)}
 	    \label{fig:hc-wing-disp}
 		%\label{fig:undist}
 	\end{subfigure}
@@ -236,10 +236,10 @@ Finally some images taken from the fluid and the solid side of the simulation ar
 	\begin{subfigure}{.75\textwidth}
 		\centering
     	\includegraphics[width=0.99\textwidth]{images/heathcote/naca0012_Fy.png}
-    	\caption{naca0012 forces on surface}
+    	\caption{NACA 0012 forces on surface}
     	\label{fig:hc-surf-forces}
 	\end{subfigure}
-	\caption{naca0012 solid domain}
+	\caption{NACA 0012 solid domain}
 	\label{fig:hc-solid-sol}
 \end{figure}
 
