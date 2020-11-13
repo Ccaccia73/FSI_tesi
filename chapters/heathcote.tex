@@ -4,7 +4,7 @@
 
 An application example of \acrshort{precice}-\acrshort{mbdyn} coupling in the study of \acrshort{fsi} problems can be found in \cite{heathcote2008effect}, in which the effect of spanwise wing flexibility on thrust, lift and propulsive efficiency of a rectangular wing, oscillating in pure heave, is analyzed by means of water tunnel experiments.
 
-The study shows that, for some oscillating frequencies, a degree of spanwise flexibility yields a small
+The study shows that, for some oscillating frequencies, a degree of spanwise flexibi\-lity yields a small
 increase in the thrust coefficient and a small decrease in power-input requirement, resulting in higher overall efficiency.
 
 \subsection{Experimental setup}
@@ -20,9 +20,9 @@ The study considers three types of rectangular wings, with profile \textit{NACA 
 	\label{fig:profiles0012}
 \end{figure}
 
-Each wing has the following dimensions: $100$\si{mm} chord and $300$\si{mm} span.
+Each wing has the following dimensions: chord $c=100$ \si{mm} and span $b=300$ \si{mm}.
 
-The experimental setup is shown in Figure~\ref{fig:0012exp}. The displacement of the root section is given by $s = a_{ROOT} \cos(\omega t)$, where $a_{ROOT} = 0.175c$. The flow velocity $U_0$ is in the range $1-3$\si{m.s^{-1}}. The following dimensionless parameters are considered:
+The experimental setup is shown in Figure~\ref{fig:0012exp}. The displacement of the root section is given by $s = a_{ROOT} \sin(\omega t)$, where $a_{ROOT} = 0.175\cdot c$. The flow velocity $U_0$ is in the range $1\div3$ \si{m.s^{-1}}. The following dimensionless parameters are considered:
 
 \begin{itemize}
 	\item $Re = \frac{\rho U_0 c}{\mu}$: Reynolds number
@@ -37,7 +37,7 @@ The experimental setup is shown in Figure~\ref{fig:0012exp}. The displacement of
 	\label{fig:0012exp}
 \end{figure}
 
-Experiments are carried out for the three types of wings in the following ranges: $Re=1\cdot10^4-3\cdot10^4$ and $k_G=0-7$.
+Experiments are carried out for the three types of wings in the following ranges: $Re=1\cdot10^4\div 3\cdot10^4$ and $k_G=0 \div 7$.
 
 The results give information concerning the average thrust coefficient $C_T = \frac{T}{\frac{1}{2}\rho U_0^2c}$ over a finite number of cycles and the mean power input coefficient $\bar{C}_P = \frac{\bar{F_y v}}{\frac{1}{2}\rho U_0^3c}$.
 
@@ -100,7 +100,7 @@ The same NACA 0012 profile drawn in Salome has been used to generate the interfa
 
 \subsubsection{Structural domain}
 
-The structural model is composed of 10 MBDyn \texttt{beam} elements. Considering the \textit{flexible} (or the \textit{highly flexible}) structure, the stiffness of the wing can be considered completely given by the 1\si{mm} metal plate, as the PDMS, with a Young modulus of $360\div870$ \si{kPa} would contribute with only a small fraction of the overall stiffness.
+The structural model is composed of 10 MBDyn \texttt{beam} elements. Considering the \textit{flexible} (or the \textit{highly flexible}) structure, the stiffness of the wing can be considered completely given by the 1 \si{mm} metal plate, as the PDMS, with a Young modulus of $360\div870$ \si{kPa} would contribute with only a small fraction of the overall stiffness.
 
 The stiffness matrix of each beam element is given in Equation~\ref{eq:hc-stiff}, in which $w$ represents the chord and $h$ the metal thickness.
 
@@ -136,7 +136,7 @@ The main data concerning the coupling between the fluid solver and the structura
 			coupling algorithm & & &  \acrshort{iqnils}  \\
 			displacement rel. convergence limit & & & $10^{-3}$ \\
 			force rel. convergence limit &&  & $10^{-3}$  \\
-      		interface mesh mapping & & & Nearest neigh. and RBF  \\
+      		interface mesh mapping & & & Nearest neigh. and \acrshort{rbf}  \\
 			
 		\end{tabular}
 	\end{center}
@@ -146,11 +146,11 @@ The main data concerning the coupling between the fluid solver and the structura
 
 Different experiments have been carried out considering different parameters. For example, a shorter time step is beneficial for a better mesh displacement, at the expense of a longer simulation time. At the same time, convergence limits have an obvious impact on the simulation time, as more iterations are required in order to reach a lower convergence limit.
 
-Finally, also mesh mapping strategy (see Section \ref{sec:data-mapping}) influence the simulation quality and time: \textit{nearest-neighbor} is faster but can be detrimental for mash movement, on the other side, the \acrfull{rbf} mapping gives better results, but for larger grids ($\approx4000$ points) the computational cost of the mapping becomes relevant. Moreover, it needs to be tuned.
+Finally, also mesh mapping strategy (see Section \ref{sec:data-mapping}) influences the simulation quality and time: \textit{nearest-neighbor} is faster but can be detrimental for mesh movement, on the other side, the \acrfull{rbf} mapping gives better results, but for larger grids ($\approx4000$ points) the computational cost of the mapping becomes relevant. Moreover, it needs to be tuned.
 
 \subsection{Results}
 
-Due to resource constraints, only some preliminary results have been carried out fort the \textit{flexible} wing. In particular, the results obtained with a root displacement of $\pm2.5$\si{mm} at $2.5$\si{Hz} with a fluid velocity of 1\si{m.s^{-1}} are presented here. This corresponds to:
+Due to resource constraints, only some preliminary results have been carried out fort the \textit{flexible} wing. In particular, the results obtained with a root displacement of $\pm2.5$ \si{mm} at $2.5$ \si{Hz} with a fluid velocity of 1 \si{m.s^{-1}} are presented here. This corresponds to:
 
 \begin{equation}
     Re=10000,\quad k_G = 0.785, \quad S_r \approx 1.5\cdot 10^{-2}
@@ -163,9 +163,9 @@ Due to resource constraints, only some preliminary results have been carried out
 	\label{fig:hc-tip-disp}
 \end{figure}
 
-The tip displacement is shown in Figure~\ref{fig:hc-tip-disp}. After the first settling oscillation, the peak tip displacement settles to around $3.62$\si{mm}. compared to the root displacement, the ratio is around $\frac{a_{TIP}}{a_{ROOT}} \approx 1.45$ with a lag of around $27^o$. These results are much closer to the the ones of the\textit{highly-flexible} wing presented in \cite{heathcote2008effect}.
+The tip displacement is shown in Figure~\ref{fig:hc-tip-disp}. After the first transient oscillation, the peak tip displacement settles to around $3.62$\si{mm}. compared to the root displacement, the ratio is around $\frac{a_{TIP}}{a_{ROOT}} \approx 1.45$ with a lag of around $27^o$. These results are much closer to the the ones of the\textit{highly-flexible} wing presented in \cite{heathcote2008effect}.
 
-The first eigenfrequency of the model, computed in MBDyn, is $\approx6.8$\si{Hz}. The first eigenfrequency of the metal plate alone, considered as a cantilevered beam, would be around $9$\si{Hz}. The mass of the PDMS lowers the value, as expected. The amplification and the lag found in the simulation seem to be compatible with those theoretical data, while the experimental model seems to be stiffer. Citing the article: ``the airfoil comprises a tear-drop solid aluminium leading edge followed by a flexible steel plate''. The aluminium leading edge might contribute to the overall stiffness of the model.  
+The first eigenfrequency of the model, computed in MBDyn, is $\approx6.8$ \si{Hz}. The first eigenfrequency of the metal plate alone, considered as a cantilevered beam, would be around $9$ \si{Hz}. The mass of the PDMS lowers the value, as expected. The amplification and the lag found in the simulation seem to be compatible with those theoretical data, while the experimental model seems to be stiffer. Citing the article: ``the airfoil comprises a tear-drop solid aluminium leading edge followed by a flexible steel plate''. The aluminium leading edge might contribute to the overall stiffness of the model.  
 
 The root displacement considered in the simulation is much smaller than the one used in the article in order to keep the mesh deformation small. This aspect might also be a cause of the discrepancy in the results.
 Nevertheless the difference between the experimental and the computer model needs to be further analyzed.
