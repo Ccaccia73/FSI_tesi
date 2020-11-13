@@ -1,7 +1,7 @@
 \chapter{Software Packages used in this work}
 \label{cha:software}
 
-This chapter illustrates the main software tools used in this work. First, the \acrfull{mbdyn}  is shortly presented in Section \ref{sec:mbdyn}. Then, the coupling library \acrfull{precice} is introduced in Section \ref{sec:precice}.
+This chapter illustrates the main software tools used in this work. First, the \acrfull{mbdyn}  is shortly presented in Section \ref{sec:mbdyn}. Then, the coupling library \acrfull{precice} is introduced in Section~\ref{sec:precice}.
 
 
 \section{MBDyn}
@@ -73,18 +73,16 @@ We focus now on the main entities of a MBDyn simulation, namely nodes and elemen
 
 Nodes are the basic blocks of a model: they instantiate kinematic degrees of freedom and the corresponding equilibrium equations. There can be different type of nodes in MBDyn, we focus here on \texttt{structural nodes}.
 
-Structural nodes can have 3 degrees of freedom, thus describe the kinematics of point mass motion in space  (position) or 6 DoFs (position and orientation), and thus describe the kinematics of rigid-body motion in space.
+Structural nodes can have 3 degrees of freedom, thus describing the kinematics of point mass motion in space  (position) or 6 DoFs (position and orientation), and thus describing the kinematics of rigid-body motion in space.
 
 Each node has a unique label and can be specified in different ways:
 
 \begin{itemize}
 	\item \texttt{static}: this keyword instantiates only equilibrium equations (force for 3 DoF nodes or force and moment for 6 DoF nodes)
-	\item \texttt{dynamic}: this also instantiates momentum (3 and 6 DoFs) and momenta moment (6 DoFs)
+	\item \texttt{dynamic}: this also instantiates momentum (3 and 6 DoFs) and momenta moment (6~DoFs)
 \end{itemize}
 
-Also \texttt{modal} and \texttt{dummy} nodes exist, but are beyond the scope of this work.
-
-Nodes are the starting point to define the elements of a simulation.
+Also \texttt{modal} and \texttt{dummy} nodes exist, but are beyond the scope of this work. Nodes are the starting point to define the elements of a simulation.
 
 
 \subsection{Elements}
@@ -192,8 +190,8 @@ The \texttt{body} element describes a lumped rigid body when connected to a regu
 \texttt{structural} nodes can be constrained by means of \texttt{joint} elements. Many different joints are available. In the FSI model the following types of joints are used:
 
 \begin{itemize}
-	\item \texttt{clamp}: grounds all 6 DoFs of a node in an arbitrary position and orientation
-	\item \texttt{total joint}: allows to arbitrarily constrain specific components of the relative position and orientation of two nodes\cite{masarati2013formulation}
+	\item \texttt{clamp}: grounds all 6 DoFs of a node in an arbitrary position and orientation.
+	\item \texttt{total joint}: allows to arbitrarily constrain specific components of the relative position and orientation of two nodes\cite{masarati2013formulation}.
 \end{itemize}
 
 
@@ -216,9 +214,9 @@ The \texttt{External Structural} element allows to communicate with an external 
 This element is similar to the previous one, but the nodes where forces are applied and the kinematics is computed depend on structural nodes through a linear mapping. This element has been used in building the adapter. In order to use the \texttt{external structural mapping} elements, the following steps have to be performed:
 
 \begin{enumerate}
-	\item a set of points is defined for each \texttt{structural node} according to a specified offset. Those points are used to compute the kinematics of the interface points, originating from the rigid-body motion of the structural nodes
-	\item before the simulation, a linear mapping matrix $H$ is generated starting from the position of the above points and the interface mesh points (this is performed by means of an \texttt{Octave} script which is part of MBDyn). The matrix is stored in sparse form
-	\item the mapping matrix is used during simulation to map forces and kinematics between the interface nodes and the structural nodes
+	\item a set of points is defined for each \texttt{structural node} according to a specified offset. Those points are used to compute the kinematics of the interface points, originating from the rigid-body motion of the structural nodes,
+	\item before the simulation, a linear mapping matrix $H$ is generated starting from the position of the above points and the interface mesh points (this is performed by means of an \texttt{Octave} script which is part of MBDyn). The matrix is stored in sparse form,
+	\item the mapping matrix is used during the simulation to map forces and kinematics between the interface nodes and the structural nodes.
 \end{enumerate}
 
 The constant matrix mapping allows to compute the position and the velocity of the \textit{interface} points as function of the points rigidly offset from structural nodes:
@@ -242,12 +240,12 @@ which implies
 	f_{mbdyn} = H^T f_{interf}
 \end{equation}
 
-When performing an FSI simulation with strong coupling (see Section \ref{sec:strong-coupling}), MBDyn may need to compute multiple iterations of the same time step in order to reach global convergence. This is performed by using the keyword \texttt{tight} in the coupling of the \texttt{external structural mapping}. The computation and the communication pattern is the following:
+When performing an \acrshort{fsi} simulation with strong coupling (see Section \ref{sec:strong-coupling}), MBDyn may need to compute multiple iterations of the same time step in order to reach global convergence. This is performed by using the keyword \texttt{tight} in the coupling of the \texttt{external structural mapping}. The computation and the communication pattern is the following:
 
 \begin{enumerate}
-	\item MBDyn sends the predicted kinematics for time step $k$
-	\item MBDyn receives a set of forces sent by the external peer; those forces are computed based on the kinematics at iteration $j$
-	\item MBDyn continues iterating until convergence using the last set of forces until, while reading the forces, it is informed that the external peer converged. this implies that MBDyn solves the kinematics for time step $k$ at iteration $j$ using the forces evaluated by the external solver for iteration $j-1$ 
+	\item MBDyn sends the predicted kinematics for time step $k$,
+	\item MBDyn receives a set of forces sent by the external peer; those forces are computed based on the kinematics at iteration $j$,
+	\item MBDyn continues iterating until convergence using the last set of forces until, while reading the forces, it is informed that the external peer converged. this implies that MBDyn solves the kinematics for time step $k$ at iteration $j$ using the forces evaluated by the external solver for iteration $j-1$ .
 \end{enumerate}
 
 The communication with the external software, in our case the adapter itself, is performed by means of a local unix socket.
@@ -308,7 +306,7 @@ The ability to switch among different solvers is advantageous as it provides a l
 
 In a nutshell, preCICE simply affects the input and observes the output of the solvers (called \textit{participants}). The required data and control elements are accessed using an \textit{adapter}, i.e. a  ``glue code'' that is attached to the corresponding solver and communicates the information with the library.
 
-preCICE makes all the actions required to perform a coupled simulation: 
+\acrshort{precice} makes all the actions required to perform a coupled simulation: 
 
 \begin{itemize}
 	\item it implements the coupling strategy (Section \ref{sec:pc-coupling}),
@@ -358,13 +356,13 @@ processes use asynchronous point-to-point (M:N) communication. The channels are 
 \subsection{Data mapping}
 \label{sec:pc-map}
 
-Even if volume coupling is possible, preCICE is mainly designed to couple simulations that share a common surface boundary (namely \textit{conforming meshes}, in the terminology used in Section \ref{sec:conforming-mesh}). The meshes don't need to be node-to-node coincident, so it is necessary to map variables at the interface, preserving the geometry (i.e. no gaps or superpositions at the interface) and the mass and energy balances. 
+Even if volume coupling is possible, preCICE is mainly designed to couple simulations that share a common surface boundary (namely \textit{conforming meshes}, in the terminology used in Section~\ref{sec:conforming-mesh}). The meshes do not need to be node-to-node coincident, so it is necessary to map variables at the interface, preserving the geometry (i.e. no gaps or superpositions at the interface) and the mass and energy balances. 
 
-The user defines which data are shared by each \textit{participant} (i.e. solver) and the way data is shared in the configuration section named \texttt{mapping}. As described in Section \ref{sec:data-mapping}, two kinds of mapping are available:
+The user defines which data are shared by each \textit{participant} (i.e. solver) and the way data is shared in the configuration section named \texttt{mapping}. As described in Section~\ref{sec:data-mapping}, two kinds of mapping are available:
 
 \begin{itemize}
-	\item \texttt{consistent}: the value of a node at the one grid is the same as the value of the corresponding node (or nodes) at the other grid. In general the number of fluid nodes is at least the same or, more often, exceeds the nodes of the structure, so a single structural node is associated to several fluid nodes. The mapping of displacements is consistent: in the simplest case, all fluid nodes experience the same displacement of a single solid node, otherwise an interpolation is performed (see Section \ref{sec:data-mapping} for a detailed explanation and Figure \ref{fig:consistent} for an example).
-	\item \texttt{conservative}: in the same conditions as before, forces are mapped from multiple fluid nodes to a single solid node in an additive manner (see Section \ref{sec:data-mapping} and Figure \ref{fig:conservative} for an example).
+	\item \texttt{consistent}: the value of a node at the one grid is the same as the value of the corresponding node (or nodes) at the other grid. In general the number of fluid nodes is at least the same or, more often, exceeds the nodes of the structure, so a single structural node is associated to several fluid nodes. The mapping of displacements is consistent: in the simplest case, all fluid nodes experience the same displacement of a single solid node, otherwise an interpolation is performed (see Section~\ref{sec:data-mapping} for a detailed explanation and Figure~\ref{fig:consistent} for an example).
+	\item \texttt{conservative}: in the same conditions as before, forces are mapped from multiple fluid nodes to a single solid node in an additive manner (see Section~\ref{sec:data-mapping} and Figure~\ref{fig:conservative} for an example).
 \end{itemize} 
 
 Along with the mapping strategy, a method must be defined: \texttt{nearest-neighbor}, \texttt{nearest-projection}, \texttt{rbf} (see Section \ref{sec:data-mapping}). For the latest method, preCICE implements a wide variety of basis functions, with Gaussian and thin plate splines being the most widely used.
@@ -379,7 +377,7 @@ Some configuration files are needed:
 
 \begin{itemize}
 	\item each adapter generally needs its own configuration file. It normally contains information about the boundaries (wet-surface) used for the coupling, the names of exchanged data, mesh and the name of the common preCICE configuration file, together with other parameters, specific to the adapter. The one for the MBDyn adapter will be described in more detail in Chapter \ref{cha:adapter} and in Appendix \ref{app:mbd-config-file}.
-	\item preCICE configuration file: This is an XML file and each participant points at it. It defines all the information relevant to the simulation:
+	\item preCICE configuration file: This is an \acrshort{xml} file and each participant points at it. It defines all the information relevant to the simulation:
 	\begin{itemize}
 		\item type and name of exchanged data and meshes over which those data are passed,
 		\item which solvers participate in the simulation, which data produce or consume, and how the mapping is performed,
@@ -401,7 +399,7 @@ The result is an \textit{adapter}, which can be the modified and recompiled orig
 
 While preCICE is written in C++, there exist APIs also for other languages, so that the adapter can be written also in C, Fortran or Python.
 
-A coupling consists of a configuration and an initialization phase, multiple coupling advancements and a finalization phase: the general structure of an adapter can be found in \ref{sec:adapter-code}.
+A coupling consists of a configuration and an initialization phase, multiple coupling advancements and a finalization phase: the general structure of an adapter can be found in Appendix~\ref{sec:adapter-code}.
 
 
 \subsection{Official Adapters}

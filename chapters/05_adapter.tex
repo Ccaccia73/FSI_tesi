@@ -2,7 +2,7 @@
 \label{cha:adapter}
 
 
-To prepare an existing simulation code for coupling, \acrshort{precice} has to be integrated with the solver, using  API described in Section \ref{sec:pc-api} and in Appendix \ref{sec:api-code}. The ``glue-code'' required for this operation is called \textit{adapter}, as depicted in Figure \ref{fig:adapter-scheme}.
+To prepare an existing simulation code for coupling, \acrshort{precice} has to be integrated with the solver, using  an \acrshort{api} described in Section~\ref{sec:pc-api} and in Appendix~\ref{sec:api-code}. The ``glue-code'' required for this operation is called \textit{adapter}, as depicted in Figure~\ref{fig:adapter-scheme}.
 
 
 \begin{figure}[htbp!]
@@ -189,7 +189,7 @@ An example of input file is given in Appendix \ref{app:mbd-config-file}. The typ
         \item \texttt{mesh}: location of the file containing the points mapped in MBDyn,
         \item \texttt{mbdyn-input}: input file name to be passed to MBDyn,
         \item \texttt{node-socket}: name of the socket to exchange data between the adapter and MBDyn (the name has been made configurable to allow different simulations to run in parallel using different sockets: the user must take care to use the same name in the MBDyn input file),
-        \item \texttt{mbdyn-output}: location and prefix of all MBDyn related output files (see Section \ref{sec:mbd-output} and Appendix \ref{sec:mbdyn-output-file}).
+        \item \texttt{mbdyn-output}: location and prefix of all MBDyn related output files (see Section~\ref{sec:mbd-output} and Appendix~\ref{sec:mbdyn-output-file}).
     \end{itemize}
     \item Simulation:
     \begin{itemize}
@@ -227,7 +227,7 @@ An example of input file is given in Appendix \ref{app:mbd-config-file}. The typ
 \section{Output results}
 \label{sec:mbdyn-adapter-output}
 
-Besides the output strictly related to \acrshort{precice}, concerning information about convergence and number of iterations, or the output strictly related to the \acrshort{mbdyn} solution (see Appendix \ref{sec:mbdyn-output-file}), the adapter gives two types of output.
+Besides the output strictly related to \acrshort{precice}, concerning information about convergence and number of iterations, or the output strictly related to the \acrshort{mbdyn} solution (see Appendix~\ref{sec:mbdyn-output-file}), the adapter gives two types of output.
 
 The information concerning the interface mesh points is saved in \texttt{vtu} file format, which is a binary \acrshort{xml} VTK  file format used to store data on unstructured grids of points. A sequential number corresponding to the current iteration is appended to the name of the file so that any visualization software (e.g. \textit{ParaView}\footnote{\href{https://www.paraview.org/}{paraview.org}}) can load the whole dataset as a time series. Each file contains the following vector data:
 
