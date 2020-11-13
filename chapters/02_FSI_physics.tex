@@ -3,7 +3,7 @@
 \label{cha:physics}
 
 
-Dynamic models of solids or fluids aim at describing the evolution of an initial configuration through time. Structural mechanics and fluid dynamics use different perspectives when describing the motion of respectively a solid or a fluid particle. When dealing with \acrshort{fsi} problems the two approaches need to be combined in order to obtain a suitable description of the two domains and their interface: this aspect is treated in \ref{sec:desc-motion}.
+Dynamic models of solids or fluids aim at describing the evolution of an initial configuration through time. Structural mechanics and fluid dynamics use different perspectives when describing the motion of respectively a solid or a fluid particle. When dealing with \acrshort{fsi} problems, the two approaches need to be combined in order to obtain a suitable description of the two domains and their interface: this aspect is treated in \ref{sec:desc-motion}.
 
 As outlined in the introduction, the fluid and the solid domain of a FSI problem might be described by means of many different models: some of them are outlined in section \ref{sec:models}.  \textit{Dimensional analysis} and the use of dimensionless numbers is a powerful tool used to classify fluid dynamics problems: some of the principles used there can be applied to FSI problems in order to classify them: this can help define and classify FSI problems, as described in section \ref{sec:classification}.
 
@@ -40,7 +40,7 @@ computational domain. Within this approach, proper mesh refinement is crucial fo
 \subsection{Lagrangian perspective}
 \label{subsec:lagrange}
 
-A \textit{lagrangian observer} focuses on a single particles and follows it throughout the motion, as depicted in Figure \ref{fig:lagrangian}. Changes in the quantities of interest are observed at different spatial locations. 
+A \textit{Lagrangian observer} focuses on a single particle and follows it throughout the motion, as depicted in Figure \ref{fig:lagrangian}. Changes in the quantities of interest are observed at different spatial locations. 
 
 \begin{figure}[htbp!]
 	\centering
@@ -162,9 +162,9 @@ with $\mu$ being the dynamic viscosity and \textit{S} the rate of deformation te
 
 A detailed derivation of such equations and the theory beyond can be found for example in  \cite{quartapelle2013fluidodinamicaI} and \cite{quartapelle2013fluidodinamicaC} or in \cite{pope2001turbulent}. 
 
-The set of equations above, even with a Newtonian fluid model, lack some other information in order to form a closed set of \acrfull{pde}. A conductive heat flux model is needed  (e.g. Fourier’s Law), the caloric and thermodynamic equations of state have to be chosen, a proper turbulence model if needed (see \cite{pope2001turbulent}) and finally, the appropriate initial and boundary conditions for the problem \cite{galdi2011introduction} must be defined.
+The set of equations above, even with a Newtonian fluid model, lack some other information in order to form a closed set of \acrfull{pde}. A conductive heat flux model is needed  (e.g. Fourier’s Law), the caloric and thermodynamic equations of state have to be chosen, a proper turbulence model (if needed, see \cite{pope2001turbulent}) and finally, the appropriate initial and boundary conditions for the problem \cite{galdi2011introduction} must be defined.
 
-Simplifications can be done to obtain less sophisticated models such as: adiabatic, inviscid, incompressible, and many others. Dimensional Analysis is a powerful tool to determine to what extent some reduced models are meaningful, and it is widely used in fluid dynamics, as described in section \ref{sec:dimensional}. Most \acrshort{cfd} software codes allow to set up simulations with the most suitable model which can be coupled with a solid model to build a \acrshort{fsi} problem. Some further details are given in section \ref{sec:monolithic}. 
+Simplifications can be done to obtain less sophisticated flow models such as: adiabatic, inviscid, incompressible, and many others. Dimensional Analysis is a powerful tool to determine to what extent some reduced models are meaningful, and it is widely used in fluid dynamics, as described in section \ref{sec:dimensional}. Most \acrshort{cfd} software codes allow to set up simulations with the most suitable model which can be coupled with a solid model to build a \acrshort{fsi} problem. Some further details are given in section \ref{sec:monolithic}. 
 
 
 \subsection{Solid domain}
@@ -172,7 +172,7 @@ Simplifications can be done to obtain less sophisticated models such as: adiabat
 
 In solid mechanics, particles do not travel as much as they do in fluid dynamic problems, as described in \ref{subsec:lagrange}. For this reason, a Lagrangian perspective is generally used.  
 
-The  de-Saint Venant-Kirchhoff model \cite{ogden1997non} is very commonly used when describing the movement of a solid: it is also often used in FSI problems ad it is capable of handling large deformation. The material is considered:
+The  de-Saint Venant-Kirchhoff model \cite{ogden1997non} is very commonly used when describing the movement of a solid: it is also often used in FSI problems ad it is capable of handling large deformations. The material is considered:
 
 \begin{itemize}
 	\item \textit{homogeneous}: the material properties do not depend on the position of the particle
@@ -229,7 +229,7 @@ The equations introduced in section \ref{sec:solid} may be a tough task to solve
 The \textit{beam} model splits the description of the geometry into two sub-problems:
 \begin{enumerate}
 	\item a beam is defined by its \textit{reference line} and the movement (displacement and rotation) of the solid is completely defined by it (see Figure \ref{fig:beam-model}),
-	\item the beam \textit{cross section} is considered as a whole, its movement depends on the movement of the reference line, stresses are generalized into \textit{resultants} (axial, bending, shear, torsional) which represent the aggregate effect of all of the stresses acting on the cross section. The constitutive properties of the section (axial, shear, torsion and bending stiffness) allow to relate stresses and deformations (by means of VWP) and close the problem.
+	\item the beam \textit{cross section} is considered as a whole, its movement depends on the movement of the reference line, stresses are generalized into \textit{resultants} (axial, bending, shear, torsional) which represent the aggregate effect of all of the stresses acting on the cross section. The constitutive properties of the section (axial, shear, torsion and bending stiffness) allow to relate stresses and deformations (by means of \acrshort{vwp}) and close the problem.
 \end{enumerate}
 
 
